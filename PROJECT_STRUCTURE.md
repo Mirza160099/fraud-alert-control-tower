@@ -3,6 +3,7 @@
 ```text
 fraud-alert-control-tower/
   README.md
+  START_HERE_SEQUENCE.md
   PUBLISH_AND_REHEARSE.md
   index.html
   styles.css
@@ -49,7 +50,8 @@ fraud-alert-control-tower/
 ## What To Open First
 
 1. `README.md`
-2. `app/index.html` through a local web server
-3. `docs/governance/model_card.md`
-4. `docs/interview/interview_script.md`
-5. `presentation/fraud-alert-control-tower-executive-story.pptx`
+2. `START_HERE_SEQUENCE.md`
+3. `app/index.html` through a local web server
+4. `docs/governance/model_card.md`
+5. `docs/interview/interview_script.md`
+6. `presentation/fraud-alert-control-tower-executive-story.pptx`
