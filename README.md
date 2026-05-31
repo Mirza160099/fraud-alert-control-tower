@@ -163,7 +163,6 @@ Views:
 Run locally:
 
 ```powershell
-cd app
 python -m http.server 4173
 ```
 
@@ -176,8 +175,10 @@ http://localhost:4173
 Deploy to Vercel:
 
 ```text
-Use app as the Vercel project root.
+Use the repository root as the Vercel project root.
 ```
+
+If you already created a Vercel project with `app` as the root, that also works. The static app files are available in both places so Vercel can serve `index.html` reliably.
 
 ## Key Artifacts
 
@@ -186,6 +187,7 @@ Use app as the Vercel project root.
 - Explainability: `src/explainability.py`, `src/explain_model.py`
 - Web model export: `src/export_model_for_web.py`
 - Static app: `app`
+- Root static deployment files: `index.html`, `styles.css`, `app.js`, `model.json`, `dashboard-data.json`
 - Screenshots: `assets`
 - Modeling outputs: `artifacts/modeling`
 - Governance pack: `docs/governance`

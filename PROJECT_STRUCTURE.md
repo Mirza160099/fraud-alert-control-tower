@@ -4,6 +4,11 @@
 fraud-alert-control-tower/
   README.md
   PUBLISH_AND_REHEARSE.md
+  index.html
+  styles.css
+  app.js
+  model.json
+  dashboard-data.json
   requirements.txt
   src/
     fraud_pipeline.py

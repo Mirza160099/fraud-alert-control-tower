@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Fraud Alert Control Tower</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="workspace">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">JPMorgan-inspired fraud analytics</p>
+            <h1>Fraud Alert Control Tower</h1>
+          </div>
+          <div class="model-chip">
+            <span class="chip-label">Champion</span>
+            <strong id="modelName">Loading</strong>
+          </div>
+        </header>
+
+        <nav class="tabbar" aria-label="Control tower views">
+          <button class="tab-button active" type="button" data-tab="score">Score</button>
+          <button class="tab-button" type="button" data-tab="queue">Queue</button>
+          <button class="tab-button" type="button" data-tab="metrics">Metrics</button>
+          <button class="tab-button" type="button" data-tab="governance">Governance</button>
+        </nav>
+
+        <section id="scoreView" class="tab-view active">
+          <section class="content-grid">
+            <form id="transactionForm" class="panel input-panel">
+              <div class="panel-header">
+                <h2>Transaction Input</h2>
+                <button class="icon-button" type="button" id="loadScenario" aria-label="Load high-risk scenario" title="Load high-risk scenario">
+                  !
+                </button>
+              </div>
+
+              <div class="form-grid">
+                <label>
+                  Amount
+                  <input id="amount" name="amount" type="number" min="0" step="0.01" value="180.00" />
+                </label>
+
+                <label>
+                  Currency
+                  <select id="currency" name="currency"></select>
+                </label>
+
+                <label>
+                  Transaction country
+                  <select id="txn_country" name="txn_country"></select>
+                </label>
+
+                <label>
+                  Channel
+                  <select id="channel" name="channel"></select>
+                </label>
+
+                <label>
+                  Transaction hour
+                  <input id="txn_hour" name="txn_hour" type="number" min="0" max="23" step="1" value="22" />
+                </label>
+
+                <label>
+                  Geographic distance km
+                  <input id="geo_distance_km" name="geo_distance_km" type="number" min="0" step="0.1" value="2800" />
+                </label>
+
+                <label>
+                  Device risk score
+                  <input id="device_risk_score" name="device_risk_score" type="number" min="0" max="1" step="0.001" value="0.62" />
+                </label>
+
+                <label>
+                  Synthetic identity score
+                  <input id="synthetic_identity_score" name="synthetic_identity_score" type="number" min="0" max="1" step="0.001" value="0.38" />
+                </label>
+
+                <label>
+                  Merchant risk score
+                  <input id="merchant_risk_score" name="merchant_risk_score" type="number" min="0" max="1" step="0.001" value="0.52" />
+                </label>
+
+                <label>
+                  Merchant profile risk score
+                  <input id="merchant_profile_risk_score" name="merchant_profile_risk_score" type="number" min="0" max="1" step="0.001" value="0.48" />
+                </label>
+              </div>
+
+              <div class="actions">
+                <button class="primary-button" type="submit">
+                  Score transaction
+                </button>
+              </div>
+            </form>
+
+            <aside class="panel result-panel">
+              <div class="panel-header">
+                <h2>Decision</h2>
+                <span id="thresholdLabel" class="muted-label">Threshold</span>
+              </div>
+
+              <div id="decisionBadge" class="decision-badge monitor">
+                <span id="decisionText">Ready</span>
+                <strong id="probabilityText">0.000</strong>
+              </div>
+
+              <div class="metric-row">
+                <div>
+                  <span>Priority</span>
+                  <strong id="priorityText">Monitor</strong>
+                </div>
+                <div>
+                  <span>Queue policy</span>
+                  <strong id="capacityText">5%</strong>
+                </div>
+              </div>
+
+              <div class="explanation-box">
+                <h3>Why</h3>
+                <ol id="reasonList"></ol>
+              </div>
+            </aside>
+          </section>
+
+          <section class="panel lower-panel">
+            <div class="panel-header">
+              <h2>Top Features In This Score</h2>
+              <span class="muted-label">Local sensitivity</span>
+            </div>
+            <div id="featureBars" class="feature-bars"></div>
+          </section>
+        </section>
+
+        <section id="queueView" class="tab-view">
+          <section class="kpi-grid">
+            <div class="panel kpi-card">
+              <span>Review queue</span>
+              <strong id="queueSize">0</strong>
+            </div>
+            <div class="panel kpi-card">
+              <span>Frauds in queue</span>
+              <strong id="fraudsInQueue">0</strong>
+            </div>
+            <div class="panel kpi-card">
+              <span>Queue hit rate</span>
+              <strong id="queueHitRate">0%</strong>
+            </div>
+            <div class="panel kpi-card">
+              <span>Missed by old alert</span>
+              <strong id="missedOldAlerts">0</strong>
+            </div>
+          </section>
+
+          <section class="panel queue-panel">
+            <div class="panel-header">
+              <h2>Highest-Risk Cases</h2>
+              <span class="muted-label">Investigator queue</span>
+            </div>
+            <div id="caseList" class="case-list"></div>
+          </section>
+        </section>
+
+        <section id="metricsView" class="tab-view">
+          <section class="content-grid">
+            <section class="panel">
+              <div class="panel-header">
+                <h2>Model Comparison</h2>
+                <span class="muted-label">Held-out test set</span>
+              </div>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Model</th>
+                      <th>Precision</th>
+                      <th>Recall</th>
+                      <th>PR-AUC</th>
+                      <th>Reviews</th>
+                    </tr>
+                  </thead>
+                  <tbody id="modelComparisonRows"></tbody>
+                </table>
+              </div>
+            </section>
+
+            <section class="panel">
+              <div class="panel-header">
+                <h2>Feature Importance</h2>
+                <span class="muted-label">Permutation PR-AUC</span>
+              </div>
+              <div id="globalFeatureBars" class="feature-bars compact"></div>
+            </section>
+          </section>
+
+          <section class="panel lower-panel">
+            <div class="panel-header">
+              <h2>Capacity Thresholds</h2>
+              <span class="muted-label">5% review policy</span>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Model</th>
+                    <th>Threshold</th>
+                    <th>Test reviews</th>
+                    <th>Hit rate</th>
+                    <th>Fraud capture</th>
+                    <th>Exact top-K hit</th>
+                  </tr>
+                </thead>
+                <tbody id="capacityRows"></tbody>
+              </table>
+            </div>
+          </section>
+        </section>
+
+        <section id="governanceView" class="tab-view">
+          <section class="kpi-grid governance-kpis">
+            <div class="panel kpi-card">
+              <span>Model use</span>
+              <strong>Decision support</strong>
+            </div>
+            <div class="panel kpi-card">
+              <span>Data status</span>
+              <strong>Synthetic</strong>
+            </div>
+            <div class="panel kpi-card">
+              <span>Human review</span>
+              <strong>Required</strong>
+            </div>
+            <div class="panel kpi-card">
+              <span>Production status</span>
+              <strong>Prototype</strong>
+            </div>
+          </section>
+
+          <section class="content-grid">
+            <section class="panel governance-panel">
+              <div class="panel-header">
+                <h2>Model Card Summary</h2>
+                <span class="muted-label">Responsible AI</span>
+              </div>
+              <dl class="governance-list">
+                <div>
+                  <dt>Intended use</dt>
+                  <dd>Prioritize transaction review queues and provide investigator-facing explanations.</dd>
+                </div>
+                <div>
+                  <dt>Not approved for</dt>
+                  <dd>Automatic account blocking, eligibility decisions, or production use without real-data validation.</dd>
+                </div>
+                <div>
+                  <dt>Primary controls</dt>
+                  <dd>Leakage prevention, threshold validation, explainability, human review, and queue monitoring.</dd>
+                </div>
+              </dl>
+            </section>
+
+            <section class="panel governance-panel">
+              <div class="panel-header">
+                <h2>Operating Policy</h2>
+                <span class="muted-label">Threshold memo</span>
+              </div>
+              <dl class="governance-list">
+                <div>
+                  <dt>Recommended threshold</dt>
+                  <dd id="governanceThreshold">0.780</dd>
+                </div>
+                <div>
+                  <dt>Target capacity</dt>
+                  <dd id="governanceCapacity">5%</dd>
+                </div>
+                <div>
+                  <dt>Trade-off</dt>
+                  <dd>Higher capture than the old alert rule, with more false positives requiring investigator capacity.</dd>
+                </div>
+              </dl>
+            </section>
+          </section>
+
+          <section class="panel lower-panel">
+            <div class="panel-header">
+              <h2>Monitoring Controls</h2>
+              <span class="muted-label">Operational governance</span>
+            </div>
+            <div class="control-grid">
+              <div>Queue size vs staffing capacity</div>
+              <div>Hit rate and fraud capture trend</div>
+              <div>False positives by country and channel</div>
+              <div>Score distribution drift</div>
+              <div>Top explanation driver drift</div>
+              <div>Investigator outcome feedback</div>
+            </div>
+          </section>
+        </section>
+      </section>
+    </main>
+
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>

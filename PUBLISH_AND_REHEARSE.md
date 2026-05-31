@@ -46,8 +46,8 @@ Replace `YOUR_USERNAME` with your GitHub username.
 In Vercel:
 
 1. Import the GitHub repository.
-2. Set the project root directory to `app`.
-3. Keep the default static-site settings.
+2. Set the project root directory to `./`.
+3. Set framework preset to `Other`.
 4. Deploy.
 5. Open the deployed URL and test all tabs.
 
@@ -58,6 +58,8 @@ Expected smoke test:
 - Decision says `Review as fraud risk`.
 - Priority is `Critical`.
 - Queue, Metrics, and Governance tabs render.
+
+If Vercel shows a 404, check that the project root is `./` and that `index.html` is visible in the deployment file list. The static app files are also duplicated in `app/` as a fallback.
 
 ## 5. Update README With Live Link
 

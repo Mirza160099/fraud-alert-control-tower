@@ -2,13 +2,13 @@
 
 ## Deployment Folder
 
-Use this folder as the Vercel project root:
+Use the repository root as the Vercel project root:
 
 ```text
-outputs/step_05_vercel_app
+.
 ```
 
-This folder contains:
+The root contains:
 
 - `index.html`
 - `styles.css`
@@ -28,7 +28,7 @@ No Python backend is required at runtime.
 
 ## Local Smoke Test
 
-From the app folder:
+From the repository root:
 
 ```powershell
 python -m http.server 4173
@@ -53,8 +53,8 @@ Expected smoke-test result:
 1. Push the project to GitHub.
 2. Go to Vercel.
 3. Import the GitHub repository.
-4. Set the project root to `outputs/step_05_vercel_app`.
-5. Use default static-site settings.
+4. Set the project root to `./`.
+5. Set framework preset to `Other`.
 6. Deploy.
 7. Open the deployed URL.
 8. Test Score, Queue, Metrics, and Governance views.

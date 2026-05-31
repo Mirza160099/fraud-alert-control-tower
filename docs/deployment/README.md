@@ -1,6 +1,6 @@
 # Deployment Notes
 
-Use `app` as the Vercel project root.
+Use the repository root, `./`, as the Vercel project root.
 
 The app is static and runs in the browser using:
 
@@ -9,3 +9,5 @@ The app is static and runs in the browser using:
 - `app.js`
 
 No Python server is required for the deployed app.
+
+Fallback: the same static app files also exist under `app/`. If you deploy from that folder, set the Vercel root directory to `app`.
