@@ -1,0 +1,84 @@
+{
+  "geo_distance_km": {
+    "type": "numeric",
+    "min": 0.0,
+    "max": 16211.8,
+    "median": 17.1,
+    "mean": 300.5912
+  },
+  "synthetic_identity_score": {
+    "type": "numeric",
+    "min": 0.0,
+    "max": 0.741,
+    "median": 0.163,
+    "mean": 0.19123791287697461
+  },
+  "merchant_risk_score": {
+    "type": "numeric",
+    "min": 0.012,
+    "max": 0.721,
+    "median": 0.221,
+    "mean": 0.2568776
+  },
+  "txn_hour": {
+    "type": "numeric",
+    "min": 0.0,
+    "max": 23.0,
+    "median": 11.0,
+    "mean": 11.413
+  },
+  "device_risk_score": {
+    "type": "numeric",
+    "min": 0.006,
+    "max": 0.895,
+    "median": 0.268,
+    "mean": 0.2889332
+  },
+  "merchant_profile_risk_score": {
+    "type": "numeric",
+    "min": 0.012,
+    "max": 0.721,
+    "median": 0.228,
+    "mean": 0.2603312
+  },
+  "transaction_amount_usd": {
+    "type": "numeric",
+    "min": 2.12,
+    "max": 2845.7,
+    "median": 54.96,
+    "mean": 90.439792
+  },
+  "amount_log1p": {
+    "type": "numeric",
+    "min": 1.1378330018213911,
+    "max": 7.953915707647822,
+    "median": 4.024637149797281,
+    "mean": 4.026206835048433
+  },
+  "txn_country": {
+    "type": "categorical",
+    "categories": [
+      "AE",
+      "BR",
+      "CA",
+      "DE",
+      "IN",
+      "NG",
+      "SG",
+      "UK",
+      "US"
+    ],
+    "default": "AE"
+  },
+  "channel": {
+    "type": "categorical",
+    "categories": [
+      "Card Not Present",
+      "Card Present",
+      "Online Banking",
+      "P2P",
+      "Wire"
+    ],
+    "default": "Card Not Present"
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "target_capacity_rate": 0.05,
+  "selected_features": [
+    "geo_distance_km",
+    "txn_country",
+    "synthetic_identity_score",
+    "merchant_risk_score",
+    "channel",
+    "txn_hour",
+    "device_risk_score",
+    "merchant_profile_risk_score",
+    "transaction_amount_usd",
+    "amount_log1p"
+  ],
+  "champion": {
+    "model_name": "adaboost_weighted",
+    "threshold": 0.7795058313393747,
+    "test_review_count": 74,
+    "test_queue_rate": 0.074,
+    "test_precision_hit_rate": 0.13513513513513514,
+    "test_recall_fraud_capture_rate": 0.25,
+    "test_f1": 0.17543859649122806,
+    "test_true_positives": 10,
+    "test_false_positives": 64,
+    "test_false_negatives": 30,
+    "test_exact_topk_review_count": 50,
+    "test_exact_topk_precision_hit_rate": 0.2,
+    "test_exact_topk_recall_fraud_capture_rate": 0.25,
+    "test_exact_topk_f1": 0.2222222222222222,
+    "test_exact_topk_true_positives": 10,
+    "test_exact_topk_false_positives": 40
+  },
+  "existing_alert_benchmark": {
+    "threshold": 0.5,
+    "accuracy": 0.954,
+    "precision": 0.36363636363636365,
+    "recall": 0.2,
+    "f1": 0.25806451612903225,
+    "roc_auc": 0.5927083333333334,
+    "average_precision_pr_auc": 0.10472727272727274,
+    "true_negatives": 946,
+    "false_positives": 14,
+    "false_negatives": 32,
+    "true_positives": 8
+  }
+}

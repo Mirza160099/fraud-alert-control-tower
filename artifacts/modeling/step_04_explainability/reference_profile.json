@@ -1,0 +1,12 @@
+{
+  "geo_distance_km": 17.6,
+  "synthetic_identity_score": 0.16,
+  "merchant_risk_score": 0.221,
+  "txn_hour": 12.0,
+  "device_risk_score": 0.268,
+  "merchant_profile_risk_score": 0.225,
+  "transaction_amount_usd": 55.425,
+  "amount_log1p": 4.032912224549842,
+  "txn_country": "US",
+  "channel": "Card Present"
+}

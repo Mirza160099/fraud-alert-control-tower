@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+
+# Local/editor state
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Large/private local inputs
+data/
+*.zip
+
+# Temporary outputs
+work/
+.pytest_cache/
