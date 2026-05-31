@@ -63,16 +63,10 @@ If Vercel shows a 404, check that the project root is `./` and that `index.html`
 
 ## 5. Update README With Live Link
 
-After Vercel gives you a URL, replace this README line:
+Current live demo:
 
 ```text
-Live demo: `TODO: add Vercel URL after deployment`
-```
-
-with:
-
-```markdown
-Live demo: [Fraud Alert Control Tower](https://your-vercel-url.vercel.app)
+https://fraud-alert-control-tower-5cic.vercel.app
 ```
 
 Then commit and push:

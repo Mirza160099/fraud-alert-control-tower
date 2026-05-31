@@ -6,7 +6,7 @@ JPMorgan-inspired fraud analytics project that prioritizes transaction alerts, e
 
 ## Links
 
-- Live demo: `TODO: add Vercel URL after deployment`
+- Live demo: [Fraud Alert Control Tower](https://fraud-alert-control-tower-5cic.vercel.app)
 - Executive deck: [`presentation/fraud-alert-control-tower-executive-story.pptx`](presentation/fraud-alert-control-tower-executive-story.pptx)
 - Governance docs: [`docs/governance`](docs/governance)
 - Interview script: [`docs/interview/interview_script.md`](docs/interview/interview_script.md)
