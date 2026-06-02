@@ -805,9 +805,17 @@ function championTrueNegatives(champion, existing) {
   return Math.max(0, existingTotal - championKnown);
 }
 
+function championComparisonRow() {
+  return state.dashboard.model_comparison.find(
+    (row) => row.model_name === state.dashboard.metrics.champion.model_name,
+  );
+}
+
 function renderAnalystMetrics() {
   const champion = state.dashboard.metrics.champion;
   const existing = state.dashboard.metrics.existing_alert_benchmark;
+  const championComparison = championComparisonRow();
+  const championPrAuc = Number(championComparison?.test_average_precision_pr_auc ?? 0);
   const championName = champion.model_name.replaceAll("_", " ");
   const championTn = championTrueNegatives(champion, existing);
   const championTotal =
@@ -823,7 +831,7 @@ function renderAnalystMetrics() {
 
   document.getElementById("championModelBadge").textContent = championName;
   document.getElementById("scorecardPrAuc").textContent = numberText(
-    champion.test_average_precision_pr_auc,
+    championPrAuc,
     3,
   );
   document.getElementById("scorecardPrAucBench").textContent =
@@ -862,7 +870,7 @@ function renderAnalystMetrics() {
   document.getElementById("oldTn").textContent = String(existing.true_negatives);
 
   const takeaways = [
-    `PR-AUC is the lead model-selection metric because fraud is rare; the champion reached ${numberText(champion.test_average_precision_pr_auc, 3)} versus ${numberText(existing.average_precision_pr_auc, 3)} for the old alert rule.`,
+    `PR-AUC is the lead model-selection metric because fraud is rare; the champion reached ${numberText(championPrAuc, 3)} versus ${numberText(existing.average_precision_pr_auc, 3)} for the old alert rule.`,
     `The champion captures ${percent(champion.test_recall_fraud_capture_rate)} of fraud in the test set, which is ${signedCount(incrementalFraud)} more caught fraud cases than the old alert benchmark.`,
     `The hit rate is ${percent(champion.test_precision_hit_rate)}, or about one fraud per ${reviewsPerFraud.toFixed(1)} reviewed cases, so investigator capacity remains part of the decision.`,
     `${signedCount(incrementalReviews)} extra reviews are accepted in exchange for higher capture; that is why the Business Impact panel translates model metrics into operating cost.`,
