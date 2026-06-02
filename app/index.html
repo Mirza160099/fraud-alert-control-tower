@@ -51,15 +51,18 @@
             <form id="transactionForm" class="panel input-panel">
               <div class="panel-header">
                 <h2>Transaction Input</h2>
-                <button class="icon-button" type="button" id="loadScenario" aria-label="Load high-risk scenario" title="Load high-risk scenario">
-                  !
-                </button>
+                <div class="scenario-buttons" aria-label="Scenario presets">
+                  <button class="scenario-button active" type="button" data-scenario="low">Low</button>
+                  <button class="scenario-button" type="button" data-scenario="medium">Medium</button>
+                  <button class="scenario-button" type="button" data-scenario="high">High</button>
+                  <button class="scenario-button" type="button" data-scenario="critical">Critical</button>
+                </div>
               </div>
 
               <div class="form-grid">
                 <label>
                   Amount
-                  <input id="amount" name="amount" type="number" min="0" step="0.01" value="180.00" />
+                  <input id="amount" name="amount" type="number" min="0" step="0.01" value="20.00" />
                 </label>
 
                 <label>
@@ -79,32 +82,32 @@
 
                 <label>
                   Transaction hour
-                  <input id="txn_hour" name="txn_hour" type="number" min="0" max="23" step="1" value="22" />
+                  <input id="txn_hour" name="txn_hour" type="number" min="0" max="23" step="1" value="12" />
                 </label>
 
                 <label>
                   Geographic distance km
-                  <input id="geo_distance_km" name="geo_distance_km" type="number" min="0" step="0.1" value="2800" />
+                  <input id="geo_distance_km" name="geo_distance_km" type="number" min="0" step="0.1" value="0" />
                 </label>
 
                 <label>
                   Device risk score
-                  <input id="device_risk_score" name="device_risk_score" type="number" min="0" max="1" step="0.001" value="0.62" />
+                  <input id="device_risk_score" name="device_risk_score" type="number" min="0" max="1" step="0.001" value="0.02" />
                 </label>
 
                 <label>
                   Synthetic identity score
-                  <input id="synthetic_identity_score" name="synthetic_identity_score" type="number" min="0" max="1" step="0.001" value="0.38" />
+                  <input id="synthetic_identity_score" name="synthetic_identity_score" type="number" min="0" max="1" step="0.001" value="0.02" />
                 </label>
 
                 <label>
                   Merchant risk score
-                  <input id="merchant_risk_score" name="merchant_risk_score" type="number" min="0" max="1" step="0.001" value="0.52" />
+                  <input id="merchant_risk_score" name="merchant_risk_score" type="number" min="0" max="1" step="0.001" value="0.02" />
                 </label>
 
                 <label>
                   Merchant profile risk score
-                  <input id="merchant_profile_risk_score" name="merchant_profile_risk_score" type="number" min="0" max="1" step="0.001" value="0.48" />
+                  <input id="merchant_profile_risk_score" name="merchant_profile_risk_score" type="number" min="0" max="1" step="0.001" value="0.02" />
                 </label>
               </div>
 

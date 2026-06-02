@@ -214,6 +214,31 @@ h3 {
   margin-bottom: 16px;
 }
 
+.scenario-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.scenario-button {
+  min-height: 34px;
+  padding: 0 10px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #fbfdfc;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 850;
+}
+
+.scenario-button.active {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: #fff;
+}
+
 .form-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -632,6 +657,10 @@ td {
     grid-template-columns: 1fr;
   }
 
+  .panel-header {
+    align-items: flex-start;
+  }
+
   .topbar {
     display: grid;
   }
@@ -680,6 +709,14 @@ td {
 
   .tab-button {
     min-width: 0;
+  }
+
+  .panel-header {
+    display: grid;
+  }
+
+  .scenario-buttons {
+    justify-content: flex-start;
   }
 
   .feature-row {

@@ -178,6 +178,7 @@ The app is a Vercel-style static browser application. It does not need Streamlit
 Views:
 
 - `Score`: user enters transaction details and receives a prediction, probability, priority tier, and explanation.
+- Scenario presets: Low, Medium, High, and Critical demonstrate that the model separates normal transactions from escalating fraud risk.
 - `Queue`: highest-risk cases are ranked for investigator review.
 - `Metrics`: model comparison, feature importance, and capacity thresholds.
 - `Governance`: model-card summary, threshold policy, and monitoring controls.

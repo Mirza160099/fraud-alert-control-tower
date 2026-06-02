@@ -38,6 +38,7 @@ Show:
 Say:
 
 > In the app, a user can enter transaction details. The live scenario strip updates the fraud probability, risk tier, and recommended investigator action as the inputs change.
+> I start with the Low preset to show the model does not automatically call everything fraud, then move through Medium, High, and Critical scenarios to show escalation.
 
 Show:
 

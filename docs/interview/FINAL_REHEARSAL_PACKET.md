@@ -41,9 +41,9 @@ Do not say:
 1. Open the GitHub README.
 2. Point to the live Vercel demo link.
 3. Open the live app.
-4. On the Score tab, load or show the high-risk scenario.
-5. Point to the live fraud probability, risk tier, and recommended action.
-6. Point to the priority: `Critical`.
+4. On the Score tab, show that the app opens on a low-risk normal transaction.
+5. Click Medium, High, and Critical to show escalation.
+6. Point to the live fraud probability, risk tier, and recommended action.
 7. Read the explanation: geographic distance and P2P channel.
 8. Open Queue.
 9. Explain the review queue and hit rate.
@@ -57,6 +57,7 @@ Do not say:
 ### Score
 
 > This is where a user enters transaction details. The app runs the exported model in the browser and returns a fraud-risk probability, priority tier, and explanation.
+> I added Low, Medium, High, and Critical presets so reviewers can see the model separate normal activity from escalating fraud risk.
 
 ### Queue
 

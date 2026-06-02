@@ -41,9 +41,10 @@ I would validate on real transaction data, add time-based backtesting, monitor d
 ## Demo Flow
 
 1. Open the README and explain the business problem.
-2. Show the app Score tab and load the high-risk scenario.
-3. Point to the live probability, risk tier, recommended action, and reasons.
-4. Open the Queue tab and explain review capacity.
-5. Open Metrics and explain why the enhanced depth-2 AdaBoost was selected.
-6. Open Governance and explain why this is decision support only.
-7. Close with the executive deck and the model-card/threshold memo.
+2. Show that the app opens on a low-risk normal transaction.
+3. Click Medium, High, and Critical presets to show the risk score escalating.
+4. Point to the live probability, risk tier, recommended action, and reasons.
+5. Open the Queue tab and explain review capacity.
+6. Open Metrics and explain why the enhanced depth-2 AdaBoost was selected.
+7. Open Governance and explain why this is decision support only.
+8. Close with the executive deck and the model-card/threshold memo.

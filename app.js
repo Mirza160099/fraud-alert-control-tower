@@ -316,25 +316,79 @@ function scoreCurrentForm() {
   renderFeatureBars(deltas);
 }
 
-function loadHighRiskScenario() {
-  document.getElementById("amount").value = "240";
-  document.getElementById("currency").value = "USD";
-  document.getElementById("txn_country").value = "BR";
-  document.getElementById("channel").value = "P2P";
-  document.getElementById("txn_hour").value = "4";
-  document.getElementById("geo_distance_km").value = "4200";
-  document.getElementById("device_risk_score").value = "0.72";
-  document.getElementById("synthetic_identity_score").value = "0.44";
-  document.getElementById("merchant_risk_score").value = "0.58";
-  document.getElementById("merchant_profile_risk_score").value = "0.55";
+const scenarioPresets = {
+  low: {
+    amount: "20.00",
+    currency: "USD",
+    txn_country: "US",
+    channel: "Card Present",
+    txn_hour: "12",
+    geo_distance_km: "0",
+    device_risk_score: "0.02",
+    synthetic_identity_score: "0.02",
+    merchant_risk_score: "0.02",
+    merchant_profile_risk_score: "0.02",
+  },
+  medium: {
+    amount: "120.00",
+    currency: "USD",
+    txn_country: "UK",
+    channel: "Online Banking",
+    txn_hour: "12",
+    geo_distance_km: "300",
+    device_risk_score: "0.25",
+    synthetic_identity_score: "0.20",
+    merchant_risk_score: "0.25",
+    merchant_profile_risk_score: "0.25",
+  },
+  high: {
+    amount: "240.00",
+    currency: "USD",
+    txn_country: "BR",
+    channel: "P2P",
+    txn_hour: "4",
+    geo_distance_km: "4200",
+    device_risk_score: "0.72",
+    synthetic_identity_score: "0.44",
+    merchant_risk_score: "0.58",
+    merchant_profile_risk_score: "0.55",
+  },
+  critical: {
+    amount: "2500.00",
+    currency: "USD",
+    txn_country: "NG",
+    channel: "P2P",
+    txn_hour: "3",
+    geo_distance_km: "8000",
+    device_risk_score: "0.89",
+    synthetic_identity_score: "0.70",
+    merchant_risk_score: "0.72",
+    merchant_profile_risk_score: "0.72",
+  },
+};
+
+function applyScenarioPreset(name) {
+  const preset = scenarioPresets[name] ?? scenarioPresets.low;
+  Object.entries(preset).forEach(([id, value]) => {
+    document.getElementById(id).value = value;
+  });
+  document.querySelectorAll(".scenario-button").forEach((button) => {
+    button.classList.toggle("active", button.dataset.scenario === name);
+  });
   scoreCurrentForm();
+}
+
+function clearScenarioPreset() {
+  document.querySelectorAll(".scenario-button").forEach((button) => {
+    button.classList.remove("active");
+  });
 }
 
 function initializeForm(model) {
   const countrySchema = model.feature_schema.txn_country;
   const channelSchema = model.feature_schema.channel;
-  populateSelect("txn_country", countrySchema.categories, "BR");
-  populateSelect("channel", channelSchema.categories, "P2P");
+  populateSelect("txn_country", countrySchema.categories, "US");
+  populateSelect("channel", channelSchema.categories, "Card Present");
   populateSelect("currency", Object.keys(model.currency_rates_to_usd), "USD");
 
   document.getElementById("modelName").textContent = model.model_name.replaceAll("_", " ");
@@ -346,9 +400,18 @@ function initializeForm(model) {
     event.preventDefault();
     scoreCurrentForm();
   });
-  document.getElementById("transactionForm").addEventListener("input", scoreCurrentForm);
-  document.getElementById("transactionForm").addEventListener("change", scoreCurrentForm);
-  document.getElementById("loadScenario").addEventListener("click", loadHighRiskScenario);
+  document.getElementById("transactionForm").addEventListener("input", () => {
+    clearScenarioPreset();
+    scoreCurrentForm();
+  });
+  document.getElementById("transactionForm").addEventListener("change", () => {
+    clearScenarioPreset();
+    scoreCurrentForm();
+  });
+  document.querySelectorAll(".scenario-button").forEach((button) => {
+    button.addEventListener("click", () => applyScenarioPreset(button.dataset.scenario));
+  });
+  applyScenarioPreset("low");
 }
 
 function initializeTabs() {
