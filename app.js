@@ -115,10 +115,32 @@ function predictProbability(input, model = state.model) {
 }
 
 function classifyPriority(probability, threshold) {
-  if (probability >= Math.max(0.8, threshold)) return "Critical";
-  if (probability >= Math.max(0.6, threshold)) return "High";
-  if (probability >= threshold) return "Standard Review";
-  return "Monitor";
+  if (probability >= Math.max(0.82, threshold)) {
+    return {
+      tier: "Critical",
+      action: "Immediate review",
+      className: "critical",
+    };
+  }
+  if (probability >= threshold) {
+    return {
+      tier: "High",
+      action: "Review as fraud risk",
+      className: "high",
+    };
+  }
+  if (probability >= 0.35) {
+    return {
+      tier: "Medium",
+      action: "Monitor closely",
+      className: "medium",
+    };
+  }
+  return {
+    tier: "Low",
+    action: "Likely legitimate",
+    className: "low",
+  };
 }
 
 function readFormInput() {
@@ -261,18 +283,12 @@ function buildBarRow(nameText, value, maxValue, valueText, negative = false) {
 }
 
 function renderDecision(probability, priority) {
-  const threshold = state.model.threshold;
-  const isReview = probability >= threshold;
   const badge = document.getElementById("decisionBadge");
-  badge.className = `decision-badge ${
-    priority === "Critical" ? "critical" : isReview ? "review" : "monitor"
-  }`;
+  badge.className = `decision-badge ${priority.className}`;
 
-  document.getElementById("decisionText").textContent = isReview
-    ? "Review as fraud risk"
-    : "Monitor as likely legitimate";
+  document.getElementById("decisionText").textContent = `${priority.tier} fraud risk`;
   document.getElementById("probabilityText").textContent = probability.toFixed(3);
-  document.getElementById("priorityText").textContent = priority;
+  document.getElementById("priorityText").textContent = priority.action;
 }
 
 function scoreCurrentForm() {

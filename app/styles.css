@@ -259,12 +259,20 @@ select:focus {
   line-height: 0.9;
 }
 
+.decision-badge.low,
 .decision-badge.monitor {
   background: #eef8f0;
   border-color: #bad7c0;
   color: var(--ok);
 }
 
+.decision-badge.medium {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+  color: #1d4ed8;
+}
+
+.decision-badge.high,
 .decision-badge.review {
   background: #fff7ed;
   border-color: #fed7aa;
