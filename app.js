@@ -315,6 +315,8 @@ function initializeForm(model) {
     event.preventDefault();
     scoreCurrentForm();
   });
+  document.getElementById("transactionForm").addEventListener("input", scoreCurrentForm);
+  document.getElementById("transactionForm").addEventListener("change", scoreCurrentForm);
   document.getElementById("loadScenario").addEventListener("click", loadHighRiskScenario);
 }
 
