@@ -37,7 +37,7 @@ Show:
 
 Say:
 
-> In the app, a user can enter transaction details. This high-risk example produces a fraud probability around 0.841 and is marked Critical.
+> In the app, a user can enter transaction details. The live scenario strip updates the fraud probability, risk tier, and recommended investigator action as the inputs change.
 
 Show:
 
@@ -50,7 +50,7 @@ Show:
 
 Say:
 
-> The Queue tab turns model scores into investigator workflow. The Metrics tab shows model comparison. I selected AdaBoost because it balanced F1 performance with review queue discipline.
+> The Queue tab turns model scores into investigator workflow. The Metrics tab shows model comparison. I selected the enhanced depth-2 AdaBoost because it improved PR-AUC and made the live risk score smoother while keeping review queue discipline.
 
 Show:
 

@@ -149,6 +149,57 @@ h3 {
   display: block;
 }
 
+.live-strip {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0;
+  padding: 0;
+  margin-bottom: 18px;
+  overflow: hidden;
+}
+
+.live-strip div {
+  min-height: 78px;
+  display: grid;
+  align-content: center;
+  gap: 8px;
+  padding: 14px 16px;
+  border-right: 1px solid var(--line);
+}
+
+.live-strip div:last-child {
+  border-right: 0;
+}
+
+.live-strip span {
+  color: var(--muted);
+  font-size: 0.76rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.live-strip strong {
+  color: var(--ink);
+  font-size: 1.05rem;
+  line-height: 1.1;
+}
+
+.live-strip strong.low {
+  color: var(--ok);
+}
+
+.live-strip strong.medium {
+  color: #1d4ed8;
+}
+
+.live-strip strong.high {
+  color: var(--warn);
+}
+
+.live-strip strong.critical {
+  color: var(--danger);
+}
+
 .panel {
   border-radius: 8px;
   padding: 18px;
@@ -557,13 +608,31 @@ td {
   .kpi-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
+  .live-strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .live-strip div:nth-child(2) {
+    border-right: 0;
+  }
 }
 
 @media (max-width: 640px) {
   .form-grid,
   .metric-row,
-  .kpi-grid {
+  .kpi-grid,
+  .live-strip {
     grid-template-columns: 1fr;
+  }
+
+  .live-strip div {
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .live-strip div:last-child {
+    border-bottom: 0;
   }
 
   .tabbar {

@@ -27,6 +27,25 @@
           <button class="tab-button" type="button" data-tab="governance">Governance</button>
         </nav>
 
+        <section class="panel live-strip" aria-live="polite">
+          <div>
+            <span>Live transaction risk</span>
+            <strong id="liveRiskTier">Loading</strong>
+          </div>
+          <div>
+            <span>Fraud probability</span>
+            <strong id="liveProbability">0.000</strong>
+          </div>
+          <div>
+            <span>Recommended action</span>
+            <strong id="liveAction">Loading</strong>
+          </div>
+          <div>
+            <span>Portfolio evidence</span>
+            <strong id="liveModelName">Loading</strong>
+          </div>
+        </section>
+
         <section id="scoreView" class="tab-view active">
           <section class="content-grid">
             <form id="transactionForm" class="panel input-panel">
@@ -268,7 +287,7 @@
               <dl class="governance-list">
                 <div>
                   <dt>Recommended threshold</dt>
-                  <dd id="governanceThreshold">0.780</dd>
+                  <dd id="governanceThreshold">0.798</dd>
                 </div>
                 <div>
                   <dt>Target capacity</dt>

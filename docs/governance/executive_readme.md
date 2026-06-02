@@ -28,13 +28,13 @@ Use this line:
 
 ## Key Numbers
 
-- Champion model: `adaboost_weighted`
-- Recommended threshold: `0.7795`
+- Champion model: `adaboost_depth2_weighted`
+- Recommended threshold: `0.7977`
 - Target review capacity: `5%`
 - Test hit rate at threshold: `13.5%`
 - Test fraud capture at threshold: `25.0%`
 - Exact top-5% queue hit rate: `20.0%`
-- Exact top-5% fraud capture: `25.0%`
+- Exact top-5% fraud capture: `22.5%`
 
 ## Important Honesty Point
 

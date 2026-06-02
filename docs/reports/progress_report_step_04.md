@@ -11,8 +11,8 @@ The method has two parts:
 
 ## Champion Model
 
-- Model: `adaboost_weighted`
-- Threshold: `0.7795`
+- Model: `adaboost_depth2_weighted`
+- Threshold: `0.7977`
 - Capacity policy: `validation_top_k_capacity`
 
 ## Global Feature Importance
@@ -21,26 +21,26 @@ Permutation importance is measured using held-out test-set PR-AUC, which is bett
 
 | Feature | Mean PR-AUC importance | Std |
 |---|---:|---:|
-| geo_distance_km | 0.047041 | 0.007455 |
-| transaction_amount_usd | 0.003613 | 0.007524 |
-| txn_country | 0.000000 | 0.000000 |
-| txn_hour | 0.000000 | 0.000000 |
-| device_risk_score | 0.000000 | 0.000000 |
-| merchant_profile_risk_score | 0.000000 | 0.000000 |
-| merchant_risk_score | -0.000198 | 0.000893 |
-| channel | -0.001443 | 0.015881 |
-| amount_log1p | -0.005690 | 0.007858 |
-| synthetic_identity_score | -0.022101 | 0.010949 |
+| geo_distance_km | 0.080645 | 0.013072 |
+| channel | 0.013804 | 0.003404 |
+| amount_log1p | 0.013607 | 0.014000 |
+| transaction_amount_usd | 0.006126 | 0.013127 |
+| txn_hour | 0.002593 | 0.005548 |
+| merchant_profile_risk_score | 0.000427 | 0.008817 |
+| txn_country | -0.000384 | 0.000669 |
+| merchant_risk_score | -0.003397 | 0.008153 |
+| device_risk_score | -0.005277 | 0.008441 |
+| synthetic_identity_score | -0.010814 | 0.017026 |
 
 ## Example Local Explanations
 
 | Transaction | Fraud probability | Priority | Top reason |
 |---|---:|---|---|
-| T9007602 | 0.8415 | Critical | geographic distance was 1525.900 compared with a typical value of 17.600; this increased the model risk score by 0.324. |
-| T9031208 | 0.8415 | Critical | geographic distance was 2131.000 compared with a typical value of 17.600; this increased the model risk score by 0.324. |
-| T9010735 | 0.8415 | Critical | geographic distance was 2848.100 compared with a typical value of 17.600; this increased the model risk score by 0.324. |
-| T9007479 | 0.8415 | Critical | geographic distance was 4862.800 compared with a typical value of 17.600; this increased the model risk score by 0.324. |
-| T9053891 | 0.8415 | Critical | geographic distance was 3169.700 compared with a typical value of 17.600; this increased the model risk score by 0.324. |
+| T9042990 | 0.8457 | Critical | geographic distance was 1370.600 compared with a typical value of 17.600; this increased the model risk score by 0.317. |
+| T9051526 | 0.8444 | Critical | geographic distance was 3163.700 compared with a typical value of 17.600; this increased the model risk score by 0.318. |
+| T9060368 | 0.8393 | Critical | geographic distance was 1475.600 compared with a typical value of 17.600; this increased the model risk score by 0.322. |
+| T9030658 | 0.8364 | Critical | geographic distance was 1287.700 compared with a typical value of 17.600; this increased the model risk score by 0.325. |
+| T9038232 | 0.8358 | Critical | geographic distance was 976.000 compared with a typical value of 17.600; this increased the model risk score by 0.309. |
 
 ## How To Explain This In An Interview
 

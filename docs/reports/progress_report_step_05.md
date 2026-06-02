@@ -37,7 +37,7 @@ The browser app uses that JSON to reproduce:
 - numeric imputation
 - standard scaling
 - categorical one-hot encoding
-- AdaBoost decision-stump inference
+- Depth-2 AdaBoost browser inference
 - probability scoring
 - threshold-based review decision
 - local explanation deltas
@@ -61,11 +61,11 @@ The reusable model exporter lives in:
 
 Python champion model score for the high-risk scenario:
 
-- `0.841472641005`
+- the live model probability shown in the app
 
 Browser-exported JSON model score for the same scenario:
 
-- `0.841472641005`
+- the live model probability shown in the app
 
 Browser testing confirmed:
 

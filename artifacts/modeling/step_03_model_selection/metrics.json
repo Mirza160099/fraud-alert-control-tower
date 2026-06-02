@@ -13,8 +13,8 @@
     "amount_log1p"
   ],
   "champion": {
-    "model_name": "adaboost_weighted",
-    "threshold": 0.7795058313393747,
+    "model_name": "adaboost_depth2_weighted",
+    "threshold": 0.7976891621674433,
     "test_review_count": 74,
     "test_queue_rate": 0.074,
     "test_precision_hit_rate": 0.13513513513513514,
@@ -24,11 +24,11 @@
     "test_false_positives": 64,
     "test_false_negatives": 30,
     "test_exact_topk_review_count": 50,
-    "test_exact_topk_precision_hit_rate": 0.2,
-    "test_exact_topk_recall_fraud_capture_rate": 0.25,
-    "test_exact_topk_f1": 0.2222222222222222,
-    "test_exact_topk_true_positives": 10,
-    "test_exact_topk_false_positives": 40
+    "test_exact_topk_precision_hit_rate": 0.18,
+    "test_exact_topk_recall_fraud_capture_rate": 0.225,
+    "test_exact_topk_f1": 0.2,
+    "test_exact_topk_true_positives": 9,
+    "test_exact_topk_false_positives": 41
   },
   "existing_alert_benchmark": {
     "threshold": 0.5,

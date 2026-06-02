@@ -6,8 +6,8 @@
 |---|---|
 | Project | Explainable Fraud Alert Prioritization and Investigation Control Tower |
 | Model purpose | Score transaction fraud risk and prioritize investigator review queues |
-| Champion model | `adaboost_weighted` |
-| Model family | AdaBoost classifier with weighted training |
+| Champion model | `adaboost_depth2_weighted` |
+| Model family | Depth-2 AdaBoost classifier with weighted training |
 | Primary users | Fraud operations analysts, investigators, risk analytics reviewers |
 | Decision type | Decision-support, not fully automated adverse action |
 | Current status | Prototype / capstone model using synthetic data |
@@ -102,8 +102,8 @@ Modeling controls:
 
 Champion operating policy:
 
-- Model: `adaboost_weighted`
-- Threshold: `0.7795`
+- Model: `adaboost_depth2_weighted`
+- Threshold: `0.7977`
 - Target review capacity: `5%`
 
 Held-out test performance at the selected threshold:
@@ -124,11 +124,11 @@ Exact top-5% queue performance:
 | Metric | Value |
 |---|---:|
 | Review count | 50 |
-| Precision / hit rate | 20.0% |
-| Recall / fraud capture | 25.0% |
-| F1 | 22.2% |
-| True positives | 10 |
-| False positives | 40 |
+| Precision / hit rate | 18.0% |
+| Recall / fraud capture | 22.5% |
+| F1 | 20.0% |
+| True positives | 9 |
+| False positives | 41 |
 
 ## Existing Alert Benchmark
 
@@ -146,7 +146,7 @@ Existing `alert_generated` performance on the same test split:
 Interpretation:
 
 - The existing alert rule is more precise but catches fewer fraud cases.
-- The champion model catches more fraud cases at the selected capacity setting, but increases false positives.
+- The champion model catches more fraud cases than the existing alert rule at the selected capacity setting, but increases false positives.
 - This is a business trade-off, not a purely technical win.
 
 ## Explainability

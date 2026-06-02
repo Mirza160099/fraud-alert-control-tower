@@ -289,6 +289,10 @@ function renderDecision(probability, priority) {
   document.getElementById("decisionText").textContent = `${priority.tier} fraud risk`;
   document.getElementById("probabilityText").textContent = probability.toFixed(3);
   document.getElementById("priorityText").textContent = priority.action;
+  document.getElementById("liveRiskTier").textContent = priority.tier;
+  document.getElementById("liveRiskTier").className = priority.className;
+  document.getElementById("liveProbability").textContent = probability.toFixed(3);
+  document.getElementById("liveAction").textContent = priority.action;
 }
 
 function scoreCurrentForm() {
@@ -324,6 +328,7 @@ function initializeForm(model) {
   populateSelect("currency", Object.keys(model.currency_rates_to_usd), "USD");
 
   document.getElementById("modelName").textContent = model.model_name.replaceAll("_", " ");
+  document.getElementById("liveModelName").textContent = model.model_name.replaceAll("_", " ");
   document.getElementById("thresholdLabel").textContent = `Threshold ${model.threshold.toFixed(3)}`;
   document.getElementById("capacityText").textContent = `${Math.round(model.target_capacity_rate * 100)}%`;
 

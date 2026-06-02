@@ -28,9 +28,9 @@ Do not say:
 >
 > Next, I selected the top 10 features using mutual information on training data only. The key signals included geographic distance, transaction country, synthetic identity score, merchant risk score, channel, transaction hour, device risk, merchant profile risk, and transaction amount.
 >
-> Then I compared several models: logistic regression, random forest, extra trees, gradient boosting, and AdaBoost. I selected AdaBoost because it gave the strongest F1 among the tested models while keeping the review queue more disciplined than the highest-recall random forest.
+> Then I compared several models: logistic regression, random forest, extra trees, gradient boosting, standard AdaBoost, and enhanced depth-2 AdaBoost. I selected the enhanced AdaBoost because it improved PR-AUC and produced smoother risk scores while keeping the review queue disciplined.
 >
-> After that, I tuned the threshold around investigator capacity. The recommended threshold was 0.7795. On the held-out test set, it routed 74 transactions for review and captured 25.0% of known fraud. This matters because thresholding is a business-control decision, not just a model setting.
+> After that, I tuned the threshold around investigator capacity. The recommended threshold was 0.7977. On the held-out test set, it routed 74 transactions for review and captured 25.0% of known fraud. This matters because thresholding is a business-control decision, not just a model setting.
 >
 > Finally, I exported the trained model into a static Vercel-style app. The app lets a user enter transaction details, returns a fraud probability, assigns a priority tier, and explains the main drivers. I also created a model card, threshold strategy memo, governance summary, and executive deck to show how the model should be reviewed responsibly.
 
@@ -40,13 +40,13 @@ Do not say:
 2. Point to the live Vercel demo link.
 3. Open the live app.
 4. On the Score tab, load or show the high-risk scenario.
-5. Point to the fraud probability around `0.841`.
+5. Point to the live fraud probability, risk tier, and recommended action.
 6. Point to the priority: `Critical`.
 7. Read the explanation: geographic distance and P2P channel.
 8. Open Queue.
 9. Explain the review queue and hit rate.
 10. Open Metrics.
-11. Explain why AdaBoost was chosen.
+11. Explain why enhanced AdaBoost was chosen.
 12. Open Governance.
 13. Say this is decision support only and not production-ready.
 
@@ -92,15 +92,15 @@ Best answer:
 
 > I wanted the model and app to remain explainable. A small feature set makes it easier to explain why a transaction enters the review queue.
 
-### Why AdaBoost?
+### Why Enhanced AdaBoost?
 
-> AdaBoost had the strongest F1 among the tested models and kept the review queue smaller than the highest-recall random forest.
+> The first AdaBoost model was too jumpy in the live app because it used stumps. The enhanced depth-2 version improved PR-AUC, gave smoother probabilities, and still kept the queue smaller than the highest-recall random forest.
 
 ### Why not random forest if it had higher recall?
 
 > Random forest captured more fraud but created a much larger review queue. In a real fraud team, capacity matters, so I selected a model with better operating discipline.
 
-### What does threshold 0.7795 mean?
+### What does threshold 0.7977 mean?
 
 > It is the probability cutoff used to decide which cases enter review. It was selected around investigator-capacity assumptions, not just model accuracy.
 
@@ -121,7 +121,7 @@ Best answer:
 5. Answer these five questions aloud:
    - What problem did I solve?
    - What cleaning did I do?
-   - Why AdaBoost?
+   - Why enhanced AdaBoost?
    - Why does thresholding matter?
    - Why is this not production-ready?
 

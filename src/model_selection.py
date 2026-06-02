@@ -30,6 +30,7 @@ from sklearn.metrics import (
     roc_auc_score,
 )
 from sklearn.pipeline import Pipeline
+from sklearn.tree import DecisionTreeClassifier
 
 from fraud_pipeline import (
     PROJECT_ROOT,
@@ -71,6 +72,31 @@ class FittedCandidate:
     pipeline: Pipeline
     validation_probabilities: np.ndarray
     test_probabilities: np.ndarray
+
+
+def build_depth2_adaboost() -> AdaBoostClassifier:
+    """Create a less jumpy AdaBoost model using shallow trees, not stumps."""
+
+    base_tree = DecisionTreeClassifier(
+        max_depth=2,
+        min_samples_leaf=20,
+        random_state=42,
+    )
+
+    try:
+        return AdaBoostClassifier(
+            estimator=base_tree,
+            n_estimators=300,
+            learning_rate=0.03,
+            random_state=42,
+        )
+    except TypeError:
+        return AdaBoostClassifier(
+            base_estimator=base_tree,
+            n_estimators=300,
+            learning_rate=0.03,
+            random_state=42,
+        )
 
 
 def get_model_candidates() -> list[ModelCandidate]:
@@ -117,6 +143,11 @@ def get_model_candidates() -> list[ModelCandidate]:
                 min_samples_leaf=20,
                 random_state=42,
             ),
+            use_sample_weight=True,
+        ),
+        ModelCandidate(
+            name="adaboost_depth2_weighted",
+            estimator=build_depth2_adaboost(),
             use_sample_weight=True,
         ),
         ModelCandidate(
@@ -290,6 +321,15 @@ def build_model_comparison_rows(
                 "validation_precision": threshold_info["precision"],
                 "validation_recall": threshold_info["recall"],
                 "validation_f1": threshold_info["f1"],
+                "validation_roc_auc": float(
+                    roc_auc_score(y_validation, fitted.validation_probabilities)
+                ),
+                "validation_average_precision_pr_auc": float(
+                    average_precision_score(
+                        y_validation,
+                        fitted.validation_probabilities,
+                    )
+                ),
                 "test_precision": test_metrics["precision"],
                 "test_recall": test_metrics["recall"],
                 "test_f1": test_metrics["f1"],
@@ -405,6 +445,7 @@ def build_capacity_rows(
 
 def choose_champion_from_capacity(
     capacity_results: pd.DataFrame,
+    model_comparison: pd.DataFrame,
     target_capacity_rate: float,
 ) -> pd.Series:
     """Choose the champion model at the selected investigator capacity."""
@@ -418,10 +459,24 @@ def choose_champion_from_capacity(
             f"No capacity rows found for target rate {target_capacity_rate}."
         )
 
-    # At a fixed review capacity, validation F1 balances hit rate and fraud
-    # capture. This is more operationally honest than choosing by accuracy.
+    target_rows = target_rows.merge(
+        model_comparison[
+            [
+                "model_name",
+                "validation_average_precision_pr_auc",
+                "validation_roc_auc",
+            ]
+        ],
+        on="model_name",
+        how="left",
+    )
+
+    # Validation PR-AUC is the primary ranking metric for rare-fraud models.
+    # Capacity F1 remains the operational tie-breaker because the model still
+    # needs to produce an investigator-sized queue.
     target_rows = target_rows.sort_values(
         [
+            "validation_average_precision_pr_auc",
             "validation_f1",
             "validation_recall_fraud_capture_rate",
             "validation_precision_hit_rate",
@@ -464,11 +519,12 @@ def write_step_03_report(
     """Write the Step 3 model-selection progress report."""
 
     model_table = model_comparison.sort_values(
-        "test_average_precision_pr_auc",
+        "validation_average_precision_pr_auc",
         ascending=False,
     )[
         [
             "model_name",
+            "validation_average_precision_pr_auc",
             "test_precision",
             "test_recall",
             "test_f1",
@@ -479,7 +535,8 @@ def write_step_03_report(
     ]
 
     model_lines = "\n".join(
-        "| {model_name} | {test_precision:.4f} | {test_recall:.4f} | "
+        "| {model_name} | {validation_average_precision_pr_auc:.4f} | "
+        "{test_precision:.4f} | {test_recall:.4f} | "
         "{test_f1:.4f} | {test_roc_auc:.4f} | "
         "{test_average_precision_pr_auc:.4f} | {test_review_count} |".format(
             **row
@@ -490,9 +547,25 @@ def write_step_03_report(
     target_capacity = champion_row["target_capacity_rate"]
     target_rows = capacity_results[
         capacity_results["target_capacity_rate"] == target_capacity
-    ].sort_values("validation_f1", ascending=False)
+    ].merge(
+        model_comparison[
+            [
+                "model_name",
+                "validation_average_precision_pr_auc",
+            ]
+        ],
+        on="model_name",
+        how="left",
+    ).sort_values(
+        [
+            "validation_average_precision_pr_auc",
+            "validation_f1",
+        ],
+        ascending=False,
+    )
     capacity_lines = "\n".join(
-        "| {model_name} | {validation_threshold:.4f} | "
+        "| {model_name} | {validation_average_precision_pr_auc:.4f} | "
+        "{validation_threshold:.4f} | "
         "{validation_precision_hit_rate:.4f} | "
         "{validation_recall_fraud_capture_rate:.4f} | "
         "{validation_f1:.4f} | {test_review_count} | "
@@ -517,16 +590,16 @@ We kept the Step 2 top-10 feature constraint so the final app remains explainabl
 
 ## Models Compared
 
-| Model | Test precision | Test recall | Test F1 | Test ROC-AUC | Test PR-AUC | Test reviews |
-|---|---:|---:|---:|---:|---:|---:|
+| Model | Validation PR-AUC | Test precision | Test recall | Test F1 | Test ROC-AUC | Test PR-AUC | Test reviews |
+|---|---:|---:|---:|---:|---:|---:|---:|
 {model_lines}
 
 ## Capacity Tuning at {target_capacity:.0%} Review Capacity
 
 The primary operating assumption is that investigators can review about {target_capacity:.0%} of transactions. Thresholds are chosen on validation data and then applied to the held-out test set. The last two columns also show an exact top-K queue policy, where the team simply reviews the highest-risk {target_capacity:.0%} of test transactions.
 
-| Model | Validation threshold | Validation hit rate | Validation fraud capture | Validation F1 | Test reviews | Test hit rate | Test fraud capture | Exact top-K hit rate | Exact top-K fraud capture |
-|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| Model | Validation PR-AUC | Validation threshold | Validation hit rate | Validation fraud capture | Validation F1 | Test reviews | Test hit rate | Test fraud capture | Exact top-K hit rate | Exact top-K fraud capture |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
 {capacity_lines}
 
 ## Champion Choice
@@ -624,6 +697,7 @@ def run_model_selection_pipeline(
 
     champion_row = choose_champion_from_capacity(
         capacity_results,
+        model_comparison,
         target_capacity_rate,
     )
     champion_name = champion_row["model_name"]

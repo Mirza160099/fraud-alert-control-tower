@@ -43,7 +43,7 @@ http://localhost:4173
 Expected smoke-test result:
 
 - The Score tab loads.
-- The high-risk scenario returns fraud probability around `0.841`.
+- The high-risk scenario returns a visible fraud probability, risk tier, and recommended action.
 - The decision says `Review as fraud risk`.
 - Priority is `Critical`.
 - Queue, Metrics, and Governance tabs render.

@@ -12,9 +12,9 @@ I started by profiling the synthetic transaction, customer, and merchant data. I
 
 For feature selection, I used training-only mutual information and kept the top 10 source features. The strongest features included geographic distance, transaction country, synthetic identity score, merchant risk score, channel, transaction hour, device risk score, merchant profile risk, amount, and log amount.
 
-I compared logistic regression, random forest, extra trees, gradient boosting, and AdaBoost. AdaBoost became the champion because it had the strongest F1 among the tested models while keeping the review queue more disciplined than the highest-recall random forest.
+I compared logistic regression, random forest, extra trees, gradient boosting, standard AdaBoost, and an enhanced depth-2 AdaBoost. The enhanced AdaBoost became the champion because it improved PR-AUC and produced smoother risk scores while still keeping the review queue disciplined.
 
-Then I tuned the threshold as a business-control decision. At the recommended threshold of 0.7795, the model routed 74 test transactions for review, captured 25.0% of fraud, and produced a 13.5% hit rate. I also documented the exact top-5% queue, which had a 20.0% hit rate and 25.0% fraud capture.
+Then I tuned the threshold as a business-control decision. At the recommended threshold of 0.7977, the model routed 74 test transactions for review, captured 25.0% of fraud, and produced a 13.5% hit rate. I also documented the exact top-5% queue, which had an 18.0% hit rate and 22.5% fraud capture.
 
 Finally, I exported the model to a static browser app. The app lets a user enter transaction details, predicts fraud risk, assigns a priority tier, and explains the top risk drivers. I also created a model card, threshold strategy memo, governance summary, and executive deck.
 
@@ -40,8 +40,8 @@ I would validate on real transaction data, add time-based backtesting, monitor d
 
 1. Open the README and explain the business problem.
 2. Show the app Score tab and load the high-risk scenario.
-3. Point to the `0.841` probability, Critical priority, and reasons.
+3. Point to the live probability, risk tier, recommended action, and reasons.
 4. Open the Queue tab and explain review capacity.
-5. Open Metrics and explain why AdaBoost was selected.
+5. Open Metrics and explain why the enhanced depth-2 AdaBoost was selected.
 6. Open Governance and explain why this is decision support only.
 7. Close with the executive deck and the model-card/threshold memo.

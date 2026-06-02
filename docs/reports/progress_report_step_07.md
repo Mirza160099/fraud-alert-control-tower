@@ -44,7 +44,7 @@ The model is documented as:
 
 Recommended prototype threshold:
 
-- `0.7795`
+- `0.7977`
 
 Target capacity:
 
@@ -59,7 +59,7 @@ Main trade-off:
 Verified in the in-app browser:
 
 - Governance tab opens correctly.
-- Threshold displays as `0.780`.
+- Threshold displays as `0.798`.
 - Capacity displays as `5%`.
 - Four governance KPI cards render.
 - Six monitoring controls render.

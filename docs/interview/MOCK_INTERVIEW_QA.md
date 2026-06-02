@@ -36,17 +36,17 @@ Mutual information can rank numeric and categorical features without assuming a 
 
 ## 9. What models did you compare?
 
-I compared logistic regression, random forest, extra trees, gradient boosting, and AdaBoost.
+I compared logistic regression, random forest, extra trees, gradient boosting, standard AdaBoost, and enhanced depth-2 AdaBoost.
 
-## 10. Why did AdaBoost win?
+## 10. Why did enhanced AdaBoost win?
 
-AdaBoost had the strongest F1 among the tested models and kept the review queue more disciplined than the random forest.
+The enhanced depth-2 AdaBoost improved PR-AUC and made the live risk score smoother than the original stump-based AdaBoost, while still keeping the review queue disciplined.
 
 ## 11. What does queue discipline mean?
 
 It means the model does not simply flag too many cases. In fraud operations, investigators have limited capacity, so a useful model must balance fraud capture with review volume.
 
-## 12. What does threshold 0.7795 mean?
+## 12. What does threshold 0.7977 mean?
 
 It is the fraud-risk probability cutoff used to route a transaction into review. It was selected around investigator-capacity assumptions.
 

@@ -52,8 +52,8 @@ The metrics tab now shows:
 
 The capacity table is sorted by validation F1, so the Step 3 champion appears first:
 
-- `adaboost_weighted`
-- threshold `0.780`
+- `adaboost_depth2_weighted`
+- threshold `0.798`
 - test reviews `74`
 - test hit rate `13.5%`
 - test fraud capture `25.0%`

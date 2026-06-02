@@ -2,7 +2,7 @@
 
 The Step 5 app is intentionally Vercel-friendly: it runs as static HTML, CSS,
 and JavaScript. To avoid a Python server in production, this exporter converts
-the fitted preprocessing pipeline and AdaBoost decision stumps into JSON.
+the fitted preprocessing pipeline and AdaBoost tree ensemble into JSON.
 """
 
 from __future__ import annotations
@@ -60,7 +60,7 @@ def to_plain_list(values) -> list:
 
 
 def export_tree(estimator) -> dict:
-    """Export one fitted decision tree from AdaBoost."""
+    """Export one fitted decision tree from the AdaBoost ensemble."""
 
     tree = estimator.tree_
     values = tree.value

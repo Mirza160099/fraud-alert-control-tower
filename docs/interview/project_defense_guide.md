@@ -54,9 +54,9 @@ Say:
 >
 > Then I selected the top 10 features using mutual information on training data only. The strongest signals included geographic distance, transaction country, synthetic identity score, merchant risk score, channel, transaction hour, device risk, merchant profile risk, and transaction amount.
 >
-> I trained a baseline and compared stronger models including logistic regression, random forest, extra trees, gradient boosting, and AdaBoost. I selected AdaBoost because it had the strongest F1 among the tested models while keeping the review queue more disciplined than the highest-recall random forest.
+> I trained a baseline and compared stronger models including logistic regression, random forest, extra trees, gradient boosting, standard AdaBoost, and an enhanced depth-2 AdaBoost. I selected the enhanced AdaBoost because it improved PR-AUC and produced smoother risk scores while keeping the review queue disciplined.
 >
-> After that, I tuned the threshold around investigator capacity. This is important because in fraud operations the threshold controls workload, false positives, missed fraud, and customer friction. The recommended threshold was 0.7795.
+> After that, I tuned the threshold around investigator capacity. This is important because in fraud operations the threshold controls workload, false positives, missed fraud, and customer friction. The recommended threshold was 0.7977.
 >
 > Finally, I exported the model into a static Vercel-style app. The user can enter transaction details, get a fraud probability, priority tier, and explanation. I also created governance documents and an executive deck to show how the model should be used responsibly.
 
@@ -70,9 +70,9 @@ Because it represents an existing alert decision. If I train on it, the model ma
 
 Mutual information is useful for ranking both numeric and categorical signals against the target without assuming a linear relationship. I used it on training data only to avoid test leakage.
 
-### Why AdaBoost?
+### Why Enhanced AdaBoost?
 
-AdaBoost gave the strongest F1 among the tested models while keeping the queue smaller than the random forest. Random forest captured more fraud but created a much larger review queue, which is operationally expensive.
+The first AdaBoost version used very shallow stumps, so the live score moved in large jumps. I upgraded to depth-2 AdaBoost because it improved PR-AUC, created smoother probabilities, and still kept the queue smaller than the highest-recall random forest.
 
 ### Why is the threshold a business decision?
 
@@ -92,7 +92,7 @@ Be ready to do these live:
 
 1. Open `src/fraud_pipeline.py` and point to the cleaning steps.
 2. Open `artifacts/modeling/step_02_baseline/top_10_features_mutual_info.csv` and explain the top features.
-3. Open `artifacts/modeling/step_03_model_selection/model_comparison.csv` and explain why AdaBoost was chosen.
+3. Open `artifacts/modeling/step_03_model_selection/model_comparison.csv` and explain why the enhanced depth-2 AdaBoost was chosen.
 4. Open the Vercel app and score the high-risk scenario.
 5. Open `docs/governance/model_card.md` and explain why it is decision support only.
 

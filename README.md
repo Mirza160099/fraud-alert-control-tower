@@ -94,19 +94,20 @@ The final comparison used the same top-10 feature set so the app remained explai
 
 | Model | Precision | Recall | F1 | PR-AUC | Reviews |
 |---|---:|---:|---:|---:|---:|
+| Enhanced AdaBoost depth-2 weighted | 15.3% | 32.5% | 20.8% | 0.141 | 85 |
 | Gradient boosting weighted | 11.6% | 40.0% | 18.0% | 0.130 | 138 |
 | AdaBoost weighted | 14.9% | 35.0% | 20.9% | 0.098 | 94 |
 | Random forest balanced | 7.7% | 50.0% | 13.3% | 0.092 | 261 |
 | Logistic regression balanced | 10.3% | 30.0% | 15.4% | 0.091 | 116 |
 | Extra trees balanced | 5.8% | 37.5% | 10.1% | 0.089 | 257 |
 
-Champion model: `adaboost_weighted`
+Champion model: `adaboost_depth2_weighted`
 
-Why AdaBoost: it gave the strongest F1 among the tested models while keeping the review queue more disciplined than the highest-recall random forest.
+Why this model: the original AdaBoost stump model was strong but produced jumpy probability bands. The upgraded depth-2 AdaBoost keeps the queue discipline, improves held-out PR-AUC, and gives a smoother fraud-risk score for the live app.
 
 ## Threshold Strategy
 
-Recommended review threshold: `0.7795`
+Recommended review threshold: `0.7977`
 
 At this threshold on the held-out test set:
 
@@ -121,8 +122,8 @@ At this threshold on the held-out test set:
 Exact top-5% queue:
 
 - Review count: `50`
-- Hit rate: `20.0%`
-- Fraud capture: `25.0%`
+- Hit rate: `18.0%`
+- Fraud capture: `22.5%`
 
 Business interpretation: the threshold is not just a modeling parameter. It is a staffing and operating-control decision.
 
@@ -132,9 +133,9 @@ The app explains each transaction with local sensitivity analysis against a refe
 
 Example high-risk output:
 
-- Risk probability: `0.841`
-- Prediction: review as fraud risk
-- Priority: Critical
+- Risk probability: updates from the live form
+- Prediction: low, medium, high, or critical fraud risk
+- Priority: shown as the recommended investigator action
 - Main reason: geographic distance was far above the typical reference value
 - Secondary reason: P2P channel increased model risk
 
@@ -219,6 +220,6 @@ The clean GitHub package does not include raw source data by default. The reposi
 
 ## Interview Pitch
 
-I built an explainable fraud alert prioritization system that treats fraud detection as an operational control problem. The project cleans and joins transaction, customer, and merchant data, selects the top 10 model features using training-only mutual information, compares several imbalanced-classification models, and selects an AdaBoost champion. I then tune the decision threshold around investigator capacity, export the model into a static Vercel-style app, and document governance through a model card, threshold memo, and responsible-AI summary.
+I built an explainable fraud alert prioritization system that treats fraud detection as an operational control problem. The project cleans and joins transaction, customer, and merchant data, selects the top 10 model features using training-only mutual information, compares several imbalanced-classification models, and selects an enhanced depth-2 AdaBoost champion. I then tune the decision threshold around investigator capacity, export the model into a static Vercel-style app, and document governance through a model card, threshold memo, and responsible-AI summary.
 
 The strongest part of the project is that it does not stop at prediction. It shows how a bank would decide which cases get reviewed, why they are risky, and what controls would be needed before production use.

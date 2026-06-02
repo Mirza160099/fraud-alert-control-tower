@@ -7,7 +7,7 @@ Use 2 or 3 bullets, not all of them.
 Recommended resume bullets:
 
 - Built an explainable fraud alert prioritization system using synthetic transaction, customer, and merchant data, covering data cleaning, feature engineering, model comparison, threshold tuning, deployment, and governance documentation.
-- Compared logistic regression, random forest, extra trees, gradient boosting, and AdaBoost for imbalanced fraud detection; selected an AdaBoost champion based on F1 performance and investigator queue discipline.
+- Compared logistic regression, random forest, extra trees, gradient boosting, standard AdaBoost, and enhanced depth-2 AdaBoost for imbalanced fraud detection; selected an enhanced AdaBoost champion based on PR-AUC and investigator queue discipline.
 - Deployed a Vercel-style static app that accepts transaction inputs, returns fraud probability, assigns priority tier, and explains local risk drivers without requiring a Python server at runtime.
 
 ## LinkedIn Featured Section

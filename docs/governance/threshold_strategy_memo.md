@@ -6,7 +6,7 @@ The fraud model should not be evaluated only as a binary classifier. In fraud op
 
 > Given limited investigator capacity, which transactions should be reviewed first?
 
-For this prototype, the recommended operating policy is to use the `adaboost_weighted` champion model with a threshold of `0.7795`, selected from validation data under a target review capacity of approximately `5%`.
+For this prototype, the recommended operating policy is to use the `adaboost_depth2_weighted` champion model with a threshold of `0.7977`, selected from validation data under a target review capacity of approximately `5%`.
 
 ## Business Objective
 
@@ -21,8 +21,8 @@ The threshold strategy balances:
 
 | Item | Value |
 |---|---:|
-| Champion model | `adaboost_weighted` |
-| Recommended threshold | `0.7795` |
+| Champion model | `adaboost_depth2_weighted` |
+| Recommended threshold | `0.7977` |
 | Target review capacity | 5% |
 | Test review count after threshold | 74 |
 | Test queue rate after threshold | 7.4% |
@@ -41,11 +41,11 @@ Exact top-5% test result:
 | Metric | Value |
 |---|---:|
 | Review count | 50 |
-| Hit rate | 20.0% |
-| Fraud capture | 25.0% |
-| F1 | 22.2% |
-| True positives | 10 |
-| False positives | 40 |
+| Hit rate | 18.0% |
+| Fraud capture | 22.5% |
+| F1 | 20.0% |
+| True positives | 9 |
+| False positives | 41 |
 
 Recommendation:
 
@@ -58,11 +58,11 @@ For the champion model:
 
 | Target capacity | Validation threshold | Test reviews | Test hit rate | Test fraud capture |
 |---:|---:|---:|---:|---:|
-| 1% | 0.8415 | 10 | 20.0% | 5.0% |
-| 2% | 0.8151 | 16 | 25.0% | 10.0% |
-| 5% | 0.7795 | 74 | 13.5% | 25.0% |
-| 10% | 0.5274 | 148 | 10.8% | 40.0% |
-| 15% | 0.5179 | 224 | 8.5% | 47.5% |
+| 1% | 0.8118 | 10 | 50.0% | 12.5% |
+| 2% | 0.8087 | 23 | 21.7% | 12.5% |
+| 5% | 0.7977 | 74 | 13.5% | 25.0% |
+| 10% | 0.5742 | 102 | 12.7% | 32.5% |
+| 15% | 0.5571 | 164 | 9.8% | 40.0% |
 
 Interpretation:
 
@@ -137,7 +137,7 @@ Threshold review should be triggered if:
 
 ## Final Recommendation
 
-Use `0.7795` as the prototype threshold for the demo and portfolio app.
+Use `0.7977` as the prototype threshold for the demo and portfolio app.
 
 For an interview, frame the threshold as a business-control decision:
 
