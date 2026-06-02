@@ -119,6 +119,10 @@ Best answer:
 
 > The blank form area became a live case summary. It helps a reviewer quickly see the primary signal, review focus, control measure, and evidence check, which makes the app feel closer to a real analyst workflow.
 
+### Why split risk drivers and protective signals?
+
+> A single top-feature list can be misleading for low-risk cases because the strongest local effect may reduce risk. Splitting the view shows what increases risk separately from what normalizes the transaction.
+
 ### What is the biggest limitation?
 
 > The data is synthetic, so this is not production-ready. It demonstrates the workflow and controls, but real deployment would require real-data validation, calibration, monitoring, and model-risk approval.

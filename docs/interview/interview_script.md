@@ -18,7 +18,7 @@ Then I tuned the threshold as a business-control decision. At the recommended th
 
 I also added an alert-economics sensitivity. Using illustrative assumptions of $8 per review and $500 avoided loss per captured fraud, the champion policy catches two more fraud cases than the existing alert benchmark, adds 52 reviews, and produces an illustrative net impact of $584. I would not present that as production ROI, but it shows how thresholding becomes a business decision.
 
-Finally, I exported the model to a static browser app. The app lets a user enter transaction details, predicts fraud risk, assigns a priority tier, produces an investigator brief, explains the top risk drivers, and recommends practical next actions such as monitoring, investigator review, step-up verification, or escalation. I also created a model card, threshold strategy memo, governance summary, and executive deck.
+Finally, I exported the model to a static browser app. The app lets a user enter transaction details, predicts fraud risk, assigns a priority tier, produces an investigator brief, separates risk-increasing features from protective signals, and recommends practical next actions such as monitoring, investigator review, step-up verification, or escalation. I also created a model card, threshold strategy memo, governance summary, and executive deck.
 
 ## Technical Deep Dive
 

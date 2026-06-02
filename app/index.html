@@ -182,10 +182,25 @@
 
           <section class="panel lower-panel">
             <div class="panel-header">
-              <h2>Top Features In This Score</h2>
+              <h2>Feature Impact For This Score</h2>
               <span class="muted-label">Local sensitivity</span>
             </div>
-            <div id="featureBars" class="feature-bars"></div>
+            <div class="feature-impact-grid">
+              <section class="feature-impact-group">
+                <div class="feature-group-header">
+                  <h3>Risk Drivers</h3>
+                  <span id="riskDriverCount">0 signals</span>
+                </div>
+                <div id="riskFeatureBars" class="feature-bars"></div>
+              </section>
+              <section class="feature-impact-group">
+                <div class="feature-group-header">
+                  <h3>Protective Signals</h3>
+                  <span id="protectiveSignalCount">0 signals</span>
+                </div>
+                <div id="protectiveFeatureBars" class="feature-bars"></div>
+              </section>
+            </div>
           </section>
         </section>
 

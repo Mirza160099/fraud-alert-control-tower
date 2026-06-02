@@ -376,25 +376,78 @@ function renderInvestigatorBrief(input, probability, priority, deltas) {
 }
 
 function renderFeatureBars(deltas) {
-  const featureBars = document.getElementById("featureBars");
-  featureBars.replaceChildren();
-  const visible = deltas
-    .slice()
-    .sort((a, b) => b.absoluteDelta - a.absoluteDelta)
-    .slice(0, 6);
-  const maxDelta = Math.max(...visible.map((item) => item.absoluteDelta), 0.001);
+  const riskBars = document.getElementById("riskFeatureBars");
+  const protectiveBars = document.getElementById("protectiveFeatureBars");
+  riskBars.replaceChildren();
+  protectiveBars.replaceChildren();
 
-  visible.forEach((item) => {
-    featureBars.appendChild(
+  const material = deltas
+    .slice()
+    .filter((item) => item.absoluteDelta > 0.001);
+  const riskDrivers = material
+    .filter((item) => item.delta > 0)
+    .sort((a, b) => b.delta - a.delta)
+    .slice(0, 5);
+  const protectiveSignals = material
+    .filter((item) => item.delta < 0)
+    .sort((a, b) => b.absoluteDelta - a.absoluteDelta)
+    .slice(0, 5);
+
+  document.getElementById("riskDriverCount").textContent =
+    `${riskDrivers.length} ${riskDrivers.length === 1 ? "signal" : "signals"}`;
+  document.getElementById("protectiveSignalCount").textContent =
+    `${protectiveSignals.length} ${protectiveSignals.length === 1 ? "signal" : "signals"}`;
+
+  const maxRiskDelta = Math.max(
+    ...riskDrivers.map((item) => item.absoluteDelta),
+    0.001,
+  );
+  const maxProtectiveDelta = Math.max(
+    ...protectiveSignals.map((item) => item.absoluteDelta),
+    0.001,
+  );
+
+  riskDrivers.forEach((item) => {
+    riskBars.appendChild(
       buildBarRow(
         featureLabels[item.feature] ?? item.feature,
         item.absoluteDelta,
-        maxDelta,
-        `${item.delta >= 0 ? "+" : ""}${item.delta.toFixed(3)}`,
-        item.delta < 0,
+        maxRiskDelta,
+        `+${item.delta.toFixed(3)}`,
       ),
     );
   });
+
+  protectiveSignals.forEach((item) => {
+    protectiveBars.appendChild(
+      buildBarRow(
+        featureLabels[item.feature] ?? item.feature,
+        item.absoluteDelta,
+        maxProtectiveDelta,
+        item.delta.toFixed(3),
+        true,
+      ),
+    );
+  });
+
+  if (riskDrivers.length === 0) {
+    riskBars.appendChild(
+      buildEmptyFeatureState("No material risk-increasing signal detected."),
+    );
+  }
+
+  if (protectiveSignals.length === 0) {
+    protectiveBars.appendChild(
+      buildEmptyFeatureState("No material protective signal detected."),
+    );
+  }
+}
+
+function buildEmptyFeatureState(text) {
+  const empty = document.createElement("p");
+  empty.className = "feature-empty";
+  empty.textContent = text;
+  return empty;
 }
 
 function buildBarRow(nameText, value, maxValue, valueText, negative = false) {
