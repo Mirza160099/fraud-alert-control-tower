@@ -1,6 +1,6 @@
 # Publish And Rehearse Guide
 
-This is the exact next-step checklist for taking the clean project folder public.
+This is the current checklist for confirming the published project, keeping GitHub/Vercel updated, and rehearsing the demo.
 
 ## 1. Review The README
 
@@ -10,36 +10,32 @@ Open `README.md` and check:
 - the problem statement is clear
 - the synthetic-data disclaimer is visible
 - the model metrics match the project outputs
-- the live demo line still says `TODO` until Vercel is deployed
+- the live demo link points to `https://fraud-alert-control-tower-5cic.vercel.app`
 
-## 2. Create GitHub Repository
+## 2. Confirm GitHub Repository
 
-Recommended repository name:
-
-```text
-fraud-alert-control-tower
-```
-
-Recommended visibility:
+Repository:
 
 ```text
-Public, after you confirm no private files are included.
+https://github.com/Mirza160099/fraud-alert-control-tower
 ```
 
-## 3. Push This Folder To GitHub
+Current visibility:
+
+```text
+Public
+```
+
+## 3. Push Updates To GitHub
 
 From this folder:
 
 ```powershell
-git init
-git add .
-git commit -m "Add fraud alert control tower portfolio project"
-git branch -M main
-git remote add origin https://github.com/YOUR_USERNAME/fraud-alert-control-tower.git
-git push -u origin main
+git status
+git push origin main
 ```
 
-Replace `YOUR_USERNAME` with your GitHub username.
+Use this whenever local commits are ahead of GitHub.
 
 ## 4. Deploy The App To Vercel
 
@@ -54,14 +50,14 @@ In Vercel:
 Expected smoke test:
 
 - Score tab loads.
-- High-risk scenario returns around `0.841`.
+- Critical scenario returns around `0.850`.
 - Decision says `Review as fraud risk`.
 - Priority is `Critical`.
 - Queue, Metrics, and Governance tabs render.
 
 If Vercel shows a 404, check that the project root is `./` and that `index.html` is visible in the deployment file list. The static app files are also duplicated in `app/` as a fallback.
 
-## 5. Update README With Live Link
+## 5. Confirm README Live Link
 
 Current live demo:
 
@@ -69,7 +65,7 @@ Current live demo:
 https://fraud-alert-control-tower-5cic.vercel.app
 ```
 
-Then commit and push:
+If the link changes, update `README.md`, then commit and push:
 
 ```powershell
 git add README.md
