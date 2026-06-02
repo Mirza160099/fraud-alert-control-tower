@@ -299,6 +299,88 @@ select:focus {
   background: var(--accent-strong);
 }
 
+.investigator-brief {
+  margin-top: 18px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfdfc;
+}
+
+.brief-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.brief-header span,
+.brief-grid span {
+  color: var(--muted);
+  font-size: 0.75rem;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+
+.brief-header strong {
+  padding: 5px 8px;
+  border-radius: 999px;
+  background: #e8f3f0;
+  color: var(--accent-strong);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+}
+
+.brief-header strong.low {
+  background: #eef8f0;
+  color: var(--ok);
+}
+
+.brief-header strong.medium {
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.brief-header strong.high {
+  background: #fff7ed;
+  color: var(--warn);
+}
+
+.brief-header strong.critical {
+  background: #fef2f2;
+  color: var(--danger);
+}
+
+.brief-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.brief-grid article {
+  min-height: 118px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.brief-grid strong {
+  display: block;
+  margin-top: 7px;
+  color: var(--ink);
+  font-size: 1rem;
+  line-height: 1.18;
+}
+
+.brief-grid p {
+  margin: 8px 0 0;
+  color: #2d3836;
+  font-size: 0.88rem;
+  line-height: 1.4;
+}
+
 .icon-button {
   width: 38px;
   height: 38px;
@@ -700,6 +782,7 @@ td {
 @media (max-width: 640px) {
   .form-grid,
   .metric-row,
+  .brief-grid,
   .kpi-grid,
   .economics-grid,
   .live-strip {

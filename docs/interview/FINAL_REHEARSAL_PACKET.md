@@ -115,6 +115,10 @@ Best answer:
 
 > Because an investigator needs more than a probability. The app explains the drivers and then suggests controlled actions such as monitoring, review, step-up verification, or escalation, while still keeping final decisions under human review.
 
+### Why did you add the investigator brief?
+
+> The blank form area became a live case summary. It helps a reviewer quickly see the primary signal, review focus, control measure, and evidence check, which makes the app feel closer to a real analyst workflow.
+
 ### What is the biggest limitation?
 
 > The data is synthetic, so this is not production-ready. It demonstrates the workflow and controls, but real deployment would require real-data validation, calibration, monitoring, and model-risk approval.

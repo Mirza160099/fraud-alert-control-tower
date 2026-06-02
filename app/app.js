@@ -247,12 +247,17 @@ function renderReasons(deltas) {
   }
 }
 
-function topRiskDriver(deltas) {
+function strongestRiskDriver(deltas) {
   const strongestPositive = deltas.find((item) => item.delta > 0.001);
   const strongestOverall = deltas
     .slice()
     .sort((a, b) => b.absoluteDelta - a.absoluteDelta)[0];
   const driver = strongestPositive ?? strongestOverall;
+  return driver && driver.absoluteDelta > 0.001 ? driver : null;
+}
+
+function topRiskDriver(deltas) {
+  const driver = strongestRiskDriver(deltas);
   return driver ? featureLabels[driver.feature] ?? driver.feature : "the strongest driver";
 }
 
@@ -299,6 +304,75 @@ function renderActions(priority, deltas) {
     li.textContent = text;
     actionList.appendChild(li);
   });
+}
+
+function briefCopy(priority, driverName) {
+  if (priority.tier === "Low") {
+    return {
+      focus: "Normal monitoring",
+      focusDetail: "No manual review is needed unless a new behavior pattern appears.",
+      control: "Audit trail only",
+      controlDetail: "Record the score and explanation so future changes can be compared.",
+      evidence: "Watch for change",
+      evidenceDetail: "Re-check only if device, country, channel, amount, or merchant behavior shifts.",
+    };
+  }
+
+  if (priority.tier === "Medium") {
+    return {
+      focus: "Pattern check",
+      focusDetail: `Check whether ${driverName} is repeated across recent activity.`,
+      control: "Soft friction",
+      controlDetail: "Monitor or request low-friction verification before escalating to a full review.",
+      evidence: "Two-signal rule",
+      evidenceDetail: "Escalate only if another signal supports the risk, such as device, geography, or merchant history.",
+    };
+  }
+
+  if (priority.tier === "High") {
+    return {
+      focus: "Investigator review",
+      focusDetail: `Validate ${driverName} against customer history before any customer-impacting action.`,
+      control: "Step-up verification",
+      controlDetail: "Use customer contact, authentication, or case review before blocking the transaction.",
+      evidence: "Customer context",
+      evidenceDetail: "Compare location, device, amount, merchant, and recent account activity.",
+    };
+  }
+
+  return {
+    focus: "Immediate escalation",
+    focusDetail: `Treat ${driverName} as the first investigation lead, not the only evidence.`,
+    control: "Temporary hold",
+    controlDetail: "Apply a short hold or step-up authentication while an investigator validates the case.",
+    evidence: "Full case review",
+    evidenceDetail: "Confirm multiple independent signals before a final fraud decision.",
+  };
+}
+
+function renderInvestigatorBrief(input, probability, priority, deltas) {
+  const driver = strongestRiskDriver(deltas);
+  const driverName = driver
+    ? featureLabels[driver.feature] ?? driver.feature
+    : "No material driver";
+  const signalDetail = driver
+    ? `${formatValue(driver.actual)} vs typical ${formatValue(driver.reference)}; local score impact ${driver.delta >= 0 ? "+" : ""}${driver.delta.toFixed(3)}.`
+    : "The transaction is close to the reference profile.";
+  const copy = briefCopy(priority, driverName);
+
+  document.getElementById("briefTier").textContent = `${priority.tier} priority`;
+  document.getElementById("briefTier").className = priority.className;
+  document.getElementById("briefSignal").textContent = driverName;
+  document.getElementById("briefSignalDetail").textContent = signalDetail;
+  document.getElementById("briefFocus").textContent = copy.focus;
+  document.getElementById("briefFocusDetail").textContent = copy.focusDetail;
+  document.getElementById("briefControl").textContent = copy.control;
+  document.getElementById("briefControlDetail").textContent = copy.controlDetail;
+  document.getElementById("briefEvidence").textContent = copy.evidence;
+  document.getElementById("briefEvidenceDetail").textContent =
+    probability >= 0.35
+      ? copy.evidenceDetail
+      : `${copy.evidenceDetail} Current amount in USD is ${formatValue(input.transaction_amount_usd)}.`;
 }
 
 function renderFeatureBars(deltas) {
@@ -368,6 +442,7 @@ function scoreCurrentForm() {
   renderDecision(probability, priority);
   renderReasons(deltas);
   renderActions(priority, deltas);
+  renderInvestigatorBrief(input, probability, priority, deltas);
   renderFeatureBars(deltas);
 }
 
