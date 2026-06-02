@@ -277,6 +277,97 @@
         </section>
 
         <section id="metricsView" class="tab-view">
+          <section class="metrics-command-grid">
+            <section class="panel metrics-scorecard-panel">
+              <div class="panel-header">
+                <h2>Analyst Scorecard</h2>
+                <span id="championModelBadge" class="muted-label">Champion</span>
+              </div>
+              <div class="scorecard-grid">
+                <div>
+                  <span>PR-AUC</span>
+                  <strong id="scorecardPrAuc">0.000</strong>
+                  <small id="scorecardPrAucBench">Benchmark 0.000</small>
+                </div>
+                <div>
+                  <span>Fraud capture</span>
+                  <strong id="scorecardCapture">0%</strong>
+                  <small id="scorecardCaptureBench">Benchmark 0%</small>
+                </div>
+                <div>
+                  <span>Queue hit rate</span>
+                  <strong id="scorecardHitRate">0%</strong>
+                  <small id="scorecardHitBench">Benchmark 0%</small>
+                </div>
+                <div>
+                  <span>Review rate</span>
+                  <strong id="scorecardReviewRate">0%</strong>
+                  <small id="scorecardReviewCount">0 reviews</small>
+                </div>
+              </div>
+              <p id="scorecardNarrative" class="metrics-note"></p>
+            </section>
+
+            <section class="panel metrics-matrix-panel">
+              <div class="panel-header">
+                <h2>Outcome Matrix</h2>
+                <span class="muted-label">Held-out test set</span>
+              </div>
+              <div class="confusion-boards">
+                <section class="confusion-board">
+                  <h3>Champion Model</h3>
+                  <div class="confusion-grid">
+                    <div class="confusion-cell caught">
+                      <span>True positives</span>
+                      <strong id="championTp">0</strong>
+                    </div>
+                    <div class="confusion-cell false-positive">
+                      <span>False positives</span>
+                      <strong id="championFp">0</strong>
+                    </div>
+                    <div class="confusion-cell missed">
+                      <span>False negatives</span>
+                      <strong id="championFn">0</strong>
+                    </div>
+                    <div class="confusion-cell cleared">
+                      <span>True negatives</span>
+                      <strong id="championTn">0</strong>
+                    </div>
+                  </div>
+                </section>
+                <section class="confusion-board">
+                  <h3>Old Alert Rule</h3>
+                  <div class="confusion-grid">
+                    <div class="confusion-cell caught">
+                      <span>True positives</span>
+                      <strong id="oldTp">0</strong>
+                    </div>
+                    <div class="confusion-cell false-positive">
+                      <span>False positives</span>
+                      <strong id="oldFp">0</strong>
+                    </div>
+                    <div class="confusion-cell missed">
+                      <span>False negatives</span>
+                      <strong id="oldFn">0</strong>
+                    </div>
+                    <div class="confusion-cell cleared">
+                      <span>True negatives</span>
+                      <strong id="oldTn">0</strong>
+                    </div>
+                  </div>
+                </section>
+              </div>
+            </section>
+          </section>
+
+          <section class="panel metrics-takeaway-panel">
+            <div class="panel-header">
+              <h2>Analyst Takeaways</h2>
+              <span class="muted-label">Decision rationale</span>
+            </div>
+            <ul id="metricsTakeaways" class="metrics-takeaways"></ul>
+          </section>
+
           <section class="content-grid">
             <section class="panel">
               <div class="panel-header">
@@ -288,6 +379,7 @@
                   <thead>
                     <tr>
                       <th>Model</th>
+                      <th>Role</th>
                       <th>Precision</th>
                       <th>Recall</th>
                       <th>PR-AUC</th>

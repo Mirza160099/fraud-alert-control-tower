@@ -788,14 +788,106 @@ function renderQueue() {
   });
 }
 
+function benchmarkReviewCount(existing) {
+  return Number(existing.true_positives) + Number(existing.false_positives);
+}
+
+function championTrueNegatives(champion, existing) {
+  const existingTotal =
+    Number(existing.true_positives) +
+    Number(existing.false_positives) +
+    Number(existing.false_negatives) +
+    Number(existing.true_negatives);
+  const championKnown =
+    Number(champion.test_true_positives) +
+    Number(champion.test_false_positives) +
+    Number(champion.test_false_negatives);
+  return Math.max(0, existingTotal - championKnown);
+}
+
+function renderAnalystMetrics() {
+  const champion = state.dashboard.metrics.champion;
+  const existing = state.dashboard.metrics.existing_alert_benchmark;
+  const championName = champion.model_name.replaceAll("_", " ");
+  const championTn = championTrueNegatives(champion, existing);
+  const championTotal =
+    championTn +
+    Number(champion.test_true_positives) +
+    Number(champion.test_false_positives) +
+    Number(champion.test_false_negatives);
+  const incrementalFraud =
+    Number(champion.test_true_positives) - Number(existing.true_positives);
+  const incrementalReviews =
+    Number(champion.test_review_count) - benchmarkReviewCount(existing);
+  const reviewsPerFraud = 1 / Math.max(Number(champion.test_precision_hit_rate), 0.001);
+
+  document.getElementById("championModelBadge").textContent = championName;
+  document.getElementById("scorecardPrAuc").textContent = numberText(
+    champion.test_average_precision_pr_auc,
+    3,
+  );
+  document.getElementById("scorecardPrAucBench").textContent =
+    `Old alert ${numberText(existing.average_precision_pr_auc, 3)}`;
+  document.getElementById("scorecardCapture").textContent = percent(
+    champion.test_recall_fraud_capture_rate,
+  );
+  document.getElementById("scorecardCaptureBench").textContent =
+    `Old alert ${percent(existing.recall)}`;
+  document.getElementById("scorecardHitRate").textContent = percent(
+    champion.test_precision_hit_rate,
+  );
+  document.getElementById("scorecardHitBench").textContent =
+    `Old alert ${percent(existing.precision)}`;
+  document.getElementById("scorecardReviewRate").textContent = percent(
+    champion.test_queue_rate,
+  );
+  document.getElementById("scorecardReviewCount").textContent =
+    `${champion.test_review_count} of ${championTotal.toLocaleString("en-US")} test transactions`;
+  document.getElementById("scorecardNarrative").textContent =
+    `Selected model: ${championName}. It improves PR-AUC and fraud capture versus the old alert rule, while making the review workload explicit through a ${percent(champion.test_queue_rate)} queue rate.`;
+
+  document.getElementById("championTp").textContent = String(
+    champion.test_true_positives,
+  );
+  document.getElementById("championFp").textContent = String(
+    champion.test_false_positives,
+  );
+  document.getElementById("championFn").textContent = String(
+    champion.test_false_negatives,
+  );
+  document.getElementById("championTn").textContent = String(championTn);
+  document.getElementById("oldTp").textContent = String(existing.true_positives);
+  document.getElementById("oldFp").textContent = String(existing.false_positives);
+  document.getElementById("oldFn").textContent = String(existing.false_negatives);
+  document.getElementById("oldTn").textContent = String(existing.true_negatives);
+
+  const takeaways = [
+    `PR-AUC is the lead model-selection metric because fraud is rare; the champion reached ${numberText(champion.test_average_precision_pr_auc, 3)} versus ${numberText(existing.average_precision_pr_auc, 3)} for the old alert rule.`,
+    `The champion captures ${percent(champion.test_recall_fraud_capture_rate)} of fraud in the test set, which is ${signedCount(incrementalFraud)} more caught fraud cases than the old alert benchmark.`,
+    `The hit rate is ${percent(champion.test_precision_hit_rate)}, or about one fraud per ${reviewsPerFraud.toFixed(1)} reviewed cases, so investigator capacity remains part of the decision.`,
+    `${signedCount(incrementalReviews)} extra reviews are accepted in exchange for higher capture; that is why the Business Impact panel translates model metrics into operating cost.`,
+  ];
+  const list = document.getElementById("metricsTakeaways");
+  list.replaceChildren();
+  takeaways.forEach((text) => {
+    const li = document.createElement("li");
+    li.textContent = text;
+    list.appendChild(li);
+  });
+}
+
 function renderModelComparison() {
   const tbody = document.getElementById("modelComparisonRows");
   tbody.replaceChildren();
+  const championName = state.dashboard.metrics.champion.model_name;
 
   state.dashboard.model_comparison.forEach((row) => {
     const tr = document.createElement("tr");
+    const isChampion = row.model_name === championName;
+    tr.className = isChampion ? "champion-row" : "";
     tr.innerHTML = `
       <td>${row.model_name.replaceAll("_", " ")}</td>
+      <td><span class="model-role ${isChampion ? "champion" : ""}">${isChampion ? "Champion" : "Challenger"}</span></td>
       <td>${percent(row.test_precision)}</td>
       <td>${percent(row.test_recall)}</td>
       <td>${numberText(row.test_average_precision_pr_auc, 3)}</td>
@@ -879,6 +971,7 @@ function renderBusinessImpact() {
 
 function renderDashboard() {
   renderQueue();
+  renderAnalystMetrics();
   renderModelComparison();
   renderCapacityThresholds();
   renderGlobalImportance();

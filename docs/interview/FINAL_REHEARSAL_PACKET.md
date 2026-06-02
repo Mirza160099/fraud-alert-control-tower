@@ -127,6 +127,10 @@ Best answer:
 
 > Fraud teams operate under capacity limits, so the queue should show more than case scores. I added operating-plan metrics, triage lanes, control checks, and legacy-alert gaps so reviewers can see workload, urgency, and why human validation still matters.
 
+### Why upgrade the metrics view?
+
+> A data analyst should not only show a model table. I added a scorecard, outcome matrix, and analyst takeaways so PR-AUC, recall, hit rate, false positives, missed fraud, and review workload are interpreted together.
+
 ### What is the biggest limitation?
 
 > The data is synthetic, so this is not production-ready. It demonstrates the workflow and controls, but real deployment would require real-data validation, calibration, monitoring, and model-risk approval.

@@ -92,7 +92,7 @@ Selected using training-only mutual information:
 
 ## Model Comparison
 
-The final comparison used the same top-10 feature set so the app remained explainable.
+The final comparison used the same top-10 feature set so the app remained explainable. The app's Metrics tab also translates the model table into an analyst scorecard, outcome matrix, and takeaways so reviewers can see model quality, workload, false positives, missed fraud, and benchmark trade-offs together.
 
 | Model | Precision | Recall | F1 | PR-AUC | Reviews |
 |---|---:|---:|---:|---:|---:|
@@ -106,6 +106,8 @@ The final comparison used the same top-10 feature set so the app remained explai
 Champion model: `adaboost_depth2_weighted`
 
 Why this model: the original AdaBoost stump model was strong but produced jumpy probability bands. The upgraded depth-2 AdaBoost keeps the queue discipline, improves held-out PR-AUC, and gives a smoother fraud-risk score for the live app.
+
+Metrics interpretation: PR-AUC is treated as the lead selection metric because the fraud class is rare. Precision, recall, review count, false positives, and fraud capture are shown together so the model is evaluated as an operating decision rather than a single score.
 
 ## Threshold Strategy
 
