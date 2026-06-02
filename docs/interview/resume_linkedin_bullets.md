@@ -6,6 +6,7 @@
 - Selected top 10 fraud-risk features using training-only mutual information, including geographic distance, transaction country, synthetic identity score, merchant risk score, channel, transaction hour, device risk, and transaction amount.
 - Compared logistic regression, random forest, extra trees, gradient boosting, standard AdaBoost, and enhanced depth-2 AdaBoost models for imbalanced fraud detection; selected an enhanced AdaBoost champion based on PR-AUC and queue discipline.
 - Tuned fraud review thresholds around investigator capacity, routing 74 held-out test transactions for review and capturing 25.0% of known fraud at the recommended threshold.
+- Built an alert-economics sensitivity layer comparing incremental reviews, captured fraud, review cost, avoided loss, and illustrative net impact.
 - Developed a Vercel-style static prediction app that accepts transaction inputs, returns fraud probability, priority tier, queue policy, and local model explanations without requiring a Python server at runtime.
 - Created a responsible-AI governance pack including a model card, threshold strategy memo, monitoring controls, and decision-support limitations for fraud investigation use cases.
 

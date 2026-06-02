@@ -52,6 +52,30 @@ Recommendation:
 - Use fixed thresholding for stable operational policy.
 - Use exact top-K ranking when staffing is capped and the team must review a fixed number of cases.
 
+## Alert Economics Sensitivity
+
+The model is not only a statistical threshold. It also changes investigation cost and potential fraud-loss avoidance.
+
+Compared with the existing alert benchmark:
+
+| Item | Existing alert | Champion model | Change |
+|---|---:|---:|---:|
+| Reviewed cases | 22 | 74 | +52 |
+| Fraud cases caught | 8 | 10 | +2 |
+| False positives | 14 | 64 | +50 |
+
+Illustrative assumptions:
+
+| Assumption | Value |
+|---|---:|
+| Review cost per case | $8 |
+| Avoided loss per captured fraud | $500 |
+| Additional review spend | $416 |
+| Additional avoided fraud loss | $1,000 |
+| Illustrative net impact | $584 |
+
+This sensitivity is not a production ROI claim. It demonstrates the operating question a bank would ask: are the additional reviews justified by the incremental fraud caught, and how should that trade-off change by staffing level, fraud-loss severity, and customer-friction risk?
+
 ## Capacity Sensitivity
 
 For the champion model:

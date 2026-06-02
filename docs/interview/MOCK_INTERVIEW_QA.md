@@ -58,6 +58,10 @@ On the held-out test set, it routed 74 transactions for review and captured 25.0
 
 Fraud is rare, so a high-accuracy model can still miss many fraud cases. Precision, recall, F1, PR-AUC, and operational queue size are more useful.
 
+## 14a. Why did you add alert economics?
+
+Because fraud thresholds affect money and workload. I used illustrative assumptions to show the trade-off: the champion catches two more fraud cases than the existing alert rule, but adds 52 reviews. That lets a reviewer discuss whether the extra review spend is justified by avoided fraud loss.
+
 ## 15. How does the app work?
 
 The Python model was exported into `model.json`. The static app loads `model.json` and `dashboard-data.json`, takes user inputs, calculates fraud risk in JavaScript, assigns a priority tier, and explains the top drivers.

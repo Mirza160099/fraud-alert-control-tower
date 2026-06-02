@@ -32,6 +32,16 @@ function numberText(value, digits = 3) {
   return Number(value).toFixed(digits);
 }
 
+function moneyText(value) {
+  const sign = Number(value) < 0 ? "-" : "";
+  return `${sign}$${Math.abs(Math.round(Number(value))).toLocaleString("en-US")}`;
+}
+
+function signedCount(value) {
+  const number = Number(value);
+  return `${number > 0 ? "+" : ""}${number}`;
+}
+
 function getNumber(id, fallback = 0) {
   const value = Number(document.getElementById(id).value);
   return Number.isFinite(value) ? value : fallback;
@@ -460,11 +470,40 @@ function renderGlobalImportance() {
   });
 }
 
+function renderBusinessImpact() {
+  const reviewCostUsd = 8;
+  const avoidedFraudLossUsd = 500;
+  const champion = state.dashboard.metrics.champion;
+  const existing = state.dashboard.metrics.existing_alert_benchmark;
+
+  const championReviews = Number(champion.test_review_count);
+  const existingReviews =
+    Number(existing.true_positives) + Number(existing.false_positives);
+  const incrementalReviews = championReviews - existingReviews;
+  const incrementalFraudCaught =
+    Number(champion.test_true_positives) - Number(existing.true_positives);
+  const incrementalReviewSpend = incrementalReviews * reviewCostUsd;
+  const incrementalAvoidedLoss = incrementalFraudCaught * avoidedFraudLossUsd;
+  const netImpact = incrementalAvoidedLoss - incrementalReviewSpend;
+
+  document.getElementById("incrementalFraudCaught").textContent =
+    signedCount(incrementalFraudCaught);
+  document.getElementById("incrementalReviews").textContent =
+    signedCount(incrementalReviews);
+  document.getElementById("incrementalReviewSpend").textContent =
+    moneyText(incrementalReviewSpend);
+  document.getElementById("illustrativeNetImpact").textContent =
+    moneyText(netImpact);
+  document.getElementById("economicsNote").textContent =
+    `Illustrative sensitivity: ${moneyText(reviewCostUsd)} review cost per case and ${moneyText(avoidedFraudLossUsd)} avoided loss per captured fraud. Synthetic data only.`;
+}
+
 function renderDashboard() {
   renderQueue();
   renderModelComparison();
   renderCapacityThresholds();
   renderGlobalImportance();
+  renderBusinessImpact();
   document.getElementById("governanceThreshold").textContent =
     state.model.threshold.toFixed(3);
   document.getElementById("governanceCapacity").textContent =

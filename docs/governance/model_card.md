@@ -149,6 +149,20 @@ Interpretation:
 - The champion model catches more fraud cases than the existing alert rule at the selected capacity setting, but increases false positives.
 - This is a business trade-off, not a purely technical win.
 
+## Business Impact Sensitivity
+
+Using illustrative assumptions of `$8` review cost per case and `$500` avoided loss per captured fraud:
+
+| Item | Value |
+|---|---:|
+| Additional reviewed cases vs existing alert | 52 |
+| Additional fraud cases caught | 2 |
+| Additional review spend | $416 |
+| Additional avoided fraud loss | $1,000 |
+| Illustrative net impact | $584 |
+
+These values are for decision framing only. A production model would require real loss amounts, review-cost data, customer-friction measurement, and legal/compliance review before any ROI conclusion.
+
 ## Explainability
 
 Global explainability:

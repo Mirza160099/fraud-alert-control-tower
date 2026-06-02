@@ -127,6 +127,26 @@ Exact top-5% queue:
 
 Business interpretation: the threshold is not just a modeling parameter. It is a staffing and operating-control decision.
 
+## Business Impact And Alert Economics
+
+The selected threshold is also a financial trade-off. Compared with the existing alert benchmark on the same held-out test split:
+
+| Item | Existing alert | Champion model | Change |
+|---|---:|---:|---:|
+| Reviewed cases | 22 | 74 | +52 |
+| Fraud cases caught | 8 | 10 | +2 |
+| False positives | 14 | 64 | +50 |
+
+Illustrative sensitivity assumptions:
+
+- Review cost per case: `$8`
+- Avoided loss per captured fraud: `$500`
+- Additional review spend: `$416`
+- Additional avoided fraud loss: `$1,000`
+- Illustrative net impact: `$584`
+
+This is not a production ROI claim. It shows how a fraud analytics team can connect model thresholds to investigation cost, fraud capture, and business value.
+
 ## Explainability
 
 The app explains each transaction with local sensitivity analysis against a reference profile.

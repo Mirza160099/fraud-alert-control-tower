@@ -59,6 +59,8 @@ Say:
 > After that, I tuned the threshold around investigator capacity. This is important because in fraud operations the threshold controls workload, false positives, missed fraud, and customer friction. The recommended threshold was 0.7977.
 >
 > Finally, I exported the model into a static Vercel-style app. The user can enter transaction details, get a fraud probability, priority tier, and explanation. I also created governance documents and an executive deck to show how the model should be used responsibly.
+>
+> As a final business layer, I added alert economics. It compares the champion model against the existing alert benchmark using illustrative review-cost and avoided-loss assumptions, so the threshold discussion becomes a financial trade-off, not just an ML metric.
 
 ## Questions They Might Ask
 
@@ -77,6 +79,10 @@ The first AdaBoost version used very shallow stumps, so the live score moved in 
 ### Why is the threshold a business decision?
 
 Because the threshold controls how many cases investigators review. A lower threshold catches more fraud but increases false positives and workload. A higher threshold reduces workload but may miss fraud.
+
+### Why add alert economics?
+
+Because fraud teams need to know whether extra reviews are worth the incremental fraud caught. I used transparent assumptions, not production claims, to show how review cost and avoided fraud loss can be connected to threshold strategy.
 
 ### Is this production-ready?
 

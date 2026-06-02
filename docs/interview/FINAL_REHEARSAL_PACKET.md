@@ -32,6 +32,8 @@ Do not say:
 >
 > After that, I tuned the threshold around investigator capacity. The recommended threshold was 0.7977. On the held-out test set, it routed 74 transactions for review and captured 25.0% of known fraud. This matters because thresholding is a business-control decision, not just a model setting.
 >
+> I added an alert-economics sensitivity as the final business layer. With illustrative assumptions of $8 review cost and $500 avoided loss per captured fraud, the champion policy catches two more fraud cases than the existing alert benchmark and produces an illustrative net impact of $584. I would not call that production ROI, but it shows I understand the financial trade-off behind thresholds.
+>
 > Finally, I exported the trained model into a static Vercel-style app. The app lets a user enter transaction details, returns a fraud probability, assigns a priority tier, and explains the main drivers. I also created a model card, threshold strategy memo, governance summary, and executive deck to show how the model should be reviewed responsibly.
 
 ## Live Demo Click Path
@@ -103,6 +105,10 @@ Best answer:
 ### What does threshold 0.7977 mean?
 
 > It is the probability cutoff used to decide which cases enter review. It was selected around investigator-capacity assumptions, not just model accuracy.
+
+### Why did you add alert economics?
+
+> Because a fraud model changes both investigation workload and financial risk. The economics panel shows the incremental reviews, incremental fraud caught, review-cost assumption, and illustrative net impact, so the project feels like a banking decision tool rather than only a model demo.
 
 ### What is the biggest limitation?
 

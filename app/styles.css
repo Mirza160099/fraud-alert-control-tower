@@ -460,6 +460,41 @@ select:focus {
   line-height: 1.45;
 }
 
+.economics-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.economics-grid div {
+  min-height: 94px;
+  display: grid;
+  align-content: space-between;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfdfc;
+}
+
+.economics-grid span {
+  color: var(--muted);
+  font-size: 0.76rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.economics-grid strong {
+  color: var(--accent-strong);
+  font-size: clamp(1.4rem, 3vw, 2.25rem);
+  line-height: 1;
+}
+
+.economics-note {
+  margin: 14px 0 0;
+  color: #2d3836;
+  line-height: 1.45;
+}
+
 .governance-kpis .kpi-card strong {
   font-size: clamp(1.2rem, 2.6vw, 2rem);
 }
@@ -605,7 +640,8 @@ td {
     width: 100%;
   }
 
-  .kpi-grid {
+  .kpi-grid,
+  .economics-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
@@ -622,6 +658,7 @@ td {
   .form-grid,
   .metric-row,
   .kpi-grid,
+  .economics-grid,
   .live-strip {
     grid-template-columns: 1fr;
   }

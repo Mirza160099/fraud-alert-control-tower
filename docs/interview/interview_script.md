@@ -16,6 +16,8 @@ I compared logistic regression, random forest, extra trees, gradient boosting, s
 
 Then I tuned the threshold as a business-control decision. At the recommended threshold of 0.7977, the model routed 74 test transactions for review, captured 25.0% of fraud, and produced a 13.5% hit rate. I also documented the exact top-5% queue, which had an 18.0% hit rate and 22.5% fraud capture.
 
+I also added an alert-economics sensitivity. Using illustrative assumptions of $8 per review and $500 avoided loss per captured fraud, the champion policy catches two more fraud cases than the existing alert benchmark, adds 52 reviews, and produces an illustrative net impact of $584. I would not present that as production ROI, but it shows how thresholding becomes a business decision.
+
 Finally, I exported the model to a static browser app. The app lets a user enter transaction details, predicts fraud risk, assigns a priority tier, and explains the top risk drivers. I also created a model card, threshold strategy memo, governance summary, and executive deck.
 
 ## Technical Deep Dive
