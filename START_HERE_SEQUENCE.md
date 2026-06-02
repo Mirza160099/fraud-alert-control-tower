@@ -59,6 +59,26 @@ How to explain it:
 
 > This README is the recruiter-facing summary of the project.
 
+### 1B. Complete Learning Guide: From VS Code To GitHub To Vercel
+
+Open:
+
+```text
+docs/interview/COMPLETE_PROJECT_LEARNING_GUIDE.md
+```
+
+Purpose:
+
+- explains the project from scratch
+- teaches the VS Code workflow
+- explains Git, GitHub, and Vercel
+- walks through each major file and folder
+- gives the full demo and ownership explanation
+
+How to explain it:
+
+> This is my study guide for understanding and defending the project end to end.
+
 ### 2. Source Code: The Python Pipeline
 
 Open:
