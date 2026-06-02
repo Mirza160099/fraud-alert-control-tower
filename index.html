@@ -513,18 +513,160 @@
             </section>
           </section>
 
+          <section class="governance-command-grid">
+            <section class="panel governance-readiness-panel">
+              <div class="panel-header">
+                <h2>Readiness Assessment</h2>
+                <span class="muted-label">Model risk view</span>
+              </div>
+              <div class="readiness-status">
+                <strong>Controlled prototype</strong>
+                <span>Not production-approved</span>
+              </div>
+              <div class="readiness-grid">
+                <div>
+                  <span>Backtest evidence</span>
+                  <strong>Complete</strong>
+                  <p>Held-out test metrics, threshold strategy, queue economics, and local explanations are documented.</p>
+                </div>
+                <div>
+                  <span>Production blocker</span>
+                  <strong>Real-data validation</strong>
+                  <p>Synthetic data is suitable for demonstration, but not enough for customer-impacting deployment.</p>
+                </div>
+                <div>
+                  <span>Human control</span>
+                  <strong>Mandatory review</strong>
+                  <p>The model routes cases and explains risk; investigators remain accountable for final decisions.</p>
+                </div>
+                <div>
+                  <span>Monitoring state</span>
+                  <strong>Designed</strong>
+                  <p>Monitoring controls are specified, but would need live alerting and ownership before launch.</p>
+                </div>
+              </div>
+            </section>
+
+            <section class="panel governance-evidence-panel">
+              <div class="panel-header">
+                <h2>Audit Evidence Pack</h2>
+                <span class="muted-label">Submission links</span>
+              </div>
+              <div class="evidence-links">
+                <a href="./docs/governance/model_card.md">Model card</a>
+                <a href="./docs/governance/threshold_strategy_memo.md">Threshold memo</a>
+                <a href="./docs/governance/governance_summary.md">Governance summary</a>
+                <a href="./docs/reports/progress_report_step_03.md">Model selection report</a>
+                <a href="./docs/reports/progress_report_step_04.md">Explainability report</a>
+                <a href="./presentation/fraud-alert-control-tower-executive-story.pptx">Executive deck</a>
+              </div>
+            </section>
+          </section>
+
+          <section class="panel lower-panel">
+            <div class="panel-header">
+              <h2>Model Risk Register</h2>
+              <span class="muted-label">Controls and owners</span>
+            </div>
+            <div class="risk-register-grid">
+              <article>
+                <span>Data realism</span>
+                <strong>Synthetic-data limitation</strong>
+                <p>Validate on representative transaction data before production or customer-impacting use.</p>
+                <small>Owner: Data Science + Model Risk</small>
+              </article>
+              <article>
+                <span>False positives</span>
+                <strong>Customer friction risk</strong>
+                <p>Use human review, step-up verification, and segment monitoring before any blocking action.</p>
+                <small>Owner: Fraud Operations</small>
+              </article>
+              <article>
+                <span>Leakage</span>
+                <strong>Training contamination risk</strong>
+                <p>Exclude IDs, target labels, and old alert outputs from modeling features; repeat leakage checks.</p>
+                <small>Owner: Analytics Engineering</small>
+              </article>
+              <article>
+                <span>Drift</span>
+                <strong>Changing fraud patterns</strong>
+                <p>Monitor score distribution, feature drivers, country/channel mix, and investigator outcomes.</p>
+                <small>Owner: Model Monitoring</small>
+              </article>
+            </div>
+          </section>
+
+          <section class="panel lower-panel">
+            <div class="panel-header">
+              <h2>Approval Gates</h2>
+              <span class="muted-label">Before production</span>
+            </div>
+            <ol class="approval-gates">
+              <li>
+                <strong>Real-data validation</strong>
+                <span>Confirm performance on representative production-like transactions.</span>
+              </li>
+              <li>
+                <strong>Probability calibration</strong>
+                <span>Check whether score bands match observed fraud rates before operational use.</span>
+              </li>
+              <li>
+                <strong>Model risk review</strong>
+                <span>Review feature lineage, leakage controls, threshold policy, and limitations.</span>
+              </li>
+              <li>
+                <strong>Investigator UAT</strong>
+                <span>Test explanations and queue workflow with analysts before rollout.</span>
+              </li>
+              <li>
+                <strong>Live monitoring</strong>
+                <span>Deploy drift, hit-rate, false-positive, and capacity alerts with named owners.</span>
+              </li>
+            </ol>
+          </section>
+
           <section class="panel lower-panel">
             <div class="panel-header">
               <h2>Monitoring Controls</h2>
               <span class="muted-label">Operational governance</span>
             </div>
             <div class="control-grid">
-              <div>Queue size vs staffing capacity</div>
-              <div>Hit rate and fraud capture trend</div>
-              <div>False positives by country and channel</div>
-              <div>Score distribution drift</div>
-              <div>Top explanation driver drift</div>
-              <div>Investigator outcome feedback</div>
+              <article>
+                <span>Daily capacity</span>
+                <strong>Queue size vs staffing capacity</strong>
+                <p>Alert when review volume exceeds staffing plan or the target queue rate.</p>
+                <small>Owner: Fraud Ops</small>
+              </article>
+              <article>
+                <span>Weekly quality</span>
+                <strong>Hit rate and fraud capture trend</strong>
+                <p>Track whether capture and precision are stable after threshold changes.</p>
+                <small>Owner: Analytics</small>
+              </article>
+              <article>
+                <span>Weekly fairness proxy</span>
+                <strong>False positives by country and channel</strong>
+                <p>Check whether specific segments create unusual customer friction.</p>
+                <small>Owner: Analytics + Compliance</small>
+              </article>
+              <article>
+                <span>Weekly drift</span>
+                <strong>Score distribution drift</strong>
+                <p>Investigate large changes in score bands, queue size, or risk mix.</p>
+                <small>Owner: Model Monitoring</small>
+              </article>
+              <article>
+                <span>Monthly explainability</span>
+                <strong>Top explanation driver drift</strong>
+                <p>Review whether new risk drivers dominate explanations unexpectedly.</p>
+                <small>Owner: Model Risk</small>
+              </article>
+              <article>
+                <span>Continuous feedback</span>
+                <strong>Investigator outcome feedback</strong>
+                <p>Use analyst dispositions to measure misses, false positives, and retraining need.</p>
+                <small>Owner: Fraud Ops + Data Science</small>
+              </article>
             </div>
           </section>
         </section>

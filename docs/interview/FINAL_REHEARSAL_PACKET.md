@@ -131,6 +131,10 @@ Best answer:
 
 > A data analyst should not only show a model table. I added a scorecard, outcome matrix, and analyst takeaways so PR-AUC, recall, hit rate, false positives, missed fraud, and review workload are interpreted together.
 
+### Why upgrade the governance view?
+
+> In financial services, a model is not ready just because it predicts well. I added readiness status, a risk register, approval gates, monitoring ownership, and an audit evidence pack to show how the model would be controlled before production.
+
 ### What is the biggest limitation?
 
 > The data is synthetic, so this is not production-ready. It demonstrates the workflow and controls, but real deployment would require real-data validation, calibration, monitoring, and model-risk approval.

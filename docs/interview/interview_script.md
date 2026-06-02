@@ -18,7 +18,7 @@ Then I tuned the threshold as a business-control decision. At the recommended th
 
 I also added an alert-economics sensitivity. Using illustrative assumptions of $8 per review and $500 avoided loss per captured fraud, the champion policy catches two more fraud cases than the existing alert benchmark, adds 52 reviews, and produces an illustrative net impact of $584. I would not present that as production ROI, but it shows how thresholding becomes a business decision.
 
-Finally, I exported the model to a static browser app. The app lets a user enter transaction details, predicts fraud risk, assigns a priority tier, produces an investigator brief, separates risk-increasing features from protective signals, and recommends practical next actions such as monitoring, investigator review, step-up verification, or escalation. The queue view also shows operating-plan metrics, triage lanes, control checks, and old-alert gaps so the model can be discussed as a review workflow. The Metrics tab adds an analyst scorecard, outcome matrix, and takeaways so the model comparison is connected to workload and business trade-offs. I also created a model card, threshold strategy memo, governance summary, and executive deck.
+Finally, I exported the model to a static browser app. The app lets a user enter transaction details, predicts fraud risk, assigns a priority tier, produces an investigator brief, separates risk-increasing features from protective signals, and recommends practical next actions such as monitoring, investigator review, step-up verification, or escalation. The queue view also shows operating-plan metrics, triage lanes, control checks, and old-alert gaps so the model can be discussed as a review workflow. The Metrics tab adds an analyst scorecard, outcome matrix, and takeaways so the model comparison is connected to workload and business trade-offs. The Governance tab shows readiness status, model-risk controls, approval gates, monitoring ownership, and audit evidence. I also created a model card, threshold strategy memo, governance summary, and executive deck.
 
 ## Technical Deep Dive
 
@@ -28,7 +28,7 @@ The explainability layer uses global permutation importance to show which featur
 
 ## Banking Framing
 
-The banking point is that the threshold is not just a machine-learning setting. It controls review volume, staffing pressure, false positives, missed fraud, and customer friction. That is why I documented capacity thresholds, human review requirements, synthetic-data limitations, and monitoring controls.
+The banking point is that the threshold is not just a machine-learning setting. It controls review volume, staffing pressure, false positives, missed fraud, and customer friction. That is why I documented capacity thresholds, human review requirements, synthetic-data limitations, model-risk controls, approval gates, monitoring ownership, and audit evidence.
 
 ## Strong Answer To "Why This Project?"
 
@@ -46,5 +46,5 @@ I would validate on real transaction data, add time-based backtesting, monitor d
 4. Point to the live probability, risk tier, investigator brief, reasons, and recommended next actions.
 5. Open the Queue tab and explain review capacity, triage lanes, old-alert misses, and human-review controls.
 6. Open Metrics and explain the scorecard, outcome matrix, PR-AUC, recall, false positives, and why enhanced depth-2 AdaBoost was selected.
-7. Open Governance and explain why this is decision support only.
+7. Open Governance and explain readiness status, risk register, approval gates, monitoring controls, and why this is decision support only.
 8. Close with the executive deck and the model-card/threshold memo.
