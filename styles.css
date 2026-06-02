@@ -525,6 +525,103 @@ select:focus {
   line-height: 1;
 }
 
+.queue-command-grid {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr 1fr;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.queue-command-card {
+  align-content: start;
+}
+
+.queue-command-metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.queue-command-metrics div {
+  min-height: 84px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfdfc;
+}
+
+.queue-command-metrics span,
+.priority-lane span,
+.control-checks,
+.case-workflow span,
+.case-secondary {
+  color: var(--muted);
+}
+
+.queue-command-metrics span,
+.case-workflow span {
+  font-size: 0.74rem;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+
+.queue-command-metrics strong {
+  display: block;
+  margin-top: 9px;
+  color: var(--ink);
+  font-size: 1.55rem;
+  line-height: 1;
+}
+
+.priority-lanes {
+  display: grid;
+  gap: 10px;
+}
+
+.priority-lane {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--accent);
+  border-radius: 8px;
+  background: #fbfdfc;
+}
+
+.priority-lane.critical {
+  border-left-color: var(--danger);
+}
+
+.priority-lane.high {
+  border-left-color: var(--warn);
+}
+
+.priority-lane.medium {
+  border-left-color: #1d4ed8;
+}
+
+.priority-lane strong,
+.priority-lane span {
+  display: block;
+}
+
+.priority-lane b {
+  min-width: 44px;
+  color: var(--ink);
+  font-size: 1.65rem;
+  text-align: right;
+}
+
+.control-checks {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding-left: 18px;
+  line-height: 1.45;
+}
+
 .queue-panel {
   padding-bottom: 8px;
 }
@@ -537,8 +634,21 @@ select:focus {
 .case-card {
   padding: 14px;
   border: 1px solid var(--line);
+  border-left: 4px solid var(--line);
   border-radius: 8px;
   background: #fbfdfc;
+}
+
+.case-card.critical {
+  border-left-color: var(--danger);
+}
+
+.case-card.high {
+  border-left-color: var(--warn);
+}
+
+.case-card.medium {
+  border-left-color: #1d4ed8;
 }
 
 .case-header,
@@ -547,6 +657,34 @@ select:focus {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+}
+
+.case-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.case-title strong,
+.case-title small {
+  display: block;
+}
+
+.case-title small {
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.case-rank {
+  min-width: 48px;
+  padding: 9px 10px;
+  border-radius: 8px;
+  background: #e8f3f0;
+  color: var(--accent-strong);
+  font-weight: 900;
+  text-align: center;
 }
 
 .case-score {
@@ -558,6 +696,16 @@ select:focus {
   font-size: 1.25rem;
   font-weight: 900;
   text-align: center;
+}
+
+.case-score.high {
+  background: #fff7ed;
+  color: var(--warn);
+}
+
+.case-score.medium {
+  background: #eff6ff;
+  color: #1d4ed8;
 }
 
 .case-meta {
@@ -575,10 +723,70 @@ select:focus {
   font-weight: 800;
 }
 
-.case-card p {
+.case-tag.critical {
+  background: #fef2f2;
+  color: var(--danger);
+}
+
+.case-tag.high {
+  background: #fff7ed;
+  color: var(--warn);
+}
+
+.case-tag.true-fraud {
+  background: #fef2f2;
+  color: var(--danger);
+}
+
+.case-tag.non-fraud {
+  background: #eef8f0;
+  color: var(--ok);
+}
+
+.case-tag.old-alert-missed {
+  background: #fff7ed;
+  color: var(--warn);
+}
+
+.case-workflow {
+  display: grid;
+  grid-template-columns: 0.9fr 1.4fr 1fr;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.case-workflow div {
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.case-workflow strong {
+  display: block;
+  margin-top: 7px;
+  color: var(--ink);
+  line-height: 1.2;
+}
+
+.case-card p,
+.case-workflow p {
   margin: 12px 0 0;
   color: #2d3836;
   line-height: 1.45;
+}
+
+.case-workflow p {
+  font-size: 0.9rem;
+}
+
+.case-secondary {
+  display: grid;
+  gap: 6px;
+  margin: 12px 0 0;
+  padding-left: 18px;
+  font-size: 0.88rem;
+  line-height: 1.4;
 }
 
 .economics-grid {
@@ -791,7 +999,9 @@ td {
 
   .topbar,
   .content-grid,
-  .feature-impact-grid {
+  .feature-impact-grid,
+  .queue-command-grid,
+  .case-workflow {
     grid-template-columns: 1fr;
   }
 

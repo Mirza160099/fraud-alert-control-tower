@@ -123,6 +123,10 @@ Best answer:
 
 > A single top-feature list can be misleading for low-risk cases because the strongest local effect may reduce risk. Splitting the view shows what increases risk separately from what normalizes the transaction.
 
+### Why upgrade the queue view?
+
+> Fraud teams operate under capacity limits, so the queue should show more than case scores. I added operating-plan metrics, triage lanes, control checks, and legacy-alert gaps so reviewers can see workload, urgency, and why human validation still matters.
+
 ### What is the biggest limitation?
 
 > The data is synthetic, so this is not production-ready. It demonstrates the workflow and controls, but real deployment would require real-data validation, calibration, monitoring, and model-risk approval.

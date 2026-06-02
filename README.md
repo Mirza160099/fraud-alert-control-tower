@@ -16,7 +16,7 @@ JPMorgan-inspired fraud analytics project that prioritizes transaction alerts, e
 
 - End-to-end fraud analytics workflow: data audit, cleaning, joins, feature engineering, feature selection, model comparison, thresholding, explainability, and app deployment.
 - Responsible AI framing: leakage prevention, model-card documentation, human review, threshold governance, and monitoring controls.
-- Recruiter-friendly product thinking: the final app is not just a classifier; it is an investigator control tower with explanations, risk/protective feature impact, an investigator brief, and recommended next actions.
+- Recruiter-friendly product thinking: the final app is not just a classifier; it is an investigator control tower with explanations, risk/protective feature impact, an investigator brief, queue command controls, and recommended next actions.
 
 ## Live-Style App Screenshots
 
@@ -47,7 +47,8 @@ This project treats fraud alerting as an operating-control problem:
 3. Set thresholds based on capacity.
 4. Explain high-risk drivers.
 5. Generate an investigator brief and practical review measures.
-6. Document governance limits before production use.
+6. Show queue operating controls, triage lanes, and legacy-alert gaps.
+7. Document governance limits before production use.
 
 ## Dataset Summary
 

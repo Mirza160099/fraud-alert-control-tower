@@ -224,6 +224,49 @@
             </div>
           </section>
 
+          <section class="queue-command-grid">
+            <section class="panel queue-command-card">
+              <div class="panel-header">
+                <h2>Operating Plan</h2>
+                <span class="muted-label">Threshold policy</span>
+              </div>
+              <div class="queue-command-metrics">
+                <div>
+                  <span>Review rate</span>
+                  <strong id="queueReviewRate">0%</strong>
+                </div>
+                <div>
+                  <span>Threshold</span>
+                  <strong id="queueThreshold">0.000</strong>
+                </div>
+                <div>
+                  <span>Fraud capture</span>
+                  <strong id="queueCaptureRate">0%</strong>
+                </div>
+                <div>
+                  <span>False positives</span>
+                  <strong id="queueFalsePositiveLoad">0</strong>
+                </div>
+              </div>
+            </section>
+
+            <section class="panel queue-command-card">
+              <div class="panel-header">
+                <h2>Triage Lanes</h2>
+                <span class="muted-label">Visible top cases</span>
+              </div>
+              <div id="priorityLaneList" class="priority-lanes"></div>
+            </section>
+
+            <section class="panel queue-command-card">
+              <div class="panel-header">
+                <h2>Control Checks</h2>
+                <span class="muted-label">Human review</span>
+              </div>
+              <ul id="queueControlChecks" class="control-checks"></ul>
+            </section>
+          </section>
+
           <section class="panel queue-panel">
             <div class="panel-header">
               <h2>Highest-Risk Cases</h2>

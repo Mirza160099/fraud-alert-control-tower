@@ -611,6 +611,111 @@ function initializeTabs() {
   });
 }
 
+function sentenceText(text) {
+  if (!text) return "";
+  return `${text.charAt(0).toUpperCase()}${text.slice(1)}`;
+}
+
+function titleCase(text) {
+  return String(text).replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
+
+function priorityClassName(tier) {
+  return String(tier || "medium").toLowerCase();
+}
+
+function primaryDriverLabel(reason) {
+  if (!reason) return "Primary driver";
+  const marker = " was ";
+  const driver = reason.includes(marker) ? reason.slice(0, reason.indexOf(marker)) : reason;
+  return titleCase(driver);
+}
+
+function queueSla(tier) {
+  if (tier === "Critical") return "Immediate review";
+  if (tier === "High") return "Same-shift review";
+  if (tier === "Medium") return "Monitor today";
+  return "No manual queue";
+}
+
+function queueAction(tier) {
+  if (tier === "Critical") {
+    return "Assign to an investigator before any customer-impacting decision.";
+  }
+  if (tier === "High") {
+    return "Validate the evidence and use step-up verification if the case remains suspicious.";
+  }
+  if (tier === "Medium") {
+    return "Watch for repeated activity before escalating to manual review.";
+  }
+  return "Keep in audit trail and rescore if behavior changes.";
+}
+
+function evidenceStatus(caseItem) {
+  return Number(caseItem.alert_generated) === 1
+    ? "Old alert also fired"
+    : "Old alert missed";
+}
+
+function evidenceCheckText(caseItem) {
+  if (Number(caseItem.alert_generated) === 1) {
+    return "Compare the model reason with the old alert rule before deciding the case.";
+  }
+  return "Validate this incremental model alert carefully because the old rule did not catch it.";
+}
+
+function renderQueueCommand(summary) {
+  const champion = state.dashboard.metrics.champion;
+  const existing = state.dashboard.metrics.existing_alert_benchmark;
+
+  document.getElementById("queueReviewRate").textContent = percent(
+    champion.test_queue_rate,
+  );
+  document.getElementById("queueThreshold").textContent = numberText(
+    champion.threshold,
+    3,
+  );
+  document.getElementById("queueCaptureRate").textContent = percent(
+    champion.test_recall_fraud_capture_rate,
+  );
+  document.getElementById("queueFalsePositiveLoad").textContent = String(
+    champion.test_false_positives,
+  );
+
+  const laneList = document.getElementById("priorityLaneList");
+  laneList.replaceChildren();
+  const cases = state.dashboard.top_queue_cases;
+  ["Critical", "High", "Medium", "Low"].forEach((tier) => {
+    const count = cases.filter((caseItem) => caseItem.priority_tier === tier).length;
+    if (count === 0) return;
+    const lane = document.createElement("div");
+    lane.className = `priority-lane ${priorityClassName(tier)}`;
+    lane.innerHTML = `
+      <div>
+        <strong>${tier}</strong>
+        <span>${queueSla(tier)}</span>
+      </div>
+      <b>${count}</b>
+    `;
+    laneList.appendChild(lane);
+  });
+
+  const controlChecks = document.getElementById("queueControlChecks");
+  controlChecks.replaceChildren();
+  const incrementalFrauds =
+    Number(champion.test_true_positives) - Number(existing.true_positives);
+  [
+    `Threshold ${numberText(champion.threshold, 3)} routes ${percent(champion.test_queue_rate)} of test transactions to review.`,
+    `${summary.missed_existing_alerts_in_top_cases} visible top cases were missed by the old alert rule.`,
+    `${signedCount(incrementalFrauds)} fraud cases captured versus the old alert benchmark at this operating point.`,
+    `${champion.test_false_positives} backtest false positives require human validation before any customer-impacting action.`,
+  ].forEach((text) => {
+    const li = document.createElement("li");
+    li.textContent = text;
+    controlChecks.appendChild(li);
+  });
+}
+
 function renderQueue() {
   const summary = state.dashboard.queue_summary;
   document.getElementById("queueSize").textContent = String(summary.queue_size);
@@ -619,38 +724,66 @@ function renderQueue() {
   document.getElementById("missedOldAlerts").textContent = String(
     summary.missed_existing_alerts_in_top_cases,
   );
+  renderQueueCommand(summary);
 
   const caseList = document.getElementById("caseList");
   caseList.replaceChildren();
 
   state.dashboard.top_queue_cases.forEach((caseItem) => {
     const row = document.createElement("article");
-    row.className = "case-card";
+    const tierClass = priorityClassName(caseItem.priority_tier);
+    const backtestLabel =
+      Number(caseItem.actual_fraud_label) === 1
+        ? "Backtest: true fraud"
+        : "Backtest: non-fraud";
+    const oldAlertLabel = evidenceStatus(caseItem);
+    const secondaryReasons = [caseItem.reason_2, caseItem.reason_3]
+      .filter(Boolean)
+      .map((reason) => `<li>${sentenceText(reason)}</li>`)
+      .join("");
 
-    const header = document.createElement("div");
-    header.className = "case-header";
-    header.innerHTML = `
-      <div>
-        <span class="muted-label">Transaction</span>
-        <strong>${caseItem.transaction_id}</strong>
+    row.className = `case-card ${tierClass}`;
+    row.innerHTML = `
+      <div class="case-header">
+        <div class="case-title">
+          <span class="case-rank">#${caseItem.case_rank}</span>
+          <div>
+            <span class="muted-label">Transaction</span>
+            <strong>${caseItem.transaction_id}</strong>
+            <small>${String(caseItem.event_ts).replace(" ", " at ")}</small>
+          </div>
+        </div>
+        <div class="case-score ${tierClass}">${numberText(caseItem.predicted_fraud_probability, 3)}</div>
       </div>
-      <div class="case-score">${numberText(caseItem.predicted_fraud_probability, 3)}</div>
+
+      <div class="case-meta">
+        <span class="case-tag ${tierClass}">${caseItem.priority_tier}</span>
+        <span class="case-tag ${Number(caseItem.actual_fraud_label) === 1 ? "true-fraud" : "non-fraud"}">${backtestLabel}</span>
+        <span class="case-tag ${Number(caseItem.alert_generated) === 1 ? "old-alert-hit" : "old-alert-missed"}">${oldAlertLabel}</span>
+      </div>
+
+      <div class="case-workflow">
+        <div>
+          <span>SLA</span>
+          <strong>${queueSla(caseItem.priority_tier)}</strong>
+          <p>${queueAction(caseItem.priority_tier)}</p>
+        </div>
+        <div>
+          <span>Primary driver</span>
+          <strong>${primaryDriverLabel(caseItem.reason_1)}</strong>
+          <p>${sentenceText(caseItem.reason_1)}</p>
+        </div>
+        <div>
+          <span>Evidence check</span>
+          <strong>${oldAlertLabel}</strong>
+          <p>${evidenceCheckText(caseItem)}</p>
+        </div>
+      </div>
+
+      <ul class="case-secondary">
+        ${secondaryReasons}
+      </ul>
     `;
-
-    const meta = document.createElement("div");
-    meta.className = "case-meta";
-    meta.innerHTML = `
-      <span>${caseItem.priority_tier}</span>
-      <span>${Number(caseItem.actual_fraud_label) === 1 ? "Backtest: true fraud" : "Backtest: false positive"}</span>
-      <span>${Number(caseItem.alert_generated) === 1 ? "Old alert: yes" : "Old alert: no"}</span>
-    `;
-
-    const reason = document.createElement("p");
-    reason.textContent = caseItem.reason_1
-      ? `${caseItem.reason_1.charAt(0).toUpperCase()}${caseItem.reason_1.slice(1)}`
-      : "";
-
-    row.append(header, meta, reason);
     caseList.appendChild(row);
   });
 }
