@@ -400,6 +400,20 @@ select:focus {
   line-height: 1.45;
 }
 
+.response-plan {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+
+.response-plan h3 {
+  margin-top: 0;
+}
+
+.response-plan li {
+  padding-left: 2px;
+}
+
 .lower-panel {
   margin-top: 18px;
 }

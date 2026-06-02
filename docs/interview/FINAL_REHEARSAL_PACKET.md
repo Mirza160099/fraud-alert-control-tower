@@ -111,6 +111,10 @@ Best answer:
 
 > Because a fraud model changes both investigation workload and financial risk. The economics panel shows the incremental reviews, incremental fraud caught, review-cost assumption, and illustrative net impact, so the project feels like a banking decision tool rather than only a model demo.
 
+### Why did you add recommended next actions?
+
+> Because an investigator needs more than a probability. The app explains the drivers and then suggests controlled actions such as monitoring, review, step-up verification, or escalation, while still keeping final decisions under human review.
+
 ### What is the biggest limitation?
 
 > The data is synthetic, so this is not production-ready. It demonstrates the workflow and controls, but real deployment would require real-data validation, calibration, monitoring, and model-risk approval.

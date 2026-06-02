@@ -247,6 +247,60 @@ function renderReasons(deltas) {
   }
 }
 
+function topRiskDriver(deltas) {
+  const strongestPositive = deltas.find((item) => item.delta > 0.001);
+  const strongestOverall = deltas
+    .slice()
+    .sort((a, b) => b.absoluteDelta - a.absoluteDelta)[0];
+  const driver = strongestPositive ?? strongestOverall;
+  return driver ? featureLabels[driver.feature] ?? driver.feature : "the strongest driver";
+}
+
+function recommendedActions(priority, deltas) {
+  const driver = topRiskDriver(deltas);
+
+  if (priority.tier === "Low") {
+    return [
+      "Allow or monitor without manual review unless a new risk signal appears.",
+      "Keep the score and explanation in the audit trail for later pattern analysis.",
+      "Re-score if the customer changes device, country, channel, or transaction amount suddenly.",
+    ];
+  }
+
+  if (priority.tier === "Medium") {
+    return [
+      "Monitor closely and check whether similar activity repeats across the same customer, device, or merchant.",
+      `Review ${driver} before escalation, because it is the strongest local driver in this score.`,
+      "Move to investigator review if velocity, geography, device risk, or merchant risk increases.",
+    ];
+  }
+
+  if (priority.tier === "High") {
+    return [
+      "Route to investigator review before taking any customer-impacting action.",
+      `Validate ${driver} against customer history, merchant profile, and recent account activity.`,
+      "Use step-up verification or customer contact if the evidence remains suspicious after review.",
+    ];
+  }
+
+  return [
+    "Escalate for immediate investigator review because the score is above the critical band.",
+    "Apply step-up authentication or a temporary hold while the evidence is checked.",
+    `Validate ${driver}, device risk, geography, merchant context, and customer history before final action.`,
+  ];
+}
+
+function renderActions(priority, deltas) {
+  const actionList = document.getElementById("actionList");
+  actionList.replaceChildren();
+
+  recommendedActions(priority, deltas).forEach((text) => {
+    const li = document.createElement("li");
+    li.textContent = text;
+    actionList.appendChild(li);
+  });
+}
+
 function renderFeatureBars(deltas) {
   const featureBars = document.getElementById("featureBars");
   featureBars.replaceChildren();
@@ -313,6 +367,7 @@ function scoreCurrentForm() {
 
   renderDecision(probability, priority);
   renderReasons(deltas);
+  renderActions(priority, deltas);
   renderFeatureBars(deltas);
 }
 
