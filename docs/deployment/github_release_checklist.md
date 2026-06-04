@@ -23,25 +23,24 @@ fraud-alert-control-tower/
     explain_model.py
     export_model_for_web.py
     export_dashboard_data.py
-  outputs/
-    step_02_modeling/
-    step_03_model_selection/
-    step_04_explainability/
-    step_05_vercel_app/
-    step_07_governance/
-    step_08_executive_presentation/
-    step_09_portfolio_package/
+  app/
+  assets/
+  artifacts/modeling/
+  docs/governance/
+  docs/deployment/
+  docs/reports/
+  presentation/
 ```
 
 ## Files To Highlight
 
-- `outputs/step_09_portfolio_package/README.md`
-- `outputs/step_09_portfolio_package/interview_script.md`
-- `outputs/step_09_portfolio_package/resume_linkedin_bullets.md`
-- `outputs/step_07_governance/model_card.md`
-- `outputs/step_07_governance/threshold_strategy_memo.md`
-- `outputs/step_08_executive_presentation/fraud-alert-control-tower-executive-story.pptx`
-- `outputs/step_05_vercel_app/index.html`
+- `README.md`
+- `docs/governance/model_card.md`
+- `docs/governance/threshold_strategy_memo.md`
+- `docs/governance/governance_summary.md`
+- `presentation/fraud-alert-control-tower-executive-story.pptx`
+- `index.html`
+- `app/index.html`
 
 ## README Must Include
 
@@ -80,7 +79,7 @@ Use clear commits:
 4. `Add static fraud control tower app`
 5. `Add governance documentation`
 6. `Add executive presentation`
-7. `Add recruiter portfolio package`
+7. `Polish recruiter portfolio package`
 
 ## Before Making The Repo Public
 

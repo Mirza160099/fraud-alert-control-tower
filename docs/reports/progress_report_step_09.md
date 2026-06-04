@@ -7,12 +7,10 @@ Make the project easy for a recruiter, hiring manager, or JPMorgan-style reviewe
 ## What I Added
 
 - `README.md`: master GitHub-ready project README with screenshots, problem framing, pipeline summary, model comparison, threshold strategy, explainability, governance, and run/deploy instructions.
-- `interview_script.md`: 30-second pitch, 2-minute walkthrough, technical explanation, banking framing, improvement plan, and demo flow.
-- `resume_linkedin_bullets.md`: resume bullets, LinkedIn post draft, GitHub repo description, and portfolio card text.
 - `vercel_deployment_checklist.md`: local smoke test, Vercel setup, post-deployment checks, and safe wording.
 - `github_release_checklist.md`: suggested repo structure, GitHub topics, commit sequence, and public-release checks.
 - `assets/`: app screenshots for the README.
-- `outputs/step_09_portfolio_package.zip`: compressed copy of the recruiter package.
+- Public portfolio package: clean source code, app files, screenshots, governance docs, progress reports, and executive deck.
 
 ## Screenshots Captured
 
@@ -30,7 +28,6 @@ Before this step, the project had strong technical and governance artifacts. Aft
 - proof of app UI
 - model and threshold evidence
 - responsible-AI framing
-- interview-ready language
 - deployment checklist
 
 ## Best Interview Line
