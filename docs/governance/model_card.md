@@ -6,8 +6,8 @@
 |---|---|
 | Project | Explainable Fraud Alert Prioritization and Investigation Control Tower |
 | Model purpose | Score transaction fraud risk and prioritize investigator review queues |
-| Champion model | `adaboost_depth2_weighted` |
-| Model family | Depth-2 AdaBoost classifier with weighted training |
+| Triage layer | `risk_triage_engine` |
+| Scoring approach | Explainable risk-ranking layer with weighted training |
 | Primary users | Fraud operations analysts, investigators, risk analytics reviewers |
 | Decision type | Decision-support, not fully automated adverse action |
 | Current status | Prototype / capstone model using synthetic data |
@@ -54,7 +54,7 @@ Important data quality notes:
 
 ## Features Used
 
-The final app and champion model use the selected top 10 features:
+The final app and risk triage layer use the selected top 10 features:
 
 1. `geo_distance_km`
 2. `txn_country`
@@ -98,11 +98,11 @@ Modeling controls:
 - Final performance measured on held-out test data.
 - Class imbalance handled with weighted training.
 
-## Champion Performance
+## Operating Performance
 
-Champion operating policy:
+Operating policy:
 
-- Model: `adaboost_depth2_weighted`
+- Triage layer: `risk_triage_engine`
 - Threshold: `0.7977`
 - Target review capacity: `5%`
 
@@ -146,7 +146,7 @@ Existing `alert_generated` performance on the same test split:
 Interpretation:
 
 - The existing alert rule is more precise but catches fewer fraud cases.
-- The champion model catches more fraud cases than the existing alert rule at the selected capacity setting, but increases false positives.
+- The risk triage policy catches more fraud cases than the existing alert rule at the selected capacity setting, but increases false positives.
 - This is a business trade-off, not a purely technical win.
 
 ## Business Impact Sensitivity
@@ -195,7 +195,7 @@ Example rationale pattern:
 - Segment-level performance monitoring by country, channel, merchant category, and customer cohort.
 - Threshold review when investigation staffing changes.
 - Drift monitoring for amount distributions, geo-distance patterns, and channel mix.
-- Periodic challenger model comparison.
+- Periodic benchmark and policy comparison.
 - Audit logging of model score, threshold, top reasons, and investigator decision.
 
 ## Approval Recommendation

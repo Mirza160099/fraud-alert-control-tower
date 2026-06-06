@@ -12,7 +12,7 @@ JPMorgan-inspired fraud analytics project that prioritizes transaction alerts, e
 
 ## What This Project Demonstrates
 
-- End-to-end fraud analytics workflow: data audit, cleaning, joins, feature engineering, feature selection, model comparison, thresholding, explainability, and app deployment.
+- End-to-end fraud analytics workflow: data audit, cleaning, joins, feature engineering, feature selection, fraud-risk scoring, thresholding, explainability, and app deployment.
 - Responsible AI framing: leakage prevention, model-card documentation, human review, threshold governance, risk register, approval gates, and monitoring controls.
 - Recruiter-friendly product thinking: the final app is not just a classifier; it is an investigator control tower with explanations, risk/protective feature impact, an investigator brief, queue command controls, governance evidence, and recommended next actions.
 
@@ -26,9 +26,9 @@ JPMorgan-inspired fraud analytics project that prioritizes transaction alerts, e
 
 ![Investigator queue screenshot](assets/app-queue-viewport.png)
 
-### Model Metrics
+### Operating Metrics
 
-![Model metrics screenshot](assets/app-metrics-viewport.png)
+![Operating metrics screenshot](assets/app-metrics-viewport.png)
 
 ### Governance View
 
@@ -88,24 +88,19 @@ Selected using training-only mutual information:
 | 9 | `transaction_amount_usd` |
 | 10 | `amount_log1p` |
 
-## Model Comparison
+## Operating Evidence
 
-The final comparison used the same top-10 feature set so the app remained explainable. The app's Metrics tab also translates the model table into an analyst scorecard, outcome matrix, and takeaways so reviewers can see model quality, workload, false positives, missed fraud, and benchmark trade-offs together.
+The final risk triage layer uses the same top-10 feature set so the app remains explainable. The app's Metrics tab focuses on operating evidence rather than a model leaderboard: ranking quality, fraud capture, queue precision, review workload, false positives, missed fraud, and threshold trade-offs.
 
-| Model | Precision | Recall | F1 | PR-AUC | Reviews |
-|---|---:|---:|---:|---:|---:|
-| Enhanced AdaBoost depth-2 weighted | 15.3% | 32.5% | 20.8% | 0.141 | 85 |
-| Gradient boosting weighted | 11.6% | 40.0% | 18.0% | 0.130 | 138 |
-| AdaBoost weighted | 14.9% | 35.0% | 20.9% | 0.098 | 94 |
-| Random forest balanced | 7.7% | 50.0% | 13.3% | 0.092 | 261 |
-| Logistic regression balanced | 10.3% | 30.0% | 15.4% | 0.091 | 116 |
-| Extra trees balanced | 5.8% | 37.5% | 10.1% | 0.089 | 257 |
+At the selected review threshold:
 
-Champion model: `adaboost_depth2_weighted`
+- Ranking quality score: `0.141`
+- Fraud capture: `25.0%`
+- Queue precision: `13.5%`
+- Review count: `74`
+- False positives: `64`
 
-Why this model: the original AdaBoost stump model was strong but produced jumpy probability bands. The upgraded depth-2 AdaBoost keeps the queue discipline, improves held-out PR-AUC, and gives a smoother fraud-risk score for the live app.
-
-Metrics interpretation: PR-AUC is treated as the lead selection metric because the fraud class is rare. Precision, recall, review count, false positives, and fraud capture are shown together so the model is evaluated as an operating decision rather than a single score.
+Metrics interpretation: ranking quality is tracked because the fraud class is rare, but it is not treated as the only decision point. Queue precision, review count, false positives, and fraud capture are shown together so the score is evaluated as an operating decision rather than a single technical metric.
 
 ## Threshold Strategy
 
@@ -131,9 +126,9 @@ Business interpretation: the threshold is not just a modeling parameter. It is a
 
 ## Business Impact And Alert Economics
 
-The selected threshold is also a financial trade-off. Compared with the existing alert benchmark on the same held-out test split:
+The selected threshold is also a financial trade-off. On the same held-out test split, the operating policy changes the review queue as follows:
 
-| Item | Existing alert | Champion model | Change |
+| Item | Existing alert | Risk triage policy | Change |
 |---|---:|---:|---:|
 | Reviewed cases | 22 | 74 | +52 |
 | Fraud cases caught | 8 | 10 | +2 |
@@ -182,7 +177,7 @@ Views:
 - `Score`: user enters transaction details and receives a prediction, probability, priority tier, and explanation.
 - Scenario presets: Low, Medium, High, and Critical demonstrate that the model separates normal transactions from escalating fraud risk.
 - `Queue`: highest-risk cases are ranked for investigator review.
-- `Metrics`: model comparison, feature importance, and capacity thresholds.
+- `Metrics`: operating evidence, feature importance, capacity threshold, pilot recommendation, and alert economics.
 - `Governance`: model-card summary, threshold policy, and monitoring controls.
 
 Run locally:
@@ -208,7 +203,7 @@ If you already created a Vercel project with `app` as the root, that also works.
 ## Key Artifacts
 
 - Modeling pipeline: `src/fraud_pipeline.py`, `src/train_model.py`
-- Model comparison: `src/model_selection.py`, `src/compare_models.py`
+- Risk scoring and threshold evaluation: `src/model_selection.py`, `src/compare_models.py`
 - Explainability: `src/explainability.py`, `src/explain_model.py`
 - Web model export: `src/export_model_for_web.py`
 - Static app: `app`
@@ -241,6 +236,6 @@ The clean GitHub package does not include raw source data by default. The reposi
 
 ## Interview Pitch
 
-I built an explainable fraud alert prioritization system that treats fraud detection as an operational control problem. The project cleans and joins transaction, customer, and merchant data, selects the top 10 model features using training-only mutual information, compares several imbalanced-classification models, and selects an enhanced depth-2 AdaBoost champion. I then tune the decision threshold around investigator capacity, export the model into a static Vercel-style app, and document governance through a model card, threshold memo, and responsible-AI summary.
+I built an explainable fraud alert prioritization system that treats fraud detection as an operational control problem. The project cleans and joins transaction, customer, and merchant data, selects the top 10 risk features using training-only mutual information, builds a fraud-risk triage layer, and tunes the decision threshold around investigator capacity. I then export the scoring layer into a static Vercel-style app and document governance through a model card, threshold memo, and responsible-AI summary.
 
 The strongest part of the project is that it does not stop at prediction. It shows how a bank would decide which cases get reviewed, why they are risky, and what controls would be needed before production use.

@@ -6,7 +6,7 @@ Static prediction interface for the fraud alert prioritization project.
 
 - `Score`: transaction input, prediction, priority, and local explanation.
 - `Queue`: investigator queue summary and highest-risk cases.
-- `Metrics`: model comparison, global drivers, and capacity thresholds.
+- `Metrics`: operating evidence, global drivers, pilot recommendation, and capacity thresholds.
 - `Governance`: model-card summary, threshold policy, and monitoring controls.
 
 ## Run Locally
@@ -29,4 +29,4 @@ Deploy this folder as the Vercel project root:
 outputs/step_05_vercel_app
 ```
 
-The app runs entirely in the browser using `model.json`, which was exported from the Step 3 champion model. Dashboard and queue data are loaded from `dashboard-data.json`.
+The app runs entirely in the browser using `model.json`, which was exported from the scoring pipeline as a risk triage layer. Dashboard and queue data are loaded from `dashboard-data.json`.

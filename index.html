@@ -15,7 +15,7 @@
             <h1>Fraud Alert Control Tower</h1>
           </div>
           <div class="model-chip">
-            <span class="chip-label">Champion</span>
+            <span class="chip-label">Decision layer</span>
             <strong id="modelName">Loading</strong>
           </div>
         </header>
@@ -41,7 +41,7 @@
             <strong id="liveAction">Loading</strong>
           </div>
           <div>
-            <span>Portfolio evidence</span>
+            <span>Evidence basis</span>
             <strong id="liveModelName">Loading</strong>
           </div>
         </section>
@@ -219,7 +219,7 @@
               <strong id="queueHitRate">0%</strong>
             </div>
             <div class="panel kpi-card">
-              <span>Missed by old alert</span>
+              <span>Rule-gap cases</span>
               <strong id="missedOldAlerts">0</strong>
             </div>
           </section>
@@ -281,23 +281,23 @@
             <section class="panel metrics-scorecard-panel">
               <div class="panel-header">
                 <h2>Analyst Scorecard</h2>
-                <span id="championModelBadge" class="muted-label">Champion</span>
+                <span id="championModelBadge" class="muted-label">Operating evidence</span>
               </div>
               <div class="scorecard-grid">
                 <div>
-                  <span>PR-AUC</span>
+                  <span>Ranking quality</span>
                   <strong id="scorecardPrAuc">0.000</strong>
-                  <small id="scorecardPrAucBench">Benchmark 0.000</small>
+                  <small id="scorecardPrAucBench">Held-out validation</small>
                 </div>
                 <div>
                   <span>Fraud capture</span>
                   <strong id="scorecardCapture">0%</strong>
-                  <small id="scorecardCaptureBench">Benchmark 0%</small>
+                  <small id="scorecardCaptureBench">At review threshold</small>
                 </div>
                 <div>
-                  <span>Queue hit rate</span>
+                  <span>Queue precision</span>
                   <strong id="scorecardHitRate">0%</strong>
-                  <small id="scorecardHitBench">Benchmark 0%</small>
+                  <small id="scorecardHitBench">Fraud share in reviewed cases</small>
                 </div>
                 <div>
                   <span>Review rate</span>
@@ -315,7 +315,7 @@
               </div>
               <div class="confusion-boards">
                 <section class="confusion-board">
-                  <h3>Champion Model</h3>
+                  <h3>Risk Triage Policy</h3>
                   <div class="confusion-grid">
                     <div class="confusion-cell caught">
                       <span>True positives</span>
@@ -336,7 +336,7 @@
                   </div>
                 </section>
                 <section class="confusion-board">
-                  <h3>Old Alert Rule</h3>
+                  <h3>Rules Baseline</h3>
                   <div class="confusion-grid">
                     <div class="confusion-cell caught">
                       <span>True positives</span>
@@ -371,30 +371,16 @@
           <section class="content-grid">
             <section class="panel">
               <div class="panel-header">
-                <h2>Model Comparison</h2>
-                <span class="muted-label">Held-out test set</span>
+                <h2>Pilot Recommendation</h2>
+                <span class="muted-label">Shadow-mode control</span>
               </div>
-              <div class="table-wrap">
-                <table>
-                  <thead>
-                    <tr>
-                      <th>Model</th>
-                      <th>Role</th>
-                      <th>Precision</th>
-                      <th>Recall</th>
-                      <th>PR-AUC</th>
-                      <th>Reviews</th>
-                    </tr>
-                  </thead>
-                  <tbody id="modelComparisonRows"></tbody>
-                </table>
-              </div>
+              <ul id="pilotRecommendationList" class="recommendation-list"></ul>
             </section>
 
             <section class="panel">
               <div class="panel-header">
                 <h2>Feature Importance</h2>
-                <span class="muted-label">Permutation PR-AUC</span>
+                <span class="muted-label">Top operating drivers</span>
               </div>
               <div id="globalFeatureBars" class="feature-bars compact"></div>
             </section>
@@ -409,7 +395,7 @@
               <table>
                 <thead>
                   <tr>
-                    <th>Model</th>
+                    <th>Policy</th>
                     <th>Threshold</th>
                     <th>Test reviews</th>
                     <th>Hit rate</th>
@@ -507,7 +493,7 @@
                 </div>
                 <div>
                   <dt>Trade-off</dt>
-                  <dd>Higher capture than the old alert rule, with more false positives requiring investigator capacity.</dd>
+                  <dd>Higher fraud capture at the selected review capacity, with false positives requiring investigator validation.</dd>
                 </div>
               </dl>
             </section>
@@ -584,7 +570,7 @@
               <article>
                 <span>Leakage</span>
                 <strong>Training contamination risk</strong>
-                <p>Exclude IDs, target labels, and old alert outputs from modeling features; repeat leakage checks.</p>
+                <p>Exclude IDs, target labels, and historical alert outputs from modeling features; repeat leakage checks.</p>
                 <small>Owner: Analytics Engineering</small>
               </article>
               <article>

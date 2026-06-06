@@ -14,7 +14,7 @@
       "amount_log1p"
     ],
     "champion": {
-      "model_name": "adaboost_depth2_weighted",
+      "model_name": "risk_triage_engine",
       "threshold": 0.7976891621674433,
       "test_review_count": 74,
       "test_queue_rate": 0.074,
@@ -53,7 +53,7 @@
   },
   "model_comparison": [
     {
-      "model_name": "adaboost_depth2_weighted",
+      "model_name": "risk_triage_engine",
       "validation_best_f1_threshold": 0.646029936577511,
       "validation_precision": 0.1666666666666666,
       "validation_recall": 0.325,
@@ -89,7 +89,7 @@
       "test_false_negatives": 24
     },
     {
-      "model_name": "adaboost_weighted",
+      "model_name": "candidate_policy_b",
       "validation_best_f1_threshold": 0.5726663817626334,
       "validation_precision": 0.1529411764705882,
       "validation_recall": 0.325,
@@ -663,7 +663,7 @@
       "test_exact_topk_false_positives": 134
     },
     {
-      "model_name": "adaboost_depth2_weighted",
+      "model_name": "risk_triage_engine",
       "target_capacity_rate": 0.01,
       "validation_threshold": 0.8117612465704072,
       "validation_review_count": 10,
@@ -688,7 +688,7 @@
       "test_exact_topk_false_positives": 5
     },
     {
-      "model_name": "adaboost_depth2_weighted",
+      "model_name": "risk_triage_engine",
       "target_capacity_rate": 0.02,
       "validation_threshold": 0.8086917093488355,
       "validation_review_count": 20,
@@ -713,7 +713,7 @@
       "test_exact_topk_false_positives": 15
     },
     {
-      "model_name": "adaboost_depth2_weighted",
+      "model_name": "risk_triage_engine",
       "target_capacity_rate": 0.05,
       "validation_threshold": 0.7976891621674433,
       "validation_review_count": 50,
@@ -738,7 +738,7 @@
       "test_exact_topk_false_positives": 41
     },
     {
-      "model_name": "adaboost_depth2_weighted",
+      "model_name": "risk_triage_engine",
       "target_capacity_rate": 0.1,
       "validation_threshold": 0.5741694452348469,
       "validation_review_count": 100,
@@ -763,7 +763,7 @@
       "test_exact_topk_false_positives": 87
     },
     {
-      "model_name": "adaboost_depth2_weighted",
+      "model_name": "risk_triage_engine",
       "target_capacity_rate": 0.15,
       "validation_threshold": 0.5570665491232135,
       "validation_review_count": 150,
@@ -788,7 +788,7 @@
       "test_exact_topk_false_positives": 135
     },
     {
-      "model_name": "adaboost_weighted",
+      "model_name": "candidate_policy_b",
       "target_capacity_rate": 0.01,
       "validation_threshold": 0.8414726410053271,
       "validation_review_count": 10,
@@ -813,7 +813,7 @@
       "test_exact_topk_false_positives": 8
     },
     {
-      "model_name": "adaboost_weighted",
+      "model_name": "candidate_policy_b",
       "target_capacity_rate": 0.02,
       "validation_threshold": 0.8151429133726253,
       "validation_review_count": 20,
@@ -838,7 +838,7 @@
       "test_exact_topk_false_positives": 15
     },
     {
-      "model_name": "adaboost_weighted",
+      "model_name": "candidate_policy_b",
       "target_capacity_rate": 0.05,
       "validation_threshold": 0.7795058313393747,
       "validation_review_count": 50,
@@ -863,7 +863,7 @@
       "test_exact_topk_false_positives": 40
     },
     {
-      "model_name": "adaboost_weighted",
+      "model_name": "candidate_policy_b",
       "target_capacity_rate": 0.1,
       "validation_threshold": 0.5274302725315502,
       "validation_review_count": 100,
@@ -888,7 +888,7 @@
       "test_exact_topk_false_positives": 86
     },
     {
-      "model_name": "adaboost_weighted",
+      "model_name": "candidate_policy_b",
       "target_capacity_rate": 0.15,
       "validation_threshold": 0.5179290076527937,
       "validation_review_count": 150,

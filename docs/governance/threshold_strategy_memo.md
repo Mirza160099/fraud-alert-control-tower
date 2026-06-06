@@ -6,7 +6,7 @@ The fraud model should not be evaluated only as a binary classifier. In fraud op
 
 > Given limited investigator capacity, which transactions should be reviewed first?
 
-For this prototype, the recommended operating policy is to use the `adaboost_depth2_weighted` champion model with a threshold of `0.7977`, selected from validation data under a target review capacity of approximately `5%`.
+For this prototype, the recommended operating policy is to use the `risk_triage_engine` decision-support layer with a threshold of `0.7977`, selected from validation data under a target review capacity of approximately `5%`.
 
 ## Business Objective
 
@@ -21,7 +21,7 @@ The threshold strategy balances:
 
 | Item | Value |
 |---|---:|
-| Champion model | `adaboost_depth2_weighted` |
+| Triage layer | `risk_triage_engine` |
 | Recommended threshold | `0.7977` |
 | Target review capacity | 5% |
 | Test review count after threshold | 74 |
@@ -58,7 +58,7 @@ The model is not only a statistical threshold. It also changes investigation cos
 
 Compared with the existing alert benchmark:
 
-| Item | Existing alert | Champion model | Change |
+| Item | Existing alert | Risk triage policy | Change |
 |---|---:|---:|---:|
 | Reviewed cases | 22 | 74 | +52 |
 | Fraud cases caught | 8 | 10 | +2 |
@@ -78,7 +78,7 @@ This sensitivity is not a production ROI claim. It demonstrates the operating qu
 
 ## Capacity Sensitivity
 
-For the champion model:
+For the risk triage policy:
 
 | Target capacity | Validation threshold | Test reviews | Test hit rate | Test fraud capture |
 |---:|---:|---:|---:|---:|
@@ -106,9 +106,9 @@ Existing alert performance:
 | False positives | 14 |
 | False negatives | 32 |
 
-Champion model at selected threshold:
+Risk triage policy at selected threshold:
 
-| Metric | Champion model |
+| Metric | Risk triage policy |
 |---|---:|
 | Precision / hit rate | 13.5% |
 | Recall / fraud capture | 25.0% |
@@ -119,8 +119,8 @@ Champion model at selected threshold:
 Business trade-off:
 
 - The existing alert rule is more precise.
-- The champion model captures more fraud.
-- The model should be positioned as a prioritization layer or challenger queue strategy, not a replacement rule without further validation.
+- The risk triage policy captures more fraud.
+- The model should be positioned as a prioritization layer, not a replacement rule without further validation.
 
 ## Recommended Queue Policy
 

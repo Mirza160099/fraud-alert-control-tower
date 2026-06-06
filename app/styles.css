@@ -1131,6 +1131,38 @@ td {
   line-height: 1.45;
 }
 
+.recommendation-list {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.recommendation-list li {
+  position: relative;
+  min-height: 64px;
+  padding: 14px 14px 14px 46px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfdfc;
+  color: #20312f;
+  font-weight: 750;
+  line-height: 1.38;
+}
+
+.recommendation-list li::before {
+  content: "";
+  position: absolute;
+  left: 16px;
+  top: 19px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 5px #e3f2ee;
+}
+
 .confusion-boards {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

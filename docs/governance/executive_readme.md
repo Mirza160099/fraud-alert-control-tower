@@ -28,7 +28,7 @@ Use this line:
 
 ## Key Numbers
 
-- Champion model: `adaboost_depth2_weighted`
+- Triage layer: `risk_triage_engine`
 - Recommended threshold: `0.7977`
 - Target review capacity: `5%`
 - Test hit rate at threshold: `13.5%`
@@ -41,4 +41,4 @@ Use this line:
 
 Do not claim this model is production-ready. The strongest professional framing is:
 
-> This is a disciplined prototype that demonstrates the full lifecycle: data cleaning, feature selection, model comparison, thresholding, explainability, dashboarding, and governance.
+> This is a disciplined prototype that demonstrates the full lifecycle: data cleaning, feature selection, risk scoring, thresholding, explainability, dashboarding, and governance.

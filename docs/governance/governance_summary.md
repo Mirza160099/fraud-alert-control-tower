@@ -120,7 +120,7 @@ Major limitations:
 - Threshold calibration
 - Feature drift
 - Segment-level fairness review
-- Challenger model performance
+- Periodic benchmark and policy review
 - Investigator feedback themes
 - Case outcome quality
 

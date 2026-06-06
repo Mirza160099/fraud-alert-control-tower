@@ -1,5 +1,5 @@
 {
-  "model_name": "adaboost_depth2_weighted",
+  "model_name": "risk_triage_engine",
   "threshold": 0.7976891621674433,
   "target_capacity_rate": 0.05,
   "selected_features": [
@@ -204,7 +204,18 @@
       "categorical__channel_Wire"
     ]
   },
-  "adaboost": {
+  "currency_rates_to_usd": {
+    "USD": 1.0,
+    "GBP": 1.27,
+    "EUR": 1.08,
+    "INR": 0.012,
+    "AED": 0.272,
+    "SGD": 0.74,
+    "CAD": 0.73,
+    "BRL": 0.19,
+    "NGN": 0.00067
+  },
+  "risk_ensemble": {
     "classes": [
       0,
       1
@@ -12744,16 +12755,5 @@
         ]
       }
     ]
-  },
-  "currency_rates_to_usd": {
-    "USD": 1.0,
-    "GBP": 1.27,
-    "EUR": 1.08,
-    "INR": 0.012,
-    "AED": 0.272,
-    "SGD": 0.74,
-    "CAD": 0.73,
-    "BRL": 0.19,
-    "NGN": 0.00067
   }
 }

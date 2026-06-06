@@ -42,6 +42,14 @@ function signedCount(value) {
   return `${number > 0 ? "+" : ""}${number}`;
 }
 
+function triageLayerName() {
+  return "Risk triage engine";
+}
+
+function evidenceBasisLabel() {
+  return "Held-out test + governance pack";
+}
+
 function getNumber(id, fallback = 0) {
   const value = Number(document.getElementById(id).value);
   return Number.isFinite(value) ? value : fallback;
@@ -100,7 +108,7 @@ function predictTree(tree, transformed) {
 
 function predictProbability(input, model = state.model) {
   const transformed = preprocess(input, model);
-  const { estimator_weights: weights, trees } = model.adaboost;
+  const { estimator_weights: weights, trees } = model.risk_ensemble;
   const weightSum = weights.reduce((total, weight) => total + weight, 0);
   let classZeroScore = 0;
   let classOneScore = 0;
@@ -574,8 +582,8 @@ function initializeForm(model) {
   populateSelect("channel", channelSchema.categories, "Card Present");
   populateSelect("currency", Object.keys(model.currency_rates_to_usd), "USD");
 
-  document.getElementById("modelName").textContent = model.model_name.replaceAll("_", " ");
-  document.getElementById("liveModelName").textContent = model.model_name.replaceAll("_", " ");
+  document.getElementById("modelName").textContent = triageLayerName();
+  document.getElementById("liveModelName").textContent = evidenceBasisLabel();
   document.getElementById("thresholdLabel").textContent = `Threshold ${model.threshold.toFixed(3)}`;
   document.getElementById("capacityText").textContent = `${Math.round(model.target_capacity_rate * 100)}%`;
 
@@ -653,15 +661,15 @@ function queueAction(tier) {
 
 function evidenceStatus(caseItem) {
   return Number(caseItem.alert_generated) === 1
-    ? "Old alert also fired"
-    : "Old alert missed";
+    ? "Rule signal present"
+    : "Previously unflagged";
 }
 
 function evidenceCheckText(caseItem) {
   if (Number(caseItem.alert_generated) === 1) {
-    return "Compare the model reason with the old alert rule before deciding the case.";
+    return "Use the rule signal, model reason, and customer context together before deciding the case.";
   }
-  return "Validate this incremental model alert carefully because the old rule did not catch it.";
+  return "Validate this incremental triage case carefully because no prior rule signal caught it.";
 }
 
 function renderQueueCommand(summary) {
@@ -706,8 +714,8 @@ function renderQueueCommand(summary) {
     Number(champion.test_true_positives) - Number(existing.true_positives);
   [
     `Threshold ${numberText(champion.threshold, 3)} routes ${percent(champion.test_queue_rate)} of test transactions to review.`,
-    `${summary.missed_existing_alerts_in_top_cases} visible top cases were missed by the old alert rule.`,
-    `${signedCount(incrementalFrauds)} fraud cases captured versus the old alert benchmark at this operating point.`,
+    `${summary.missed_existing_alerts_in_top_cases} visible top cases are rule-gap cases that need investigator validation.`,
+    `${signedCount(incrementalFrauds)} additional fraud cases are captured at this operating point.`,
     `${champion.test_false_positives} backtest false positives require human validation before any customer-impacting action.`,
   ].forEach((text) => {
     const li = document.createElement("li");
@@ -816,7 +824,6 @@ function renderAnalystMetrics() {
   const existing = state.dashboard.metrics.existing_alert_benchmark;
   const championComparison = championComparisonRow();
   const championPrAuc = Number(championComparison?.test_average_precision_pr_auc ?? 0);
-  const championName = champion.model_name.replaceAll("_", " ");
   const championTn = championTrueNegatives(champion, existing);
   const championTotal =
     championTn +
@@ -829,30 +836,30 @@ function renderAnalystMetrics() {
     Number(champion.test_review_count) - benchmarkReviewCount(existing);
   const reviewsPerFraud = 1 / Math.max(Number(champion.test_precision_hit_rate), 0.001);
 
-  document.getElementById("championModelBadge").textContent = championName;
+  document.getElementById("championModelBadge").textContent = "Operating evidence";
   document.getElementById("scorecardPrAuc").textContent = numberText(
     championPrAuc,
     3,
   );
   document.getElementById("scorecardPrAucBench").textContent =
-    `Old alert ${numberText(existing.average_precision_pr_auc, 3)}`;
+    "Ranking quality on held-out data";
   document.getElementById("scorecardCapture").textContent = percent(
     champion.test_recall_fraud_capture_rate,
   );
   document.getElementById("scorecardCaptureBench").textContent =
-    `Old alert ${percent(existing.recall)}`;
+    "Fraud cases captured at the review threshold";
   document.getElementById("scorecardHitRate").textContent = percent(
     champion.test_precision_hit_rate,
   );
   document.getElementById("scorecardHitBench").textContent =
-    `Old alert ${percent(existing.precision)}`;
+    "Share of reviewed cases confirmed as fraud";
   document.getElementById("scorecardReviewRate").textContent = percent(
     champion.test_queue_rate,
   );
   document.getElementById("scorecardReviewCount").textContent =
     `${champion.test_review_count} of ${championTotal.toLocaleString("en-US")} test transactions`;
   document.getElementById("scorecardNarrative").textContent =
-    `Selected model: ${championName}. It improves PR-AUC and fraud capture versus the old alert rule, while making the review workload explicit through a ${percent(champion.test_queue_rate)} queue rate.`;
+    `This operating view translates fraud ranking into a review queue: ${percent(champion.test_queue_rate)} of test transactions are routed to investigators, with capture, precision, and false-positive load shown together.`;
 
   document.getElementById("championTp").textContent = String(
     champion.test_true_positives,
@@ -870,8 +877,8 @@ function renderAnalystMetrics() {
   document.getElementById("oldTn").textContent = String(existing.true_negatives);
 
   const takeaways = [
-    `PR-AUC is the lead model-selection metric because fraud is rare; the champion reached ${numberText(championPrAuc, 3)} versus ${numberText(existing.average_precision_pr_auc, 3)} for the old alert rule.`,
-    `The champion captures ${percent(champion.test_recall_fraud_capture_rate)} of fraud in the test set, which is ${signedCount(incrementalFraud)} more caught fraud cases than the old alert benchmark.`,
+    `Ranking quality is tracked because fraud is rare; the validation score is ${numberText(championPrAuc, 3)} and is used with queue workload rather than alone.`,
+    `The triage policy captures ${percent(champion.test_recall_fraud_capture_rate)} of fraud in the test set, adding ${signedCount(incrementalFraud)} caught fraud cases at the selected operating point.`,
     `The hit rate is ${percent(champion.test_precision_hit_rate)}, or about one fraud per ${reviewsPerFraud.toFixed(1)} reviewed cases, so investigator capacity remains part of the decision.`,
     `${signedCount(incrementalReviews)} extra reviews are accepted in exchange for higher capture; that is why the Business Impact panel translates model metrics into operating cost.`,
   ];
@@ -884,38 +891,39 @@ function renderAnalystMetrics() {
   });
 }
 
-function renderModelComparison() {
-  const tbody = document.getElementById("modelComparisonRows");
-  tbody.replaceChildren();
-  const championName = state.dashboard.metrics.champion.model_name;
-
-  state.dashboard.model_comparison.forEach((row) => {
-    const tr = document.createElement("tr");
-    const isChampion = row.model_name === championName;
-    tr.className = isChampion ? "champion-row" : "";
-    tr.innerHTML = `
-      <td>${row.model_name.replaceAll("_", " ")}</td>
-      <td><span class="model-role ${isChampion ? "champion" : ""}">${isChampion ? "Champion" : "Challenger"}</span></td>
-      <td>${percent(row.test_precision)}</td>
-      <td>${percent(row.test_recall)}</td>
-      <td>${numberText(row.test_average_precision_pr_auc, 3)}</td>
-      <td>${row.test_review_count}</td>
-    `;
-    tbody.appendChild(tr);
+function renderPilotRecommendation() {
+  const champion = state.dashboard.metrics.champion;
+  const list = document.getElementById("pilotRecommendationList");
+  const recommendations = [
+    "Run the triage layer in shadow mode before any customer-impacting action.",
+    `Use the ${percent(champion.test_queue_rate)} review policy as the pilot operating point and monitor queue load daily.`,
+    "Require investigator approval and case notes before escalation, blocking, or customer contact.",
+    "Track fraud capture, false positives, queue size, score drift, and segment-level outcomes during the pilot.",
+  ];
+  list.replaceChildren();
+  recommendations.forEach((text) => {
+    const li = document.createElement("li");
+    li.textContent = text;
+    list.appendChild(li);
   });
 }
 
 function renderCapacityThresholds() {
   const tbody = document.getElementById("capacityRows");
   tbody.replaceChildren();
-  const rows = state.dashboard.capacity_thresholds.filter(
-    (row) => Number(row.target_capacity_rate) === 0.05,
-  ).sort((a, b) => Number(b.validation_f1) - Number(a.validation_f1));
+  const champion = state.dashboard.metrics.champion;
+  const rows = state.dashboard.capacity_thresholds
+    .filter(
+      (row) =>
+        Number(row.target_capacity_rate) === 0.05 &&
+        row.model_name === champion.model_name,
+    )
+    .slice(0, 1);
 
   rows.forEach((row) => {
     const tr = document.createElement("tr");
     tr.innerHTML = `
-      <td>${row.model_name.replaceAll("_", " ")}</td>
+      <td>5% investigator review policy</td>
       <td>${numberText(row.validation_threshold, 3)}</td>
       <td>${row.test_review_count}</td>
       <td>${percent(row.test_precision_hit_rate)}</td>
@@ -980,7 +988,7 @@ function renderBusinessImpact() {
 function renderDashboard() {
   renderQueue();
   renderAnalystMetrics();
-  renderModelComparison();
+  renderPilotRecommendation();
   renderCapacityThresholds();
   renderGlobalImportance();
   renderBusinessImpact();
