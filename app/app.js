@@ -937,7 +937,9 @@ function renderCapacityThresholds() {
 function renderGlobalImportance() {
   const bars = document.getElementById("globalFeatureBars");
   bars.replaceChildren();
-  const visible = state.dashboard.global_feature_importance.slice(0, 8);
+  const visible = state.dashboard.global_feature_importance
+    .filter((row) => Number(row.permutation_importance_mean_pr_auc) >= 0.001)
+    .slice(0, 8);
   const maxValue = Math.max(
     ...visible.map((row) => Math.abs(Number(row.permutation_importance_mean_pr_auc))),
     0.001,
