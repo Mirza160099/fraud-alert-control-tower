@@ -7,6 +7,10 @@ JPMorgan-inspired fraud analytics project that prioritizes transaction alerts, e
 ## Links
 
 - Live demo: [Fraud Alert Control Tower](https://fraud-alert-control-tower-5cic.vercel.app)
+- Score demo: [High-risk transaction scenario](https://fraud-alert-control-tower-5cic.vercel.app/?view=score&scenario=high)
+- Queue view: [Investigator queue](https://fraud-alert-control-tower-5cic.vercel.app/?view=queue)
+- Metrics view: [Operating metrics and capacity ladder](https://fraud-alert-control-tower-5cic.vercel.app/?view=metrics)
+- Governance view: [Model risk controls](https://fraud-alert-control-tower-5cic.vercel.app/?view=governance)
 - Executive deck: [`presentation/fraud-alert-control-tower-executive-story.pptx`](presentation/fraud-alert-control-tower-executive-story.pptx)
 - Governance docs: [`docs/governance`](docs/governance)
 

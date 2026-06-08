@@ -579,15 +579,20 @@ select:focus {
 }
 
 .priority-lane {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  justify-content: space-between;
   gap: 12px;
   padding: 12px;
   border: 1px solid var(--line);
   border-left: 4px solid var(--accent);
   border-radius: 8px;
   background: #fbfdfc;
+}
+
+.priority-lane.empty {
+  opacity: 0.72;
+  background: #f8faf9;
 }
 
 .priority-lane.critical {
@@ -603,15 +608,48 @@ select:focus {
 }
 
 .priority-lane strong,
-.priority-lane span {
+.priority-lane span,
+.priority-lane small {
   display: block;
+}
+
+.priority-lane small {
+  margin-top: 5px;
+  color: #2d3836;
+  font-size: 0.78rem;
+  line-height: 1.32;
+}
+
+.lane-count {
+  display: grid;
+  justify-items: end;
+  gap: 3px;
 }
 
 .priority-lane b {
   min-width: 44px;
   color: var(--ink);
   font-size: 1.65rem;
+  line-height: 1;
   text-align: right;
+}
+
+.lane-count span {
+  color: var(--muted);
+  font-size: 0.68rem;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+
+.lane-note {
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px dashed var(--line);
+  border-radius: 8px;
+  background: #fbfdfc;
+  color: var(--muted);
+  font-size: 0.82rem;
+  line-height: 1.35;
 }
 
 .control-checks {
@@ -746,6 +784,37 @@ select:focus {
 .case-tag.old-alert-missed {
   background: #fff7ed;
   color: var(--warn);
+}
+
+.case-facts {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.case-facts div {
+  min-height: 64px;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.case-facts span {
+  display: block;
+  color: var(--muted);
+  font-size: 0.7rem;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+
+.case-facts strong {
+  display: block;
+  margin-top: 7px;
+  color: var(--ink);
+  font-size: 0.92rem;
+  line-height: 1.25;
 }
 
 .case-workflow {
@@ -1060,6 +1129,7 @@ td {
   font-weight: 650;
 }
 
+.selected-policy-row td,
 .champion-row td {
   background: #eef8f0;
 }
@@ -1344,6 +1414,7 @@ td {
   .content-grid,
   .feature-impact-grid,
   .queue-command-grid,
+  .case-facts,
   .case-workflow,
   .metrics-command-grid,
   .metrics-takeaways,
@@ -1384,6 +1455,7 @@ td {
   .brief-grid,
   .scorecard-grid,
   .confusion-boards,
+  .case-facts,
   .readiness-grid,
   .risk-register-grid,
   .kpi-grid,

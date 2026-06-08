@@ -28,6 +28,11 @@ function percent(value) {
   return `${(Number(value) * 100).toFixed(1)}%`;
 }
 
+function capacityLabel(value) {
+  const percentage = Number(value) * 100;
+  return `${percentage % 1 === 0 ? percentage.toFixed(0) : percentage.toFixed(1)}%`;
+}
+
 function numberText(value, digits = 3) {
   return Number(value).toFixed(digits);
 }
@@ -602,21 +607,33 @@ function initializeForm(model) {
   document.querySelectorAll(".scenario-button").forEach((button) => {
     button.addEventListener("click", () => applyScenarioPreset(button.dataset.scenario));
   });
-  applyScenarioPreset("low");
+  const initialScenario = new URLSearchParams(window.location.search).get("scenario") ?? "low";
+  applyScenarioPreset(scenarioPresets[initialScenario] ? initialScenario : "low");
+}
+
+function setActiveTab(tabName, updateUrl = false) {
+  const allowedTabs = new Set(["score", "queue", "metrics", "governance"]);
+  const activeTab = allowedTabs.has(tabName) ? tabName : "score";
+
+  document.querySelectorAll(".tab-button").forEach((button) => {
+    button.classList.toggle("active", button.dataset.tab === activeTab);
+  });
+  document.querySelectorAll(".tab-view").forEach((view) => {
+    view.classList.toggle("active", view.id === `${activeTab}View`);
+  });
+
+  if (updateUrl) {
+    const url = new URL(window.location.href);
+    url.searchParams.set("view", activeTab);
+    window.history.replaceState({}, "", url);
+  }
 }
 
 function initializeTabs() {
   document.querySelectorAll(".tab-button").forEach((button) => {
-    button.addEventListener("click", () => {
-      const tabName = button.dataset.tab;
-      document.querySelectorAll(".tab-button").forEach((tabButton) => {
-        tabButton.classList.toggle("active", tabButton === button);
-      });
-      document.querySelectorAll(".tab-view").forEach((view) => {
-        view.classList.toggle("active", view.id === `${tabName}View`);
-      });
-    });
+    button.addEventListener("click", () => setActiveTab(button.dataset.tab, true));
   });
+  setActiveTab(new URLSearchParams(window.location.search).get("view") ?? "score");
 }
 
 function sentenceText(text) {
@@ -672,6 +689,26 @@ function evidenceCheckText(caseItem) {
   return "Validate this incremental triage case carefully because no prior rule signal caught it.";
 }
 
+function transactionAmountText(caseItem) {
+  const amountReason = [caseItem.reason_1, caseItem.reason_2, caseItem.reason_3]
+    .filter(Boolean)
+    .find((reason) => /^transaction amount was /i.test(reason));
+  const match = amountReason?.match(/^transaction amount was ([0-9.]+)/i);
+  if (!match) return "Not exported";
+  const amount = Number(match[1]);
+  if (!Number.isFinite(amount)) return "Not exported";
+  return `$${amount.toLocaleString("en-US", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })}`;
+}
+
+function backtestOutcomeText(caseItem) {
+  return Number(caseItem.actual_fraud_label) === 1
+    ? "Confirmed fraud"
+    : "Not fraud in backtest";
+}
+
 function renderQueueCommand(summary) {
   const champion = state.dashboard.metrics.champion;
   const existing = state.dashboard.metrics.existing_alert_benchmark;
@@ -695,18 +732,26 @@ function renderQueueCommand(summary) {
   const cases = state.dashboard.top_queue_cases;
   ["Critical", "High", "Medium", "Low"].forEach((tier) => {
     const count = cases.filter((caseItem) => caseItem.priority_tier === tier).length;
-    if (count === 0) return;
     const lane = document.createElement("div");
-    lane.className = `priority-lane ${priorityClassName(tier)}`;
+    lane.className = `priority-lane ${priorityClassName(tier)}${count === 0 ? " empty" : ""}`;
     lane.innerHTML = `
       <div>
         <strong>${tier}</strong>
         <span>${queueSla(tier)}</span>
+        <small>${queueAction(tier)}</small>
       </div>
-      <b>${count}</b>
+      <div class="lane-count">
+        <b>${count}</b>
+        <span>${count === 1 ? "case" : "cases"}</span>
+      </div>
     `;
     laneList.appendChild(lane);
   });
+
+  const laneNote = document.createElement("p");
+  laneNote.className = "lane-note";
+  laneNote.textContent = `Lane counts reflect the ${cases.length} visible highest-risk cases. Lower lanes remain defined for live scoring and production queue routing.`;
+  laneList.appendChild(laneNote);
 
   const controlChecks = document.getElementById("queueControlChecks");
   controlChecks.replaceChildren();
@@ -768,6 +813,25 @@ function renderQueue() {
         <span class="case-tag ${tierClass}">${caseItem.priority_tier}</span>
         <span class="case-tag ${Number(caseItem.actual_fraud_label) === 1 ? "true-fraud" : "non-fraud"}">${backtestLabel}</span>
         <span class="case-tag ${Number(caseItem.alert_generated) === 1 ? "old-alert-hit" : "old-alert-missed"}">${oldAlertLabel}</span>
+      </div>
+
+      <div class="case-facts">
+        <div>
+          <span>Amount</span>
+          <strong>${transactionAmountText(caseItem)}</strong>
+        </div>
+        <div>
+          <span>Event time</span>
+          <strong>${String(caseItem.event_ts).replace(" ", " at ")}</strong>
+        </div>
+        <div>
+          <span>Backtest outcome</span>
+          <strong>${backtestOutcomeText(caseItem)}</strong>
+        </div>
+        <div>
+          <span>Legacy rule</span>
+          <strong>${oldAlertLabel}</strong>
+        </div>
       </div>
 
       <div class="case-workflow">
@@ -912,18 +976,20 @@ function renderCapacityThresholds() {
   const tbody = document.getElementById("capacityRows");
   tbody.replaceChildren();
   const champion = state.dashboard.metrics.champion;
+  const allowedRates = new Set([0.01, 0.02, 0.05, 0.1, 0.15]);
   const rows = state.dashboard.capacity_thresholds
     .filter(
       (row) =>
-        Number(row.target_capacity_rate) === 0.05 &&
-        row.model_name === champion.model_name,
+        row.model_name === champion.model_name &&
+        allowedRates.has(Number(row.target_capacity_rate)),
     )
-    .slice(0, 1);
+    .sort((a, b) => Number(a.target_capacity_rate) - Number(b.target_capacity_rate));
 
   rows.forEach((row) => {
     const tr = document.createElement("tr");
+    tr.className = Number(row.target_capacity_rate) === 0.05 ? "selected-policy-row" : "";
     tr.innerHTML = `
-      <td>5% investigator review policy</td>
+      <td>${capacityLabel(row.target_capacity_rate)} capacity policy</td>
       <td>${numberText(row.validation_threshold, 3)}</td>
       <td>${row.test_review_count}</td>
       <td>${percent(row.test_precision_hit_rate)}</td>
