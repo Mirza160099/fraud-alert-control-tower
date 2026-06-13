@@ -7,7 +7,7 @@ JPMorgan-inspired fraud analytics project that prioritizes transaction alerts, e
 ## Links
 
 - Live demo: [Fraud Alert Control Tower](https://fraud-alert-control-tower-5cic.vercel.app)
-- Score demo: [High-risk transaction scenario](https://fraud-alert-control-tower-5cic.vercel.app/?view=score&scenario=high)
+- Score demo: [Manual transaction scoring](https://fraud-alert-control-tower-5cic.vercel.app/?view=score)
 - Queue view: [Investigator queue](https://fraud-alert-control-tower-5cic.vercel.app/?view=queue)
 - Metrics view: [Operating metrics and capacity ladder](https://fraud-alert-control-tower-5cic.vercel.app/?view=metrics)
 - Governance view: [Model risk controls](https://fraud-alert-control-tower-5cic.vercel.app/?view=governance)
@@ -179,7 +179,7 @@ The app is a Vercel-style static browser application. It does not need Streamlit
 Views:
 
 - `Score`: user enters transaction details and receives a prediction, probability, priority tier, and explanation.
-- Scenario presets: Low, Medium, High, and Critical demonstrate that the model separates normal transactions from escalating fraud risk.
+- Manual transaction input: users enter transaction facts and the app calculates the Low, Medium, High, or Critical alert tier from the score.
 - `Queue`: highest-risk cases are ranked for investigator review.
 - `Metrics`: operating evidence, feature importance, capacity threshold, pilot recommendation, and alert economics.
 - `Governance`: model-card summary, threshold policy, and monitoring controls.

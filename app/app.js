@@ -512,74 +512,6 @@ function scoreCurrentForm() {
   renderFeatureBars(deltas);
 }
 
-const scenarioPresets = {
-  low: {
-    amount: "20.00",
-    currency: "USD",
-    txn_country: "US",
-    channel: "Card Present",
-    txn_hour: "12",
-    geo_distance_km: "0",
-    device_risk_score: "0.02",
-    synthetic_identity_score: "0.02",
-    merchant_risk_score: "0.02",
-    merchant_profile_risk_score: "0.02",
-  },
-  medium: {
-    amount: "120.00",
-    currency: "USD",
-    txn_country: "UK",
-    channel: "Online Banking",
-    txn_hour: "12",
-    geo_distance_km: "300",
-    device_risk_score: "0.25",
-    synthetic_identity_score: "0.20",
-    merchant_risk_score: "0.25",
-    merchant_profile_risk_score: "0.25",
-  },
-  high: {
-    amount: "240.00",
-    currency: "USD",
-    txn_country: "BR",
-    channel: "P2P",
-    txn_hour: "4",
-    geo_distance_km: "4200",
-    device_risk_score: "0.72",
-    synthetic_identity_score: "0.44",
-    merchant_risk_score: "0.58",
-    merchant_profile_risk_score: "0.55",
-  },
-  critical: {
-    amount: "2500.00",
-    currency: "USD",
-    txn_country: "NG",
-    channel: "P2P",
-    txn_hour: "3",
-    geo_distance_km: "8000",
-    device_risk_score: "0.89",
-    synthetic_identity_score: "0.70",
-    merchant_risk_score: "0.72",
-    merchant_profile_risk_score: "0.72",
-  },
-};
-
-function applyScenarioPreset(name) {
-  const preset = scenarioPresets[name] ?? scenarioPresets.low;
-  Object.entries(preset).forEach(([id, value]) => {
-    document.getElementById(id).value = value;
-  });
-  document.querySelectorAll(".scenario-button").forEach((button) => {
-    button.classList.toggle("active", button.dataset.scenario === name);
-  });
-  scoreCurrentForm();
-}
-
-function clearScenarioPreset() {
-  document.querySelectorAll(".scenario-button").forEach((button) => {
-    button.classList.remove("active");
-  });
-}
-
 function initializeForm(model) {
   const countrySchema = model.feature_schema.txn_country;
   const channelSchema = model.feature_schema.channel;
@@ -597,18 +529,12 @@ function initializeForm(model) {
     scoreCurrentForm();
   });
   document.getElementById("transactionForm").addEventListener("input", () => {
-    clearScenarioPreset();
     scoreCurrentForm();
   });
   document.getElementById("transactionForm").addEventListener("change", () => {
-    clearScenarioPreset();
     scoreCurrentForm();
   });
-  document.querySelectorAll(".scenario-button").forEach((button) => {
-    button.addEventListener("click", () => applyScenarioPreset(button.dataset.scenario));
-  });
-  const initialScenario = new URLSearchParams(window.location.search).get("scenario") ?? "low";
-  applyScenarioPreset(scenarioPresets[initialScenario] ? initialScenario : "low");
+  scoreCurrentForm();
 }
 
 function setActiveTab(tabName, updateUrl = false) {

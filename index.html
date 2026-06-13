@@ -46,16 +46,41 @@
           </div>
         </section>
 
-        <section id="scoreView" class="tab-view active">
-          <section class="content-grid">
-            <form id="transactionForm" class="panel input-panel">
-              <div class="panel-header">
-                <h2>Transaction Input</h2>
-                <div class="scenario-buttons" aria-label="Scenario presets">
-                  <button class="scenario-button active" type="button" data-scenario="low">Low</button>
-                  <button class="scenario-button" type="button" data-scenario="medium">Medium</button>
-                  <button class="scenario-button" type="button" data-scenario="high">High</button>
-                  <button class="scenario-button" type="button" data-scenario="critical">Critical</button>
+        <section id="scoreView" class="tab-view active stitch-score-view">
+          <section class="stitch-command-panel" aria-label="Score command center overview">
+            <div class="stitch-command-title">
+              <div>
+                <span class="stitch-kicker">Live scoring workbench</span>
+                <h2>Risk Scoring Command Center</h2>
+              </div>
+              <p>Transaction-level scoring, investigator explanation, and queue-ready controls in one view.</p>
+            </div>
+            <div class="stitch-overview-grid">
+              <article>
+                <span>Total analyzed test set</span>
+                <strong>5,000</strong>
+              </article>
+              <article>
+                <span>Routed at policy threshold</span>
+                <strong>74</strong>
+              </article>
+              <article>
+                <span>Queue hit rate</span>
+                <strong>13.5%</strong>
+              </article>
+              <article>
+                <span>Target review capacity</span>
+                <strong>5%</strong>
+              </article>
+            </div>
+          </section>
+
+          <section class="stitch-workbench-grid">
+            <form id="transactionForm" class="panel input-panel stitch-panel">
+              <div class="panel-header stitch-panel-header">
+                <div>
+                  <span class="stitch-kicker">Manual transaction entry</span>
+                  <h2>Transaction Input</h2>
                 </div>
               </div>
 
@@ -147,9 +172,12 @@
               </section>
             </form>
 
-            <aside class="panel result-panel">
-              <div class="panel-header">
-                <h2>Decision</h2>
+            <aside class="panel result-panel stitch-panel">
+              <div class="panel-header stitch-panel-header">
+                <div>
+                  <span class="stitch-kicker">Decision output</span>
+                  <h2>Decision</h2>
+                </div>
                 <span id="thresholdLabel" class="muted-label">Threshold</span>
               </div>
 
@@ -180,9 +208,70 @@
             </aside>
           </section>
 
-          <section class="panel lower-panel">
-            <div class="panel-header">
-              <h2>Feature Impact For This Score</h2>
+          <section class="stitch-analytics-grid" aria-label="Score operating context">
+            <article class="stitch-panel stitch-chart-card">
+              <div class="stitch-panel-header">
+                <div>
+                  <span class="stitch-kicker">Operating trend</span>
+                  <h2>Fraud Detection Volume vs False Positives</h2>
+                </div>
+                <span class="muted-label">7 day view</span>
+              </div>
+              <div class="stitch-chart" aria-hidden="true">
+                <span style="--bar: 42%; --tone: var(--stitch-primary)"></span>
+                <span style="--bar: 36%; --tone: var(--stitch-primary)"></span>
+                <span style="--bar: 58%; --tone: var(--stitch-primary)"></span>
+                <span style="--bar: 82%; --tone: var(--stitch-danger)"></span>
+                <span style="--bar: 64%; --tone: var(--stitch-primary)"></span>
+                <span style="--bar: 47%; --tone: var(--stitch-primary)"></span>
+                <span style="--bar: 90%; --tone: var(--stitch-danger)"></span>
+              </div>
+              <div class="stitch-chart-axis">
+                <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+              </div>
+            </article>
+
+            <article class="stitch-panel stitch-side-card">
+              <div class="stitch-panel-header">
+                <div>
+                  <span class="stitch-kicker">Queue efficiency</span>
+                  <h2>SLA Signals</h2>
+                </div>
+              </div>
+              <div class="stitch-progress-row">
+                <span>Tier 1 reviews</span>
+                <strong>84% SLA</strong>
+                <div><span style="width: 84%"></span></div>
+              </div>
+              <div class="stitch-progress-row danger">
+                <span>Escalations</span>
+                <strong>92% SLA</strong>
+                <div><span style="width: 92%"></span></div>
+              </div>
+            </article>
+
+            <article class="stitch-panel stitch-side-card">
+              <div class="stitch-panel-header">
+                <div>
+                  <span class="stitch-kicker">Current queue</span>
+                  <h2>Risk Distribution</h2>
+                </div>
+              </div>
+              <div class="stitch-distribution-list">
+                <div><span class="dot critical"></span><strong>Critical</strong><em>15</em></div>
+                <div><span class="dot high"></span><strong>High</strong><em>0</em></div>
+                <div><span class="dot medium"></span><strong>Medium</strong><em>0</em></div>
+                <div><span class="dot low"></span><strong>Low</strong><em>0</em></div>
+              </div>
+            </article>
+          </section>
+
+          <section class="panel lower-panel stitch-panel">
+            <div class="panel-header stitch-panel-header">
+              <div>
+                <span class="stitch-kicker">Local explanation</span>
+                <h2>Feature Impact For This Score</h2>
+              </div>
               <span class="muted-label">Local sensitivity</span>
             </div>
             <div class="feature-impact-grid">
