@@ -386,8 +386,8 @@
           <section class="queue-command-grid">
             <section class="panel queue-command-card">
               <div class="panel-header">
-                <h2>Operating Plan</h2>
-                <span class="muted-label">Threshold policy</span>
+                <h2>Review Policy</h2>
+                <span class="muted-label">Capacity threshold</span>
               </div>
               <div class="queue-command-metrics">
                 <div>
@@ -411,15 +411,15 @@
 
             <section class="panel queue-command-card">
               <div class="panel-header">
-                <h2>Triage Lanes</h2>
-                <span class="muted-label">Visible top cases</span>
+                <h2>Routing Bands</h2>
+                <span class="muted-label">Top-case preview</span>
               </div>
               <div id="priorityLaneList" class="priority-lanes"></div>
             </section>
 
             <section class="panel queue-command-card">
               <div class="panel-header">
-                <h2>Control Checks</h2>
+                <h2>Review Controls</h2>
                 <span class="muted-label">Human review</span>
               </div>
               <ul id="queueControlChecks" class="control-checks"></ul>
@@ -448,6 +448,18 @@
                   <option value="all">All outcomes</option>
                   <option value="fraud">Confirmed fraud</option>
                   <option value="non_fraud">Not fraud</option>
+                </select>
+              </label>
+              <label>
+                Country
+                <select id="queueCountryFilter">
+                  <option value="all">All countries</option>
+                </select>
+              </label>
+              <label>
+                Channel
+                <select id="queueChannelFilter">
+                  <option value="all">All channels</option>
                 </select>
               </label>
               <label>

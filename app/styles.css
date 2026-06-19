@@ -504,6 +504,7 @@ select:focus {
   display: grid;
   grid-template-columns: 1.15fr 0.85fr 1fr;
   gap: 14px;
+  align-items: start;
   margin-bottom: 18px;
 }
 
@@ -1968,9 +1969,8 @@ h1 {
 }
 
 .tabbar {
-  position: sticky;
-  top: 12px;
-  z-index: 15;
+  position: relative;
+  z-index: 1;
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   width: min(760px, 100%);
@@ -2646,7 +2646,7 @@ select:focus-visible {
 
 .queue-filter-bar {
   display: grid;
-  grid-template-columns: minmax(150px, 0.8fr) minmax(180px, 1fr) minmax(180px, 1fr) minmax(170px, 1fr) auto;
+  grid-template-columns: repeat(6, minmax(132px, 1fr)) auto;
   gap: 10px;
   align-items: end;
   margin-bottom: 10px;

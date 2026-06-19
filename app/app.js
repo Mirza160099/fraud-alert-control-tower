@@ -6,6 +6,8 @@ const state = {
   queueFilters: {
     tier: "all",
     outcome: "all",
+    country: "all",
+    channel: "all",
     rule: "all",
     search: "",
   },
@@ -1068,8 +1070,9 @@ function renderQueueCommand(summary) {
   });
 
   const laneNote = document.createElement("p");
+  laneNote.id = "lanePreviewNote";
   laneNote.className = "lane-note";
-  laneNote.textContent = `Lane counts reflect the ${cases.length} visible highest-risk cases. Lower lanes remain defined for live scoring and production queue routing.`;
+  laneNote.textContent = `This preview shows the ${cases.length} highest-risk queue cases, so it is intentionally concentrated in Critical. Lower bands appear in full transaction search and manual scoring.`;
   laneList.appendChild(laneNote);
 
   const controlChecks = document.getElementById("queueControlChecks");
@@ -1078,7 +1081,7 @@ function renderQueueCommand(summary) {
     Number(champion.test_true_positives) - Number(existing.true_positives);
   [
     `Threshold ${numberText(champion.threshold, 3)} routes ${percent(champion.test_queue_rate)} of test transactions to review.`,
-    `${summary.missed_existing_alerts_in_top_cases} visible top cases are rule-gap cases that need investigator validation.`,
+    `${summary.missed_existing_alerts_in_top_cases} cases in the top-risk preview were missed by the old alert rule and need investigator validation.`,
     `${signedCount(incrementalFrauds)} additional fraud cases are captured at this operating point.`,
     `${champion.test_false_positives} backtest false positives require human validation before any customer-impacting action.`,
   ].forEach((text) => {
@@ -1089,11 +1092,17 @@ function renderQueueCommand(summary) {
 }
 
 function queueCases() {
-  return state.dashboard.top_queue_cases;
+  const lookupById = new Map(
+    state.transactionLookup.map((caseItem) => [String(caseItem.transaction_id), caseItem]),
+  );
+  return state.dashboard.top_queue_cases.map((caseItem) => {
+    const lookupItem = lookupById.get(String(caseItem.transaction_id));
+    return lookupItem ? { ...lookupItem, ...caseItem } : caseItem;
+  });
 }
 
 function queueCasesFiltered() {
-  const { tier, outcome, rule, search } = state.queueFilters;
+  const { tier, outcome, country, channel, rule, search } = state.queueFilters;
   const searchText = String(search || "").trim().toUpperCase();
 
   return queueCases().filter((caseItem) => {
@@ -1102,6 +1111,8 @@ function queueCasesFiltered() {
     if (outcome === "non_fraud" && Number(caseItem.actual_fraud_label) !== 0) {
       return false;
     }
+    if (country !== "all" && caseItem.txn_country !== country) return false;
+    if (channel !== "all" && caseItem.channel !== channel) return false;
     if (rule === "missed" && Number(caseItem.alert_generated) !== 0) return false;
     if (rule === "hit" && Number(caseItem.alert_generated) !== 1) return false;
     if (searchText && !String(caseItem.transaction_id).toUpperCase().includes(searchText)) {
@@ -1115,6 +1126,8 @@ function updateQueueFilterState() {
   state.queueFilters = {
     tier: document.getElementById("queueTierFilter")?.value ?? "all",
     outcome: document.getElementById("queueOutcomeFilter")?.value ?? "all",
+    country: document.getElementById("queueCountryFilter")?.value ?? "all",
+    channel: document.getElementById("queueChannelFilter")?.value ?? "all",
     rule: document.getElementById("queueRuleFilter")?.value ?? "all",
     search: document.getElementById("queueSearchFilter")?.value ?? "",
   };
@@ -1132,23 +1145,57 @@ function renderQueueFilterSummary(visibleCases) {
   summary.textContent = `${visibleCases.length} of ${queueCases().length} visible cases shown | ${fraudCount} confirmed fraud in backtest | ${ruleGapCount} rule-gap cases.`;
 }
 
+function populateQueueSelectFilter(id, values) {
+  const select = document.getElementById(id);
+  if (!select) return;
+  const firstOption = select.querySelector("option[value='all']")?.cloneNode(true);
+  select.replaceChildren();
+  if (firstOption) select.appendChild(firstOption);
+  values.forEach((value) => {
+    if (!value) return;
+    const option = document.createElement("option");
+    option.value = value;
+    option.textContent = value;
+    select.appendChild(option);
+  });
+}
+
+function populateQueueFilters() {
+  const countries = [...new Set(queueCases().map((caseItem) => caseItem.txn_country))]
+    .filter(Boolean)
+    .sort();
+  const channels = [...new Set(queueCases().map((caseItem) => caseItem.channel))]
+    .filter(Boolean)
+    .sort();
+  populateQueueSelectFilter("queueCountryFilter", countries);
+  populateQueueSelectFilter("queueChannelFilter", channels);
+}
+
 function initializeQueueFilters() {
-  ["queueTierFilter", "queueOutcomeFilter", "queueRuleFilter", "queueSearchFilter"].forEach(
-    (id) => {
-      document.getElementById(id)?.addEventListener("input", () => {
-        updateQueueFilterState();
-        renderQueue();
-      });
-      document.getElementById(id)?.addEventListener("change", () => {
-        updateQueueFilterState();
-        renderQueue();
-      });
-    },
-  );
+  populateQueueFilters();
+  [
+    "queueTierFilter",
+    "queueOutcomeFilter",
+    "queueCountryFilter",
+    "queueChannelFilter",
+    "queueRuleFilter",
+    "queueSearchFilter",
+  ].forEach((id) => {
+    document.getElementById(id)?.addEventListener("input", () => {
+      updateQueueFilterState();
+      renderQueue();
+    });
+    document.getElementById(id)?.addEventListener("change", () => {
+      updateQueueFilterState();
+      renderQueue();
+    });
+  });
 
   document.getElementById("queueClearFilters")?.addEventListener("click", () => {
     setFieldValue("queueTierFilter", "all");
     setFieldValue("queueOutcomeFilter", "all");
+    setFieldValue("queueCountryFilter", "all");
+    setFieldValue("queueChannelFilter", "all");
     setFieldValue("queueRuleFilter", "all");
     setFieldValue("queueSearchFilter", "");
     updateQueueFilterState();
@@ -1225,6 +1272,14 @@ function renderQueue() {
         <div>
           <span>Event time</span>
           <strong>${String(caseItem.event_ts).replace(" ", " at ")}</strong>
+        </div>
+        <div>
+          <span>Country</span>
+          <strong>${caseItem.txn_country ?? "Unknown"}</strong>
+        </div>
+        <div>
+          <span>Channel</span>
+          <strong>${caseItem.channel ?? "Unknown"}</strong>
         </div>
         <div>
           <span>Backtest outcome</span>
