@@ -1834,3 +1834,321 @@ td {
     display: grid;
   }
 }
+
+/* Final reviewer-facing frontend polish */
+:root {
+  --bg: #eef4f2;
+  --ink: #101817;
+  --muted: #5d6b69;
+  --line: #cfdad7;
+  --panel: #ffffff;
+  --accent: #0f7d75;
+  --accent-strong: #084f4a;
+  --blue: #1f4f8f;
+  --amber: #b46b12;
+  --danger: #b42318;
+  --ok: #177245;
+  --shadow: 0 20px 56px rgba(16, 24, 23, 0.11);
+}
+
+body {
+  background:
+    linear-gradient(180deg, rgba(4, 79, 74, 0.15), rgba(238, 244, 242, 0.20) 340px),
+    repeating-linear-gradient(90deg, rgba(15, 125, 117, 0.035) 0, rgba(15, 125, 117, 0.035) 1px, transparent 1px, transparent 88px),
+    repeating-linear-gradient(0deg, rgba(31, 79, 143, 0.030) 0, rgba(31, 79, 143, 0.030) 1px, transparent 1px, transparent 88px),
+    var(--bg);
+}
+
+.app-shell {
+  padding: 22px;
+}
+
+.workspace {
+  max-width: 1320px;
+}
+
+.topbar {
+  min-height: 118px;
+  align-items: stretch;
+  margin-bottom: 16px;
+  padding: 18px;
+  border: 1px solid rgba(207, 218, 215, 0.9);
+  border-radius: 10px;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.94), rgba(245, 250, 248, 0.86)),
+    linear-gradient(90deg, rgba(15, 125, 117, 0.12), transparent);
+  box-shadow: var(--shadow);
+}
+
+.brand-cluster {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+}
+
+.brand-mark {
+  width: 56px;
+  height: 56px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #082f49, #0f7d75 62%, #b46b12);
+  color: #ffffff;
+  font-weight: 900;
+  box-shadow: 0 12px 28px rgba(8, 79, 74, 0.25);
+}
+
+.eyebrow {
+  margin-bottom: 6px;
+  color: var(--accent-strong);
+}
+
+h1 {
+  font-size: 3.15rem;
+  line-height: 0.98;
+}
+
+.system-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 12px;
+}
+
+.system-badges span,
+.deployment-chip {
+  border: 1px solid rgba(15, 125, 117, 0.18);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--accent-strong);
+}
+
+.system-badges span {
+  padding: 5px 9px;
+  font-size: 0.74rem;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+
+.topbar-stack {
+  display: grid;
+  grid-template-columns: minmax(180px, 0.85fr) minmax(230px, 1fr);
+  gap: 12px;
+  align-content: center;
+  min-width: 410px;
+}
+
+.deployment-chip,
+.model-chip {
+  min-height: 76px;
+  display: grid;
+  align-content: center;
+  gap: 7px;
+  border-radius: 8px;
+}
+
+.deployment-chip {
+  padding: 14px 16px;
+}
+
+.deployment-chip span {
+  color: var(--muted);
+  font-size: 0.74rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.deployment-chip strong,
+.model-chip strong {
+  color: var(--ink);
+  font-size: 1rem;
+  line-height: 1.15;
+}
+
+.tabbar {
+  position: sticky;
+  top: 12px;
+  z-index: 15;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  width: min(760px, 100%);
+  gap: 6px;
+  padding: 6px;
+  margin-bottom: 16px;
+  border-color: rgba(207, 218, 215, 0.95);
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: 0 12px 30px rgba(16, 24, 23, 0.10);
+}
+
+.tab-button {
+  min-width: 0;
+  height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 7px;
+}
+
+.tab-button span {
+  color: inherit;
+  font-size: 0.72rem;
+  font-weight: 900;
+  opacity: 0.72;
+}
+
+.tab-button.active {
+  background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+  box-shadow: 0 10px 22px rgba(8, 79, 74, 0.26);
+}
+
+.live-strip {
+  gap: 12px;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+.live-strip div {
+  min-height: 96px;
+  padding: 16px;
+  border: 1px solid rgba(207, 218, 215, 0.94);
+  border-left: 4px solid rgba(15, 125, 117, 0.82);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: 0 14px 36px rgba(16, 24, 23, 0.09);
+}
+
+.live-strip div:last-child {
+  border-right: 1px solid rgba(207, 218, 215, 0.94);
+}
+
+.live-strip strong {
+  font-size: 1.24rem;
+}
+
+.panel,
+.model-chip {
+  border-color: rgba(207, 218, 215, 0.94);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.90);
+  box-shadow: var(--shadow);
+}
+
+.kpi-card,
+.queue-command-card,
+.metrics-summary,
+.pilot-card,
+.governance-panel {
+  position: relative;
+  overflow: hidden;
+}
+
+.kpi-card::before,
+.queue-command-card::before,
+.metrics-summary::before,
+.pilot-card::before,
+.governance-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 4px;
+  background: linear-gradient(90deg, var(--accent), var(--blue), var(--amber));
+}
+
+.kpi-card strong {
+  font-size: 2.9rem;
+  line-height: 1;
+}
+
+.primary-button {
+  min-height: 46px;
+  border-radius: 7px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+  box-shadow: 0 12px 24px rgba(8, 79, 74, 0.23);
+}
+
+.primary-button:hover {
+  transform: translateY(-1px);
+}
+
+.case-card,
+.queue-case-card,
+.feature-impact-group,
+.threshold-row,
+.model-card-row,
+.monitoring-card {
+  border-radius: 8px;
+}
+
+.stitch-score-view {
+  margin-top: 2px;
+  box-shadow: 0 26px 72px rgba(6, 18, 22, 0.28);
+}
+
+.stitch-command-panel {
+  background:
+    linear-gradient(135deg, rgba(24, 28, 30, 0.96), rgba(11, 35, 65, 0.62)),
+    repeating-linear-gradient(90deg, rgba(93, 217, 214, 0.04) 0, rgba(93, 217, 214, 0.04) 1px, transparent 1px, transparent 72px);
+}
+
+.stitch-overview-grid article,
+.stitch-panel {
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.22);
+}
+
+.stitch-score-view input,
+.stitch-score-view select {
+  min-height: 46px;
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 3px solid rgba(31, 79, 143, 0.20);
+  outline-offset: 2px;
+}
+
+@media (max-width: 1050px) {
+  .topbar,
+  .topbar-stack {
+    display: grid;
+  }
+
+  .topbar-stack {
+    grid-template-columns: 1fr;
+    min-width: 0;
+  }
+}
+
+@media (max-width: 760px) {
+  .app-shell {
+    padding: 12px;
+  }
+
+  h1 {
+    font-size: 2.15rem;
+  }
+
+  .brand-cluster {
+    grid-template-columns: auto 1fr;
+  }
+
+  .brand-mark {
+    width: 46px;
+    height: 46px;
+  }
+
+  .tabbar {
+    top: 8px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .tab-button {
+    height: 40px;
+  }
+}

@@ -10,21 +10,35 @@
     <main class="app-shell">
       <section class="workspace">
         <header class="topbar">
-          <div>
-            <p class="eyebrow">JPMorgan-inspired fraud analytics</p>
-            <h1>Fraud Alert Control Tower</h1>
+          <div class="brand-cluster">
+            <div class="brand-mark" aria-hidden="true">FA</div>
+            <div>
+              <p class="eyebrow">JPMorgan-inspired fraud analytics</p>
+              <h1>Fraud Alert Control Tower</h1>
+              <div class="system-badges" aria-label="System status">
+                <span>Decision support</span>
+                <span>Synthetic data</span>
+                <span>Human review</span>
+              </div>
+            </div>
           </div>
-          <div class="model-chip">
-            <span class="chip-label">Decision layer</span>
-            <strong id="modelName">Loading</strong>
+          <div class="topbar-stack">
+            <div class="deployment-chip">
+              <span>Live deployment</span>
+              <strong>Vercel-ready</strong>
+            </div>
+            <div class="model-chip">
+              <span class="chip-label">Decision layer</span>
+              <strong id="modelName">Loading</strong>
+            </div>
           </div>
         </header>
 
         <nav class="tabbar" aria-label="Control tower views">
-          <button class="tab-button active" type="button" data-tab="score">Score</button>
-          <button class="tab-button" type="button" data-tab="queue">Queue</button>
-          <button class="tab-button" type="button" data-tab="metrics">Metrics</button>
-          <button class="tab-button" type="button" data-tab="governance">Governance</button>
+          <button class="tab-button active" type="button" data-tab="score"><span>01</span> Score</button>
+          <button class="tab-button" type="button" data-tab="queue"><span>02</span> Queue</button>
+          <button class="tab-button" type="button" data-tab="metrics"><span>03</span> Metrics</button>
+          <button class="tab-button" type="button" data-tab="governance"><span>04</span> Governance</button>
         </nav>
 
         <section class="panel live-strip" aria-live="polite">
