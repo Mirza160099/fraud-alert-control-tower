@@ -307,7 +307,31 @@
           </section>
         </section>
 
-        <section id="queueView" class="tab-view">
+        <section id="queueView" class="tab-view ops-view">
+          <section class="view-command-panel" aria-label="Queue command center overview">
+            <div class="view-command-title">
+              <div>
+                <span class="stitch-kicker">Investigator operations</span>
+                <h2>Queue Command Center</h2>
+              </div>
+              <p>Prioritize the cases most worth human review, expose rule-gap transactions, and keep workload aligned to analyst capacity.</p>
+            </div>
+            <div class="view-command-grid">
+              <article>
+                <span>Routing objective</span>
+                <strong>Review highest risk first</strong>
+              </article>
+              <article>
+                <span>Human control</span>
+                <strong>Investigator validates</strong>
+              </article>
+              <article>
+                <span>Alert policy</span>
+                <strong>Capacity constrained</strong>
+              </article>
+            </div>
+          </section>
+
           <section class="kpi-grid">
             <div class="panel kpi-card">
               <span>Review queue</span>
@@ -379,7 +403,31 @@
           </section>
         </section>
 
-        <section id="metricsView" class="tab-view">
+        <section id="metricsView" class="tab-view ops-view">
+          <section class="view-command-panel" aria-label="Metrics command center overview">
+            <div class="view-command-title">
+              <div>
+                <span class="stitch-kicker">Analyst evidence</span>
+                <h2>Metrics Command Center</h2>
+              </div>
+              <p>Translate model performance into fraud capture, false-positive load, review cost, and threshold trade-offs.</p>
+            </div>
+            <div class="view-command-grid">
+              <article>
+                <span>Primary question</span>
+                <strong>Is the queue worth reviewing?</strong>
+              </article>
+              <article>
+                <span>Operating lens</span>
+                <strong>Precision vs capacity</strong>
+              </article>
+              <article>
+                <span>Business lens</span>
+                <strong>Fraud saved vs review cost</strong>
+              </article>
+            </div>
+          </section>
+
           <section class="metrics-command-grid">
             <section class="panel metrics-scorecard-panel">
               <div class="panel-header">
@@ -538,7 +586,31 @@
           </section>
         </section>
 
-        <section id="governanceView" class="tab-view">
+        <section id="governanceView" class="tab-view ops-view">
+          <section class="view-command-panel" aria-label="Governance command center overview">
+            <div class="view-command-title">
+              <div>
+                <span class="stitch-kicker">Responsible AI controls</span>
+                <h2>Governance Command Center</h2>
+              </div>
+              <p>Document how the model should be used, what it cannot decide alone, and what controls are required before production.</p>
+            </div>
+            <div class="view-command-grid">
+              <article>
+                <span>Model use</span>
+                <strong>Decision support only</strong>
+              </article>
+              <article>
+                <span>Approval gate</span>
+                <strong>Real-data validation</strong>
+              </article>
+              <article>
+                <span>Final authority</span>
+                <strong>Human investigator</strong>
+              </article>
+            </div>
+          </section>
+
           <section class="kpi-grid governance-kpis">
             <div class="panel kpi-card">
               <span>Model use</span>
