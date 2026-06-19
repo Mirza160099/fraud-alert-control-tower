@@ -4,6 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Fraud Alert Control Tower</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='10' fill='%23084f4a'/%3E%3Ctext x='32' y='39' font-size='22' text-anchor='middle' fill='white' font-family='Arial' font-weight='700'%3EFA%3C/text%3E%3C/svg%3E" />
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
@@ -87,6 +88,32 @@
                 <strong>5%</strong>
               </article>
             </div>
+          </section>
+
+          <section class="stitch-panel lookup-panel" aria-label="Transaction case lookup">
+            <div class="stitch-panel-header lookup-header">
+              <div>
+                <span class="stitch-kicker">Transaction lookup</span>
+                <h2>Search Exported Cases</h2>
+              </div>
+              <button id="exportCaseReport" class="secondary-button" type="button" disabled>
+                Export case report
+              </button>
+            </div>
+            <div class="lookup-grid">
+              <label>
+                Transaction ID
+                <input id="transactionSearchInput" name="transactionSearchInput" list="transactionIdOptions" placeholder="Try T9042990" autocomplete="off" />
+              </label>
+              <button id="loadTransactionButton" class="primary-button" type="button">
+                Load case
+              </button>
+              <datalist id="transactionIdOptions"></datalist>
+            </div>
+            <p id="lookupStatus" class="lookup-status">
+              Search one of the exported top-risk transaction IDs to auto-fill the available case facts and open the investigator drilldown.
+            </p>
+            <section id="caseDrilldownPanel" class="case-drilldown-panel" hidden></section>
           </section>
 
           <section class="stitch-workbench-grid">
@@ -399,6 +426,42 @@
               <h2>Highest-Risk Cases</h2>
               <span class="muted-label">Investigator queue</span>
             </div>
+            <section class="queue-filter-bar" aria-label="Queue filters">
+              <label>
+                Priority
+                <select id="queueTierFilter">
+                  <option value="all">All priorities</option>
+                  <option value="Critical">Critical</option>
+                  <option value="High">High</option>
+                  <option value="Medium">Medium</option>
+                  <option value="Low">Low</option>
+                </select>
+              </label>
+              <label>
+                Backtest outcome
+                <select id="queueOutcomeFilter">
+                  <option value="all">All outcomes</option>
+                  <option value="fraud">Confirmed fraud</option>
+                  <option value="non_fraud">Not fraud</option>
+                </select>
+              </label>
+              <label>
+                Legacy rule
+                <select id="queueRuleFilter">
+                  <option value="all">All rule statuses</option>
+                  <option value="missed">Rule-gap cases</option>
+                  <option value="hit">Rule signal present</option>
+                </select>
+              </label>
+              <label>
+                Transaction ID
+                <input id="queueSearchFilter" type="search" placeholder="Search queue ID" />
+              </label>
+              <button id="queueClearFilters" class="secondary-button" type="button">
+                Clear
+              </button>
+            </section>
+            <p id="queueFilterSummary" class="queue-filter-summary"></p>
             <div id="caseList" class="case-list"></div>
           </section>
         </section>
@@ -542,6 +605,38 @@
               <h2>Capacity Thresholds</h2>
               <span class="muted-label">Capacity ladder</span>
             </div>
+            <section class="capacity-simulator" aria-label="Threshold capacity simulator">
+              <div class="capacity-slider-row">
+                <label>
+                  Review capacity
+                  <input id="capacityPolicySlider" type="range" min="0" max="4" step="1" value="2" />
+                </label>
+                <strong id="capacityPolicyLabel">5%</strong>
+              </div>
+              <div class="capacity-sim-grid">
+                <div>
+                  <span>Threshold</span>
+                  <strong id="capacitySimThreshold">0.000</strong>
+                </div>
+                <div>
+                  <span>Reviews</span>
+                  <strong id="capacitySimReviews">0</strong>
+                </div>
+                <div>
+                  <span>Fraud capture</span>
+                  <strong id="capacitySimCapture">0%</strong>
+                </div>
+                <div>
+                  <span>False positives</span>
+                  <strong id="capacitySimFalsePositives">0</strong>
+                </div>
+                <div>
+                  <span>Review cost change</span>
+                  <strong id="capacitySimCostDelta">$0</strong>
+                </div>
+              </div>
+              <p id="capacitySimNarrative" class="metrics-note"></p>
+            </section>
             <div class="table-wrap">
               <table>
                 <thead>

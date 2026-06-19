@@ -19,6 +19,7 @@ JPMorgan-inspired fraud analytics project that prioritizes transaction alerts, e
 - End-to-end fraud analytics workflow: data audit, cleaning, joins, feature engineering, feature selection, fraud-risk scoring, thresholding, explainability, and app deployment.
 - Responsible AI framing: leakage prevention, model-card documentation, human review, threshold governance, risk register, approval gates, and monitoring controls.
 - Recruiter-friendly product thinking: the final app is not just a classifier; it is an investigator control tower with explanations, risk/protective feature impact, an investigator brief, queue command controls, governance evidence, and recommended next actions.
+- Investigator workflow depth: transaction ID lookup, case drilldown, queue filters, exportable case reports, and a live threshold/capacity simulator.
 
 ## Live-Style App Screenshots
 
@@ -179,9 +180,10 @@ The app is a Vercel-style static browser application. It does not need Streamlit
 Views:
 
 - `Score`: user enters transaction details and receives a prediction, probability, priority tier, and explanation.
+- Transaction lookup: users can search exported top-risk transaction IDs, auto-fill available case facts, compare the exported score to the current form score, and export an investigator report.
 - Manual transaction input: users enter transaction facts and the app calculates the Low, Medium, High, or Critical alert tier from the score.
-- `Queue`: highest-risk cases are ranked for investigator review.
-- `Metrics`: operating evidence, feature importance, capacity threshold, pilot recommendation, and alert economics.
+- `Queue`: highest-risk cases are ranked for investigator review, with filters for priority, backtest outcome, legacy-rule status, and transaction ID.
+- `Metrics`: operating evidence, feature importance, threshold/capacity simulator, pilot recommendation, and alert economics.
 - `Governance`: model-card summary, threshold policy, and monitoring controls.
 
 Run locally:

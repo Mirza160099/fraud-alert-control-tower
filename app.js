@@ -1,6 +1,14 @@
 const state = {
   model: null,
   dashboard: null,
+  selectedCase: null,
+  queueFilters: {
+    tier: "all",
+    outcome: "all",
+    rule: "all",
+    search: "",
+  },
+  selectedCapacityRate: 0.05,
 };
 
 const featureLabels = {
@@ -510,6 +518,7 @@ function scoreCurrentForm() {
   renderActions(priority, deltas);
   renderInvestigatorBrief(input, probability, priority, deltas);
   renderFeatureBars(deltas);
+  renderSelectedCaseDrilldown(input, probability, priority, deltas);
 }
 
 function initializeForm(model) {
@@ -552,6 +561,9 @@ function setActiveTab(tabName, updateUrl = false) {
     const url = new URL(window.location.href);
     url.searchParams.set("view", activeTab);
     window.history.replaceState({}, "", url);
+    document
+      .querySelector(".workspace")
+      ?.scrollIntoView({ behavior: "auto", block: "start" });
   }
 }
 
@@ -616,17 +628,292 @@ function evidenceCheckText(caseItem) {
 }
 
 function transactionAmountText(caseItem) {
-  const amountReason = [caseItem.reason_1, caseItem.reason_2, caseItem.reason_3]
-    .filter(Boolean)
-    .find((reason) => /^transaction amount was /i.test(reason));
-  const match = amountReason?.match(/^transaction amount was ([0-9.]+)/i);
-  if (!match) return "Not exported";
-  const amount = Number(match[1]);
+  const amount = transactionAmountNumber(caseItem);
   if (!Number.isFinite(amount)) return "Not exported";
   return `$${amount.toLocaleString("en-US", {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   })}`;
+}
+
+function transactionAmountNumber(caseItem) {
+  const amountReason = [caseItem.reason_1, caseItem.reason_2, caseItem.reason_3]
+    .filter(Boolean)
+    .find((reason) => /^transaction amount was /i.test(reason));
+  const match = amountReason?.match(/^transaction amount was ([0-9.]+)/i);
+  if (!match) return null;
+  const amount = Number(match[1]);
+  return Number.isFinite(amount) ? amount : null;
+}
+
+function geoDistanceNumber(caseItem) {
+  const geoReason = [caseItem.reason_1, caseItem.reason_2, caseItem.reason_3]
+    .filter(Boolean)
+    .find((reason) => /^geographic distance was /i.test(reason));
+  const match = geoReason?.match(/^geographic distance was ([0-9.]+)/i);
+  const distance = Number(match?.[1]);
+  return Number.isFinite(distance) ? distance : null;
+}
+
+function transactionHourNumber(caseItem) {
+  const hour = new Date(String(caseItem.event_ts).replace(" ", "T")).getHours();
+  return Number.isFinite(hour) ? hour : null;
+}
+
+function setFieldValue(id, value) {
+  const field = document.getElementById(id);
+  if (!field || value === null || value === undefined) return;
+  field.value = String(value);
+}
+
+function caseToFormDefaults(caseItem) {
+  const reference = state.model.reference_profile;
+  const amount = transactionAmountNumber(caseItem) ?? reference.transaction_amount_usd;
+  return {
+    amount: Number(amount).toFixed(2),
+    currency: "USD",
+    txn_country: caseItem.txn_country ?? reference.txn_country,
+    channel: caseItem.channel ?? reference.channel,
+    txn_hour: transactionHourNumber(caseItem) ?? reference.txn_hour,
+    geo_distance_km: geoDistanceNumber(caseItem) ?? reference.geo_distance_km,
+    device_risk_score: caseItem.device_risk_score ?? reference.device_risk_score,
+    synthetic_identity_score:
+      caseItem.synthetic_identity_score ?? reference.synthetic_identity_score,
+    merchant_risk_score: caseItem.merchant_risk_score ?? reference.merchant_risk_score,
+    merchant_profile_risk_score:
+      caseItem.merchant_profile_risk_score ?? reference.merchant_profile_risk_score,
+  };
+}
+
+function applyCaseToForm(caseItem) {
+  const defaults = caseToFormDefaults(caseItem);
+  Object.entries(defaults).forEach(([id, value]) => setFieldValue(id, value));
+}
+
+function caseFacts(caseItem, input, probability, priority) {
+  return [
+    ["Transaction ID", caseItem.transaction_id],
+    ["Event time", String(caseItem.event_ts).replace(" ", " at ")],
+    ["Exported amount", transactionAmountText(caseItem)],
+    ["Exported score", numberText(caseItem.predicted_fraud_probability, 3)],
+    ["Current form score", probability.toFixed(3)],
+    ["Risk tier", priority.tier],
+    ["Recommended action", priority.action],
+    ["Backtest outcome", backtestOutcomeText(caseItem)],
+    ["Legacy rule", evidenceStatus(caseItem)],
+    ["Country", caseItem.txn_country ?? `${input.txn_country} (editable default)`],
+    ["Channel", caseItem.channel ?? `${input.channel} (editable default)`],
+  ];
+}
+
+function reportLinesForCase(caseItem, input, probability, priority, deltas) {
+  const topDrivers = deltas
+    .filter((delta) => Math.abs(delta.delta) >= 0.001)
+    .slice(0, 5)
+    .map(
+      (delta, index) =>
+        `${index + 1}. ${explainFeature(
+          delta.feature,
+          delta.actual,
+          delta.reference,
+          delta.delta,
+        )}`,
+    );
+
+  return [
+    "Fraud Alert Control Tower - Investigator Case Report",
+    `Generated: ${new Date().toLocaleString("en-GB")}`,
+    "",
+    "Transaction Facts",
+    ...caseFacts(caseItem, input, probability, priority).map(
+      ([label, value]) => `- ${label}: ${value}`,
+    ),
+    "",
+    "Why This Case Was Prioritized",
+    `- ${sentenceText(caseItem.reason_1)}`,
+    `- ${sentenceText(caseItem.reason_2)}`,
+    `- ${sentenceText(caseItem.reason_3)}`,
+    "",
+    "Local Feature Impact From Current Form Values",
+    ...(topDrivers.length ? topDrivers : ["1. No material local driver above reporting threshold."]),
+    "",
+    "Recommended Next Steps",
+    ...recommendedActions(priority, deltas).map(
+      (recommendation, index) => `${index + 1}. ${recommendation}`,
+    ),
+    "",
+    "Governance Note",
+    "This prototype is decision support only. Human review is required before customer-impacting action. The case data is synthetic and should be validated on representative real transaction data before production use.",
+  ];
+}
+
+function renderSelectedCaseDrilldown(input, probability, priority, deltas) {
+  const panel = document.getElementById("caseDrilldownPanel");
+  const status = document.getElementById("lookupStatus");
+  const exportButton = document.getElementById("exportCaseReport");
+  if (!panel) return;
+
+  if (!state.selectedCase) {
+    panel.hidden = true;
+    if (exportButton) exportButton.disabled = true;
+    return;
+  }
+
+  const caseItem = state.selectedCase;
+  const strongestDrivers = deltas
+    .filter((delta) => Math.abs(delta.delta) >= 0.001)
+    .slice(0, 4);
+  const facts = caseFacts(caseItem, input, probability, priority)
+    .map(
+      ([label, value]) => `
+        <div>
+          <span>${label}</span>
+          <strong>${value}</strong>
+        </div>
+      `,
+    )
+    .join("");
+  const drivers = strongestDrivers.length
+    ? strongestDrivers
+        .map(
+          (delta) => `
+            <li>
+              <strong>${featureLabels[delta.feature] ?? delta.feature}</strong>
+              <span>${delta.delta >= 0 ? "+" : ""}${delta.delta.toFixed(3)}</span>
+              <p>${explainFeature(delta.feature, delta.actual, delta.reference, delta.delta)}</p>
+            </li>
+          `,
+        )
+        .join("")
+    : `<li><strong>No material driver</strong><span>0.000</span><p>The current form values do not create a material local score change.</p></li>`;
+
+  panel.hidden = false;
+  panel.innerHTML = `
+    <div class="case-drilldown-header">
+      <div>
+        <span class="stitch-kicker">Case drilldown</span>
+        <h2>${caseItem.transaction_id}</h2>
+      </div>
+      <span class="case-tag ${priority.className}">${priority.tier}</span>
+    </div>
+    <div class="case-drilldown-grid">
+      ${facts}
+    </div>
+    <div class="case-drilldown-columns">
+      <section>
+        <h3>Exported Evidence</h3>
+        <ol>
+          <li>${sentenceText(caseItem.reason_1)}</li>
+          <li>${sentenceText(caseItem.reason_2)}</li>
+          <li>${sentenceText(caseItem.reason_3)}</li>
+        </ol>
+      </section>
+      <section>
+        <h3>Current Form Drivers</h3>
+        <ul>${drivers}</ul>
+      </section>
+    </div>
+    <p class="case-data-note">Lookup fills exported fields from the case data. Country, channel, and risk scores remain editable where the top-case export did not include the original raw column.</p>
+  `;
+  if (status) {
+    status.textContent = `${caseItem.transaction_id} loaded. Review the auto-filled fields, adjust missing operational context if needed, then export the case report.`;
+  }
+  if (exportButton) exportButton.disabled = false;
+}
+
+function populateCaseLookup() {
+  const options = document.getElementById("transactionIdOptions");
+  if (!options) return;
+  options.replaceChildren();
+  state.dashboard.top_queue_cases.forEach((caseItem) => {
+    const option = document.createElement("option");
+    option.value = caseItem.transaction_id;
+    option.label = `${caseItem.transaction_id} - ${caseItem.priority_tier} - ${transactionAmountText(caseItem)}`;
+    options.appendChild(option);
+  });
+}
+
+function findCaseById(transactionId) {
+  const normalized = String(transactionId || "").trim().toUpperCase();
+  return state.dashboard.top_queue_cases.find(
+    (caseItem) => String(caseItem.transaction_id).toUpperCase() === normalized,
+  );
+}
+
+function loadCaseById(transactionId, options = {}) {
+  const status = document.getElementById("lookupStatus");
+  const input = document.getElementById("transactionSearchInput");
+  const caseItem = findCaseById(transactionId);
+  if (!caseItem) {
+    state.selectedCase = null;
+    if (status) {
+      status.textContent =
+        "No exported top-case record matched that transaction ID. Try one from the search suggestions or queue.";
+    }
+    scoreCurrentForm();
+    return;
+  }
+
+  state.selectedCase = caseItem;
+  if (input) input.value = caseItem.transaction_id;
+  applyCaseToForm(caseItem);
+  scoreCurrentForm();
+
+  if (options.switchToScore) {
+    setActiveTab("score", true);
+    document.getElementById("scoreView")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+  if (options.updateUrl) {
+    const url = new URL(window.location.href);
+    url.searchParams.set("view", "score");
+    url.searchParams.set("case", caseItem.transaction_id);
+    window.history.replaceState({}, "", url);
+  }
+}
+
+function exportSelectedCaseReport() {
+  if (!state.selectedCase) return;
+  const input = readFormInput();
+  const probability = predictProbability(input);
+  const priority = classifyPriority(probability, state.model.threshold);
+  const deltas = localDeltas(input);
+  const report = reportLinesForCase(
+    state.selectedCase,
+    input,
+    probability,
+    priority,
+    deltas,
+  ).join("\n");
+  const blob = new Blob([report], { type: "text/plain;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `${state.selectedCase.transaction_id}-investigator-report.txt`;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+}
+
+function initializeCaseLookup() {
+  populateCaseLookup();
+  const lookupInput = document.getElementById("transactionSearchInput");
+  const loadButton = document.getElementById("loadTransactionButton");
+  const exportButton = document.getElementById("exportCaseReport");
+
+  loadButton?.addEventListener("click", () =>
+    loadCaseById(lookupInput?.value, { updateUrl: true }),
+  );
+  lookupInput?.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      loadCaseById(lookupInput.value, { updateUrl: true });
+    }
+  });
+  lookupInput?.addEventListener("change", () =>
+    loadCaseById(lookupInput.value, { updateUrl: true }),
+  );
+  exportButton?.addEventListener("click", exportSelectedCaseReport);
 }
 
 function backtestOutcomeText(caseItem) {
@@ -695,6 +982,75 @@ function renderQueueCommand(summary) {
   });
 }
 
+function queueCases() {
+  return state.dashboard.top_queue_cases;
+}
+
+function queueCasesFiltered() {
+  const { tier, outcome, rule, search } = state.queueFilters;
+  const searchText = String(search || "").trim().toUpperCase();
+
+  return queueCases().filter((caseItem) => {
+    if (tier !== "all" && caseItem.priority_tier !== tier) return false;
+    if (outcome === "fraud" && Number(caseItem.actual_fraud_label) !== 1) return false;
+    if (outcome === "non_fraud" && Number(caseItem.actual_fraud_label) !== 0) {
+      return false;
+    }
+    if (rule === "missed" && Number(caseItem.alert_generated) !== 0) return false;
+    if (rule === "hit" && Number(caseItem.alert_generated) !== 1) return false;
+    if (searchText && !String(caseItem.transaction_id).toUpperCase().includes(searchText)) {
+      return false;
+    }
+    return true;
+  });
+}
+
+function updateQueueFilterState() {
+  state.queueFilters = {
+    tier: document.getElementById("queueTierFilter")?.value ?? "all",
+    outcome: document.getElementById("queueOutcomeFilter")?.value ?? "all",
+    rule: document.getElementById("queueRuleFilter")?.value ?? "all",
+    search: document.getElementById("queueSearchFilter")?.value ?? "",
+  };
+}
+
+function renderQueueFilterSummary(visibleCases) {
+  const summary = document.getElementById("queueFilterSummary");
+  if (!summary) return;
+  const fraudCount = visibleCases.filter(
+    (caseItem) => Number(caseItem.actual_fraud_label) === 1,
+  ).length;
+  const ruleGapCount = visibleCases.filter(
+    (caseItem) => Number(caseItem.alert_generated) === 0,
+  ).length;
+  summary.textContent = `${visibleCases.length} of ${queueCases().length} visible cases shown | ${fraudCount} confirmed fraud in backtest | ${ruleGapCount} rule-gap cases.`;
+}
+
+function initializeQueueFilters() {
+  ["queueTierFilter", "queueOutcomeFilter", "queueRuleFilter", "queueSearchFilter"].forEach(
+    (id) => {
+      document.getElementById(id)?.addEventListener("input", () => {
+        updateQueueFilterState();
+        renderQueue();
+      });
+      document.getElementById(id)?.addEventListener("change", () => {
+        updateQueueFilterState();
+        renderQueue();
+      });
+    },
+  );
+
+  document.getElementById("queueClearFilters")?.addEventListener("click", () => {
+    setFieldValue("queueTierFilter", "all");
+    setFieldValue("queueOutcomeFilter", "all");
+    setFieldValue("queueRuleFilter", "all");
+    setFieldValue("queueSearchFilter", "");
+    updateQueueFilterState();
+    renderQueue();
+  });
+  updateQueueFilterState();
+}
+
 function renderQueue() {
   const summary = state.dashboard.queue_summary;
   document.getElementById("queueSize").textContent = String(summary.queue_size);
@@ -707,8 +1063,19 @@ function renderQueue() {
 
   const caseList = document.getElementById("caseList");
   caseList.replaceChildren();
+  const visibleCases = queueCasesFiltered();
+  renderQueueFilterSummary(visibleCases);
 
-  state.dashboard.top_queue_cases.forEach((caseItem) => {
+  if (visibleCases.length === 0) {
+    const empty = document.createElement("p");
+    empty.className = "feature-empty queue-empty";
+    empty.textContent =
+      "No cases matched the current filters. Clear filters or search another transaction ID.";
+    caseList.appendChild(empty);
+    return;
+  }
+
+  visibleCases.forEach((caseItem) => {
     const row = document.createElement("article");
     const tierClass = priorityClassName(caseItem.priority_tier);
     const backtestLabel =
@@ -729,10 +1096,13 @@ function renderQueue() {
           <div>
             <span class="muted-label">Transaction</span>
             <strong>${caseItem.transaction_id}</strong>
-            <small>${String(caseItem.event_ts).replace(" ", " at ")}</small>
+          <small>${String(caseItem.event_ts).replace(" ", " at ")}</small>
           </div>
         </div>
-        <div class="case-score ${tierClass}">${numberText(caseItem.predicted_fraud_probability, 3)}</div>
+        <div class="case-header-actions">
+          <div class="case-score ${tierClass}">${numberText(caseItem.predicted_fraud_probability, 3)}</div>
+          <button class="secondary-button case-open-button" type="button" data-case-id="${caseItem.transaction_id}">Open case</button>
+        </div>
       </div>
 
       <div class="case-meta">
@@ -782,6 +1152,9 @@ function renderQueue() {
         ${secondaryReasons}
       </ul>
     `;
+    row.querySelector(".case-open-button")?.addEventListener("click", () => {
+      loadCaseById(caseItem.transaction_id, { switchToScore: true, updateUrl: true });
+    });
     caseList.appendChild(row);
   });
 }
@@ -898,22 +1271,105 @@ function renderPilotRecommendation() {
   });
 }
 
-function renderCapacityThresholds() {
-  const tbody = document.getElementById("capacityRows");
-  tbody.replaceChildren();
+function capacityPolicyRows() {
   const champion = state.dashboard.metrics.champion;
   const allowedRates = new Set([0.01, 0.02, 0.05, 0.1, 0.15]);
-  const rows = state.dashboard.capacity_thresholds
+  return state.dashboard.capacity_thresholds
     .filter(
       (row) =>
         row.model_name === champion.model_name &&
         allowedRates.has(Number(row.target_capacity_rate)),
     )
     .sort((a, b) => Number(a.target_capacity_rate) - Number(b.target_capacity_rate));
+}
+
+function selectedCapacityRow() {
+  const rows = capacityPolicyRows();
+  return (
+    rows.find(
+      (row) => Number(row.target_capacity_rate) === Number(state.selectedCapacityRate),
+    ) ?? rows.find((row) => Number(row.target_capacity_rate) === 0.05) ?? rows[0]
+  );
+}
+
+function renderCapacitySimulator() {
+  const rows = capacityPolicyRows();
+  const row = selectedCapacityRow();
+  if (!row) return;
+
+  const slider = document.getElementById("capacityPolicySlider");
+  const selectedIndex = rows.findIndex(
+    (candidate) =>
+      Number(candidate.target_capacity_rate) === Number(row.target_capacity_rate),
+  );
+  if (slider) {
+    slider.max = String(Math.max(rows.length - 1, 0));
+    slider.value = String(Math.max(selectedIndex, 0));
+  }
+
+  const reviewCostUsd = 8;
+  const champion = state.dashboard.metrics.champion;
+  const costDelta =
+    (Number(row.test_review_count) - Number(champion.test_review_count)) *
+    reviewCostUsd;
+  const fraudDelta =
+    Number(row.test_true_positives) - Number(champion.test_true_positives);
+
+  document.getElementById("capacityPolicyLabel").textContent = capacityLabel(
+    row.target_capacity_rate,
+  );
+  document.getElementById("capacitySimThreshold").textContent = numberText(
+    row.validation_threshold,
+    3,
+  );
+  document.getElementById("capacitySimReviews").textContent = String(
+    row.test_review_count,
+  );
+  document.getElementById("capacitySimCapture").textContent = percent(
+    row.test_recall_fraud_capture_rate,
+  );
+  document.getElementById("capacitySimFalsePositives").textContent = String(
+    row.test_false_positives,
+  );
+  document.getElementById("capacitySimCostDelta").textContent = moneyText(costDelta);
+  document.getElementById("capacitySimNarrative").textContent =
+    `At ${capacityLabel(row.target_capacity_rate)} review capacity, the queue reviews ${row.test_review_count} test cases, captures ${percent(row.test_recall_fraud_capture_rate)} of fraud, and changes review spend by ${moneyText(costDelta)} versus the selected 5% operating policy. Fraud capture changes by ${signedCount(fraudDelta)} true positives.`;
+}
+
+function initializeCapacitySimulator() {
+  const rows = capacityPolicyRows();
+  const slider = document.getElementById("capacityPolicySlider");
+  if (!slider || rows.length === 0) return;
+
+  slider.max = String(rows.length - 1);
+  slider.value = String(
+    Math.max(
+      rows.findIndex(
+        (row) => Number(row.target_capacity_rate) === Number(state.selectedCapacityRate),
+      ),
+      0,
+    ),
+  );
+  slider.addEventListener("input", () => {
+    const row = rows[Number(slider.value)] ?? rows[0];
+    state.selectedCapacityRate = Number(row.target_capacity_rate);
+    renderCapacitySimulator();
+    renderCapacityThresholds();
+  });
+  renderCapacitySimulator();
+}
+
+function renderCapacityThresholds() {
+  const tbody = document.getElementById("capacityRows");
+  tbody.replaceChildren();
+  const rows = capacityPolicyRows();
 
   rows.forEach((row) => {
     const tr = document.createElement("tr");
-    tr.className = Number(row.target_capacity_rate) === 0.05 ? "selected-policy-row" : "";
+    tr.className =
+      Number(row.target_capacity_rate) === Number(state.selectedCapacityRate)
+        ? "selected-policy-row"
+        : "";
     tr.innerHTML = `
       <td>${capacityLabel(row.target_capacity_rate)} capacity policy</td>
       <td>${numberText(row.validation_threshold, 3)}</td>
@@ -983,6 +1439,7 @@ function renderDashboard() {
   renderQueue();
   renderAnalystMetrics();
   renderPilotRecommendation();
+  renderCapacitySimulator();
   renderCapacityThresholds();
   renderGlobalImportance();
   renderBusinessImpact();
@@ -1001,8 +1458,16 @@ async function boot() {
   state.dashboard = await dashboardResponse.json();
   initializeTabs();
   initializeForm(state.model);
+  initializeCaseLookup();
+  initializeQueueFilters();
+  initializeCapacitySimulator();
   renderDashboard();
-  scoreCurrentForm();
+  const initialCase = new URLSearchParams(window.location.search).get("case");
+  if (initialCase) {
+    loadCaseById(initialCase);
+  } else {
+    scoreCurrentForm();
+  }
 }
 
 boot();
