@@ -629,7 +629,7 @@ function evidenceCheckText(caseItem) {
 
 function transactionAmountText(caseItem) {
   const amount = transactionAmountNumber(caseItem);
-  if (!Number.isFinite(amount)) return "Not exported";
+  if (!Number.isFinite(amount)) return "Unavailable in export";
   return `$${amount.toLocaleString("en-US", {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
@@ -683,6 +683,12 @@ function caseToFormDefaults(caseItem) {
     merchant_profile_risk_score:
       caseItem.merchant_profile_risk_score ?? reference.merchant_profile_risk_score,
   };
+}
+
+function caseLookupLabel(caseItem) {
+  const amount = transactionAmountNumber(caseItem);
+  const amountText = Number.isFinite(amount) ? ` - ${transactionAmountText(caseItem)}` : "";
+  return `${caseItem.transaction_id} - ${caseItem.priority_tier}${amountText}`;
 }
 
 function applyCaseToForm(caseItem) {
@@ -788,6 +794,10 @@ function renderSelectedCaseDrilldown(input, probability, priority, deltas) {
     : `<li><strong>No material driver</strong><span>0.000</span><p>The current form values do not create a material local score change.</p></li>`;
 
   panel.hidden = false;
+  const amountNote = Number.isFinite(transactionAmountNumber(caseItem))
+    ? "Lookup fills exported fields from the case data. Country, channel, and risk scores remain editable where the top-case export did not include the original raw column."
+    : "This case export did not include the original amount because amount was not one of the top explanation reasons. The form uses the reference amount as an editable default; update it if the raw transaction amount is available.";
+
   panel.innerHTML = `
     <div class="case-drilldown-header">
       <div>
@@ -813,10 +823,12 @@ function renderSelectedCaseDrilldown(input, probability, priority, deltas) {
         <ul>${drivers}</ul>
       </section>
     </div>
-    <p class="case-data-note">Lookup fills exported fields from the case data. Country, channel, and risk scores remain editable where the top-case export did not include the original raw column.</p>
+    <p class="case-data-note">${amountNote}</p>
   `;
   if (status) {
-    status.textContent = `${caseItem.transaction_id} loaded. Review the auto-filled fields, adjust missing operational context if needed, then export the case report.`;
+    status.textContent = Number.isFinite(transactionAmountNumber(caseItem))
+      ? `${caseItem.transaction_id} loaded. Review the auto-filled fields, adjust missing operational context if needed, then export the case report.`
+      : `${caseItem.transaction_id} loaded. Amount was unavailable in the top-case export, so the amount field is using an editable reference default.`;
   }
   if (exportButton) exportButton.disabled = false;
 }
@@ -828,7 +840,7 @@ function populateCaseLookup() {
   state.dashboard.top_queue_cases.forEach((caseItem) => {
     const option = document.createElement("option");
     option.value = caseItem.transaction_id;
-    option.label = `${caseItem.transaction_id} - ${caseItem.priority_tier} - ${transactionAmountText(caseItem)}`;
+    option.label = caseLookupLabel(caseItem);
     options.appendChild(option);
   });
 }
@@ -843,6 +855,14 @@ function findCaseById(transactionId) {
 function loadCaseById(transactionId, options = {}) {
   const status = document.getElementById("lookupStatus");
   const input = document.getElementById("transactionSearchInput");
+  const normalized = String(transactionId || "").trim().toUpperCase();
+  if (!normalized || normalized.length < 8) {
+    if (status) {
+      status.textContent =
+        "Keep typing a full transaction ID, or choose one from the suggestions.";
+    }
+    return;
+  }
   const caseItem = findCaseById(transactionId);
   if (!caseItem) {
     state.selectedCase = null;
