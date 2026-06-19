@@ -25,6 +25,19 @@ const featureLabels = {
   amount_log1p: "Log-scaled amount",
 };
 
+const manualScoringDefaults = {
+  amount: "20.00",
+  currency: "USD",
+  txn_country: "US",
+  channel: "Card Present",
+  txn_hour: "12",
+  geo_distance_km: "0",
+  device_risk_score: "0.02",
+  synthetic_identity_score: "0.02",
+  merchant_risk_score: "0.02",
+  merchant_profile_risk_score: "0.02",
+};
+
 function sigmoid(value) {
   return 1 / (1 + Math.exp(-value));
 }
@@ -561,6 +574,9 @@ function setActiveTab(tabName, updateUrl = false) {
   if (updateUrl) {
     const url = new URL(window.location.href);
     url.searchParams.set("view", activeTab);
+    if (activeTab !== "score") {
+      url.searchParams.delete("case");
+    }
     window.history.replaceState({}, "", url);
     document
       .querySelector(".workspace")
@@ -674,6 +690,34 @@ function setFieldValue(id, value) {
   const field = document.getElementById(id);
   if (!field || value === null || value === undefined) return;
   field.value = String(value);
+}
+
+function resetToManualScoring(updateUrl = true) {
+  state.selectedCase = null;
+  Object.entries(manualScoringDefaults).forEach(([id, value]) => {
+    setFieldValue(id, value);
+  });
+
+  const lookupInput = document.getElementById("transactionSearchInput");
+  if (lookupInput) lookupInput.value = "";
+
+  const status = document.getElementById("lookupStatus");
+  if (status) {
+    status.textContent =
+      "Manual scoring mode is active. Enter transaction facts below, then score the transaction.";
+  }
+
+  const exportButton = document.getElementById("exportCaseReport");
+  if (exportButton) exportButton.disabled = true;
+
+  if (updateUrl) {
+    const url = new URL(window.location.href);
+    url.searchParams.set("view", "score");
+    url.searchParams.delete("case");
+    window.history.replaceState({}, "", url);
+  }
+
+  scoreCurrentForm();
 }
 
 function caseToFormDefaults(caseItem) {
@@ -960,6 +1004,7 @@ function initializeCaseLookup() {
   const lookupInput = document.getElementById("transactionSearchInput");
   const loadButton = document.getElementById("loadTransactionButton");
   const exportButton = document.getElementById("exportCaseReport");
+  const resetButton = document.getElementById("resetManualScoring");
 
   loadButton?.addEventListener("click", () =>
     loadCaseById(lookupInput?.value, { updateUrl: true }),
@@ -974,6 +1019,7 @@ function initializeCaseLookup() {
     loadCaseById(lookupInput.value, { updateUrl: true }),
   );
   exportButton?.addEventListener("click", exportSelectedCaseReport);
+  resetButton?.addEventListener("click", () => resetToManualScoring(true));
 }
 
 function backtestOutcomeText(caseItem) {
@@ -1529,8 +1575,10 @@ async function boot() {
   initializeQueueFilters();
   initializeCapacitySimulator();
   renderDashboard();
-  const initialCase = new URLSearchParams(window.location.search).get("case");
-  if (initialCase) {
+  const params = new URLSearchParams(window.location.search);
+  const initialView = params.get("view") ?? "score";
+  const initialCase = params.get("case");
+  if (initialCase && initialView === "score") {
     loadCaseById(initialCase);
   } else {
     scoreCurrentForm();

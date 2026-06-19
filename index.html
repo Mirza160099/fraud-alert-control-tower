@@ -96,9 +96,14 @@
                 <span class="stitch-kicker">Transaction lookup</span>
                 <h2>Search Scored Transactions</h2>
               </div>
-              <button id="exportCaseReport" class="secondary-button" type="button" disabled>
-                Export case report
-              </button>
+              <div class="lookup-actions">
+                <button id="resetManualScoring" class="secondary-button" type="button">
+                  Start manual scoring
+                </button>
+                <button id="exportCaseReport" class="secondary-button" type="button" disabled>
+                  Export case report
+                </button>
+              </div>
             </div>
             <div class="lookup-grid">
               <label>
@@ -477,8 +482,8 @@
             </div>
             <div class="view-command-grid">
               <article>
-                <span>Primary question</span>
-                <strong>Is the queue worth reviewing?</strong>
+                <span>Operating decision</span>
+                <strong>Set review capacity and threshold</strong>
               </article>
               <article>
                 <span>Operating lens</span>

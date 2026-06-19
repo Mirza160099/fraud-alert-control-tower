@@ -2484,6 +2484,13 @@ select:focus-visible {
   padding: 16px;
 }
 
+.lookup-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
 .lookup-grid {
   display: grid;
   grid-template-columns: minmax(240px, 1fr) auto;
