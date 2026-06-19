@@ -1,6 +1,7 @@
 const state = {
   model: null,
   dashboard: null,
+  transactionLookup: [],
   selectedCase: null,
   queueFilters: {
     tier: "all",
@@ -637,6 +638,9 @@ function transactionAmountText(caseItem) {
 }
 
 function transactionAmountNumber(caseItem) {
+  const directAmount = Number(caseItem.transaction_amount_usd);
+  if (Number.isFinite(directAmount)) return directAmount;
+
   const amountReason = [caseItem.reason_1, caseItem.reason_2, caseItem.reason_3]
     .filter(Boolean)
     .find((reason) => /^transaction amount was /i.test(reason));
@@ -647,6 +651,9 @@ function transactionAmountNumber(caseItem) {
 }
 
 function geoDistanceNumber(caseItem) {
+  const directDistance = Number(caseItem.geo_distance_km);
+  if (Number.isFinite(directDistance)) return directDistance;
+
   const geoReason = [caseItem.reason_1, caseItem.reason_2, caseItem.reason_3]
     .filter(Boolean)
     .find((reason) => /^geographic distance was /i.test(reason));
@@ -656,6 +663,9 @@ function geoDistanceNumber(caseItem) {
 }
 
 function transactionHourNumber(caseItem) {
+  const directHour = Number(caseItem.txn_hour);
+  if (Number.isFinite(directHour)) return directHour;
+
   const hour = new Date(String(caseItem.event_ts).replace(" ", "T")).getHours();
   return Number.isFinite(hour) ? hour : null;
 }
@@ -713,6 +723,7 @@ function caseFacts(caseItem, input, probability, priority) {
 }
 
 function reportLinesForCase(caseItem, input, probability, priority, deltas) {
+  const evidenceReasons = caseEvidenceReasons(caseItem, deltas);
   const topDrivers = deltas
     .filter((delta) => Math.abs(delta.delta) >= 0.001)
     .slice(0, 5)
@@ -736,9 +747,7 @@ function reportLinesForCase(caseItem, input, probability, priority, deltas) {
     ),
     "",
     "Why This Case Was Prioritized",
-    `- ${sentenceText(caseItem.reason_1)}`,
-    `- ${sentenceText(caseItem.reason_2)}`,
-    `- ${sentenceText(caseItem.reason_3)}`,
+    ...evidenceReasons.map((reason) => `- ${sentenceText(reason)}`),
     "",
     "Local Feature Impact From Current Form Values",
     ...(topDrivers.length ? topDrivers : ["1. No material local driver above reporting threshold."]),
@@ -751,6 +760,27 @@ function reportLinesForCase(caseItem, input, probability, priority, deltas) {
     "Governance Note",
     "This prototype is decision support only. Human review is required before customer-impacting action. The case data is synthetic and should be validated on representative real transaction data before production use.",
   ];
+}
+
+function caseEvidenceReasons(caseItem, deltas) {
+  const exportedReasons = [caseItem.reason_1, caseItem.reason_2, caseItem.reason_3]
+    .filter(Boolean)
+    .filter((reason) => !/^No additional material/i.test(reason));
+
+  if (exportedReasons.length > 0) {
+    return exportedReasons;
+  }
+
+  const generatedReasons = deltas
+    .slice()
+    .filter((delta) => delta.absoluteDelta >= 0.001)
+    .sort((a, b) => b.absoluteDelta - a.absoluteDelta)
+    .slice(0, 3)
+    .map((delta) => delta.text);
+
+  return generatedReasons.length
+    ? generatedReasons
+    : ["No material local driver was detected against the reference profile."];
 }
 
 function renderSelectedCaseDrilldown(input, probability, priority, deltas) {
@@ -769,6 +799,7 @@ function renderSelectedCaseDrilldown(input, probability, priority, deltas) {
   const strongestDrivers = deltas
     .filter((delta) => Math.abs(delta.delta) >= 0.001)
     .slice(0, 4);
+  const evidenceReasons = caseEvidenceReasons(caseItem, deltas);
   const facts = caseFacts(caseItem, input, probability, priority)
     .map(
       ([label, value]) => `
@@ -811,11 +842,9 @@ function renderSelectedCaseDrilldown(input, probability, priority, deltas) {
     </div>
     <div class="case-drilldown-columns">
       <section>
-        <h3>Exported Evidence</h3>
+        <h3>Case Evidence</h3>
         <ol>
-          <li>${sentenceText(caseItem.reason_1)}</li>
-          <li>${sentenceText(caseItem.reason_2)}</li>
-          <li>${sentenceText(caseItem.reason_3)}</li>
+          ${evidenceReasons.map((reason) => `<li>${sentenceText(reason)}</li>`).join("")}
         </ol>
       </section>
       <section>
@@ -837,17 +866,28 @@ function populateCaseLookup() {
   const options = document.getElementById("transactionIdOptions");
   if (!options) return;
   options.replaceChildren();
-  state.dashboard.top_queue_cases.forEach((caseItem) => {
+  lookupCases().forEach((caseItem) => {
     const option = document.createElement("option");
     option.value = caseItem.transaction_id;
     option.label = caseLookupLabel(caseItem);
     options.appendChild(option);
   });
+
+  const status = document.getElementById("lookupStatus");
+  if (status && lookupCases().length > state.dashboard.top_queue_cases.length) {
+    status.textContent = `Search ${lookupCases().length.toLocaleString("en-US")} scored synthetic transactions by transaction ID, or open a case from the queue.`;
+  }
+}
+
+function lookupCases() {
+  return state.transactionLookup.length
+    ? state.transactionLookup
+    : state.dashboard.top_queue_cases;
 }
 
 function findCaseById(transactionId) {
   const normalized = String(transactionId || "").trim().toUpperCase();
-  return state.dashboard.top_queue_cases.find(
+  return lookupCases().find(
     (caseItem) => String(caseItem.transaction_id).toUpperCase() === normalized,
   );
 }
@@ -1470,12 +1510,19 @@ function renderDashboard() {
 }
 
 async function boot() {
-  const [modelResponse, dashboardResponse] = await Promise.all([
+  const [modelResponse, dashboardResponse, lookupResponse] = await Promise.all([
     fetch("./model.json"),
     fetch("./dashboard-data.json"),
+    fetch("./transaction-lookup.json").catch(() => null),
   ]);
   state.model = await modelResponse.json();
   state.dashboard = await dashboardResponse.json();
+  if (lookupResponse?.ok) {
+    const lookupPayload = await lookupResponse.json();
+    state.transactionLookup = Array.isArray(lookupPayload.records)
+      ? lookupPayload.records
+      : [];
+  }
   initializeTabs();
   initializeForm(state.model);
   initializeCaseLookup();

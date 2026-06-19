@@ -19,7 +19,7 @@ JPMorgan-inspired fraud analytics project that prioritizes transaction alerts, e
 - End-to-end fraud analytics workflow: data audit, cleaning, joins, feature engineering, feature selection, fraud-risk scoring, thresholding, explainability, and app deployment.
 - Responsible AI framing: leakage prevention, model-card documentation, human review, threshold governance, risk register, approval gates, and monitoring controls.
 - Recruiter-friendly product thinking: the final app is not just a classifier; it is an investigator control tower with explanations, risk/protective feature impact, an investigator brief, queue command controls, governance evidence, and recommended next actions.
-- Investigator workflow depth: transaction ID lookup, case drilldown, queue filters, exportable case reports, and a live threshold/capacity simulator.
+- Investigator workflow depth: 5,000 transaction ID lookup, case drilldown, queue filters, exportable case reports, and a live threshold/capacity simulator.
 
 ## Live-Style App Screenshots
 
@@ -180,7 +180,7 @@ The app is a Vercel-style static browser application. It does not need Streamlit
 Views:
 
 - `Score`: user enters transaction details and receives a prediction, probability, priority tier, and explanation.
-- Transaction lookup: users can search exported top-risk transaction IDs, auto-fill available case facts, compare the exported score to the current form score, and export an investigator report.
+- Transaction lookup: users can search 5,000 scored synthetic transaction IDs, auto-fill amount/country/channel/risk signals, compare the exported score to the current form score, and export an investigator report.
 - Manual transaction input: users enter transaction facts and the app calculates the Low, Medium, High, or Critical alert tier from the score.
 - `Queue`: highest-risk cases are ranked for investigator review, with filters for priority, backtest outcome, legacy-rule status, and transaction ID.
 - `Metrics`: operating evidence, feature importance, threshold/capacity simulator, pilot recommendation, and alert economics.
@@ -212,8 +212,9 @@ If you already created a Vercel project with `app` as the root, that also works.
 - Risk scoring and threshold evaluation: `src/model_selection.py`, `src/compare_models.py`
 - Explainability: `src/explainability.py`, `src/explain_model.py`
 - Web model export: `src/export_model_for_web.py`
+- Transaction lookup export: `src/export_transaction_lookup_for_web.py`, `transaction-lookup.json`
 - Static app: `app`
-- Root static deployment files: `index.html`, `styles.css`, `app.js`, `model.json`, `dashboard-data.json`
+- Root static deployment files: `index.html`, `styles.css`, `app.js`, `model.json`, `dashboard-data.json`, `transaction-lookup.json`
 - Screenshots: `assets`
 - Modeling outputs: `artifacts/modeling`
 - Governance pack: `docs/governance`
@@ -226,6 +227,7 @@ If you already created a Vercel project with `app` as the root, that also works.
 fraud-alert-control-tower/
   README.md
   requirements.txt
+  transaction-lookup.json
   src/
   app/
   assets/
@@ -238,7 +240,7 @@ fraud-alert-control-tower/
 
 ## Data Note
 
-The clean GitHub package does not include raw source data by default. The repository includes model outputs, app assets, governance documentation, and the static app. If raw synthetic data is allowed to be public, add a `data/` folder later and update this section with provenance notes.
+The clean GitHub package does not include full raw source tables by default. The repository includes model outputs, app assets, governance documentation, the static app, and a compact transaction lookup export for the demo. If raw synthetic data is allowed to be public, add a `data/` folder later and update this section with provenance notes.
 
 ## Interview Pitch
 
