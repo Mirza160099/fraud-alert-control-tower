@@ -1037,7 +1037,7 @@ function renderSelectedCaseDrilldown(input, probability, priority, deltas) {
   panel.innerHTML = `
     <div class="case-drilldown-header">
       <div>
-        <span class="stitch-kicker">Case drilldown</span>
+        <span class="analyst-kicker">Case drilldown</span>
         <h2>${caseItem.transaction_id}</h2>
       </div>
       <span class="case-tag ${priority.className}">${priority.tier}</span>
