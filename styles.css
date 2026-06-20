@@ -2030,10 +2030,30 @@ h1 {
 
 .topbar-stack {
   display: grid;
-  grid-template-columns: minmax(180px, 0.85fr) minmax(230px, 1fr);
+  grid-template-columns: minmax(132px, 0.62fr) minmax(158px, 0.76fr) minmax(200px, 0.94fr);
   gap: 12px;
   align-content: center;
-  min-width: 410px;
+  min-width: 510px;
+}
+
+.presenter-toggle {
+  min-height: 76px;
+  padding: 12px 14px;
+  border: 1px solid rgba(15, 125, 117, 0.22);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.76);
+  color: var(--accent-strong);
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.presenter-toggle[aria-pressed="true"] {
+  border-color: rgba(15, 125, 117, 0.52);
+  background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+  color: #fff;
+  box-shadow: 0 12px 24px rgba(8, 79, 74, 0.22);
 }
 
 .deployment-chip,
@@ -2206,6 +2226,78 @@ input:focus-visible,
 select:focus-visible {
   outline: 3px solid rgba(31, 79, 143, 0.20);
   outline-offset: 2px;
+}
+
+.build-explain {
+  position: relative;
+}
+
+.presenter-mode .build-explain {
+  outline: 1px dashed rgba(93, 217, 214, 0.72);
+  outline-offset: 4px;
+}
+
+.presenter-mode .build-explain::before {
+  content: "i";
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 30;
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(93, 217, 214, 0.72);
+  border-radius: 999px;
+  background: rgba(8, 79, 74, 0.94);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 900;
+  line-height: 1;
+  pointer-events: none;
+}
+
+.presenter-mode .build-explain::after {
+  content: attr(data-build-note);
+  position: absolute;
+  top: 38px;
+  right: 8px;
+  z-index: 80;
+  width: min(340px, 78vw);
+  padding: 12px 13px;
+  border: 1px solid rgba(93, 217, 214, 0.34);
+  border-radius: 8px;
+  background: rgba(7, 18, 20, 0.96);
+  color: #e8f5f2;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.30);
+  font-size: 0.82rem;
+  font-weight: 750;
+  line-height: 1.38;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-4px);
+  transition: opacity 140ms ease, transform 140ms ease;
+}
+
+.presenter-mode .build-explain:hover::after,
+.presenter-mode .build-explain:focus-visible::after,
+.presenter-mode .build-explain:focus-within::after {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.presenter-mode .tab-button.build-explain::before {
+  top: 6px;
+  right: 6px;
+  width: 18px;
+  height: 18px;
+  font-size: 0.62rem;
+}
+
+.presenter-mode .tab-button.build-explain::after {
+  top: calc(100% + 10px);
+  left: 0;
+  right: auto;
 }
 
 @media (max-width: 1050px) {

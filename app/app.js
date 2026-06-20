@@ -15,6 +15,7 @@ const state = {
 };
 
 const explanationReportingThreshold = 0.02;
+const presenterModeStorageKey = "fraudAlertPresenterMode";
 
 const featureLabels = {
   geo_distance_km: "Geographic distance",
@@ -692,6 +693,35 @@ function initializeTabs() {
     button.addEventListener("click", () => setActiveTab(button.dataset.tab, true));
   });
   setActiveTab(new URLSearchParams(window.location.search).get("view") ?? "score");
+}
+
+function setPresenterMode(enabled) {
+  document.body.classList.toggle("presenter-mode", enabled);
+  const toggle = document.getElementById("presenterModeToggle");
+  if (toggle) {
+    toggle.setAttribute("aria-pressed", String(enabled));
+    toggle.textContent = enabled ? "Presenter Mode On" : "Presenter Mode";
+  }
+  try {
+    window.localStorage.setItem(presenterModeStorageKey, enabled ? "on" : "off");
+  } catch {
+    // Local storage is optional; the toggle still works for the current session.
+  }
+}
+
+function initializePresenterMode() {
+  const toggle = document.getElementById("presenterModeToggle");
+  if (!toggle) return;
+  let savedMode = "off";
+  try {
+    savedMode = window.localStorage.getItem(presenterModeStorageKey) ?? "off";
+  } catch {
+    savedMode = "off";
+  }
+  setPresenterMode(savedMode === "on");
+  toggle.addEventListener("click", () => {
+    setPresenterMode(!document.body.classList.contains("presenter-mode"));
+  });
 }
 
 function sentenceText(text) {
@@ -1908,6 +1938,7 @@ async function boot() {
       : [];
   }
   initializeTabs();
+  initializePresenterMode();
   initializeForm(state.model);
   initializeCaseLookup();
   initializeQueueFilters();

@@ -20,6 +20,7 @@ JPMorgan-inspired fraud analytics project that prioritizes transaction alerts, e
 - Responsible AI framing: leakage prevention, model-card documentation, human review, threshold governance, risk register, approval gates, and monitoring controls.
 - Recruiter-friendly product thinking: the final app is not just a classifier; it is an investigator control tower with explanations, risk/protective feature impact, an investigator brief, queue command controls, governance evidence, and recommended next actions.
 - Investigator workflow depth: 5,000 transaction ID lookup, case drilldown, queue filters, exportable case reports, and a live threshold/capacity simulator.
+- Optional Presenter Mode: build explanations appear on hover so the project can be defended section-by-section without cluttering the risk analyst view.
 
 ## Live-Style App Screenshots
 
@@ -185,6 +186,7 @@ Views:
 - `Queue`: highest-risk cases are ranked for investigator review, with filters for priority, backtest outcome, legacy-rule status, and transaction ID.
 - `Metrics`: operating evidence, feature importance, threshold/capacity simulator, pilot recommendation, and alert economics.
 - `Governance`: model-card summary, threshold policy, and monitoring controls.
+- `Presenter Mode`: optional build notes explain which files and modelling artifacts power each major app section.
 
 Run locally:
 

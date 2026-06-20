@@ -24,6 +24,9 @@
             </div>
           </div>
           <div class="topbar-stack">
+            <button id="presenterModeToggle" class="presenter-toggle" type="button" aria-pressed="false">
+              Presenter Mode
+            </button>
             <div class="deployment-chip">
               <span>Live deployment</span>
               <strong>Vercel-ready</strong>
@@ -36,10 +39,10 @@
         </header>
 
         <nav class="tabbar" aria-label="Control tower views">
-          <button class="tab-button active" type="button" data-tab="score"><span>01</span> Score</button>
-          <button class="tab-button" type="button" data-tab="queue"><span>02</span> Queue</button>
-          <button class="tab-button" type="button" data-tab="metrics"><span>03</span> Metrics</button>
-          <button class="tab-button" type="button" data-tab="governance"><span>04</span> Governance</button>
+          <button class="tab-button active build-explain" type="button" data-tab="score" data-build-note="Uses exported model logic in model.json, frontend scoring in app.js, and selected fraud features to calculate the transaction risk score."><span>01</span> Score</button>
+          <button class="tab-button build-explain" type="button" data-tab="queue" data-build-note="Uses scored transaction records from dashboard-data.json and transaction-lookup.json to prioritize investigator workload."><span>02</span> Queue</button>
+          <button class="tab-button build-explain" type="button" data-tab="metrics" data-build-note="Shows held-out test results, false positives, fraud capture, threshold capacity, and alert economics."><span>03</span> Metrics</button>
+          <button class="tab-button build-explain" type="button" data-tab="governance" data-build-note="Summarizes the model card, threshold memo, human-review control, production limitations, and monitoring plan."><span>04</span> Governance</button>
         </nav>
 
         <section class="panel live-strip" aria-live="polite">
@@ -62,7 +65,7 @@
         </section>
 
         <section id="scoreView" class="tab-view active stitch-score-view">
-          <section class="stitch-command-panel" aria-label="Score command center overview">
+          <section class="stitch-command-panel build-explain" aria-label="Score command center overview" data-build-note="This score view combines the exported model, the live transaction form, local explanation logic, and queue policy into one analyst workbench.">
             <div class="stitch-command-title">
               <div>
                 <span class="stitch-kicker">Live scoring workbench</span>
@@ -100,7 +103,7 @@
                 <button id="resetManualScoring" class="secondary-button" type="button">
                   Start manual scoring
                 </button>
-                <button id="exportCaseReport" class="secondary-button" type="button" disabled>
+                <button id="exportCaseReport" class="secondary-button build-explain" type="button" disabled data-build-note="Generates an investigator-ready Markdown report from the selected transaction, score, explanation, next steps, and governance notes.">
                   Export case report
                 </button>
               </div>
@@ -243,7 +246,7 @@
                 </div>
               </div>
 
-              <div class="explanation-box">
+              <div class="explanation-box build-explain" data-build-note="Uses local sensitivity-style explanations to show which transaction features increased or reduced the risk score.">
                 <h3>Why</h3>
                 <ol id="reasonList"></ol>
                 <div class="response-plan">
@@ -351,7 +354,7 @@
         </section>
 
         <section id="queueView" class="tab-view ops-view">
-          <section class="view-command-panel" aria-label="Queue command center overview">
+          <section class="view-command-panel build-explain" aria-label="Queue command center overview" data-build-note="This queue view turns model scores into an investigator workflow with routing bands, filters, rule-gap cases, and case drilldowns.">
             <div class="view-command-title">
               <div>
                 <span class="stitch-kicker">Investigator operations</span>
@@ -495,7 +498,7 @@
         </section>
 
         <section id="metricsView" class="tab-view ops-view">
-          <section class="view-command-panel" aria-label="Metrics command center overview">
+          <section class="view-command-panel build-explain" aria-label="Metrics command center overview" data-build-note="This metrics view translates model performance into fraud capture, false positives, review capacity, segment validation, and cost trade-offs.">
             <div class="view-command-title">
               <div>
                 <span class="stitch-kicker">Analyst evidence</span>
@@ -611,7 +614,7 @@
           </section>
 
           <section class="content-grid">
-            <section class="panel model-trust-panel">
+            <section class="panel model-trust-panel build-explain" data-build-note="This section answers model-risk questions a fraud analyst may challenge: calibration, explanation method, false positives, and drift response.">
               <div class="panel-header">
                 <h2>Model Trust Answers</h2>
                 <span class="muted-label">Reviewer challenge log</span>
@@ -640,7 +643,7 @@
               </div>
             </section>
 
-            <section class="panel segment-validation-panel">
+            <section class="panel segment-validation-panel build-explain" data-build-note="Calculates segment-level validation from scored transaction records by risk tier, channel, country, and amount band.">
               <div class="panel-header">
                 <h2>Segment Validation</h2>
                 <span class="muted-label">Country, channel, amount, tier</span>
@@ -763,7 +766,7 @@
         </section>
 
         <section id="governanceView" class="tab-view ops-view">
-          <section class="view-command-panel" aria-label="Governance command center overview">
+          <section class="view-command-panel build-explain" aria-label="Governance command center overview" data-build-note="This governance view collects responsible-AI controls, model-card limits, threshold policy, approval gates, and monitoring ownership.">
             <div class="view-command-title">
               <div>
                 <span class="stitch-kicker">Responsible AI controls</span>
@@ -850,7 +853,7 @@
             </section>
           </section>
 
-          <section class="panel lower-panel">
+          <section class="panel lower-panel build-explain" data-build-note="Frames calibration, segment validation, explainability, and drift monitoring as production approval gates instead of claiming the prototype is production-ready.">
             <div class="panel-header">
               <h2>Model Trust Checklist</h2>
               <span class="muted-label">Risk analyst review</span>
