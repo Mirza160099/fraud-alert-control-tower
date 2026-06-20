@@ -1731,6 +1731,123 @@ function renderBusinessImpact() {
     `Illustrative sensitivity: ${moneyText(reviewCostUsd)} review cost per case and ${moneyText(avoidedFraudLossUsd)} avoided loss per captured fraud. Synthetic data only.`;
 }
 
+function validationRecords() {
+  return state.transactionLookup.length
+    ? state.transactionLookup
+    : state.dashboard.top_queue_cases;
+}
+
+function recordProbability(record) {
+  return Number(record.predicted_fraud_probability ?? record.score ?? 0);
+}
+
+function recordIsFraud(record) {
+  return Number(record.actual_fraud_label) === 1;
+}
+
+function recordIsReviewed(record) {
+  return recordProbability(record) >= Number(state.model.threshold);
+}
+
+function amountBand(record) {
+  const amount = transactionAmountNumber(record);
+  if (!Number.isFinite(amount)) return "Amount unavailable";
+  if (amount < 50) return "Amount under $50";
+  if (amount < 250) return "Amount $50-$249";
+  if (amount < 1000) return "Amount $250-$999";
+  return "Amount $1,000+";
+}
+
+function segmentStats(records, segmentType, valueFn) {
+  const groups = new Map();
+  records.forEach((record) => {
+    const value = valueFn(record) || "Unknown";
+    const key = `${segmentType}: ${value}`;
+    if (!groups.has(key)) {
+      groups.set(key, {
+        segment: key,
+        count: 0,
+        reviewed: 0,
+        reviewedFraud: 0,
+        scoreTotal: 0,
+      });
+    }
+    const group = groups.get(key);
+    group.count += 1;
+    group.scoreTotal += recordProbability(record);
+    if (recordIsReviewed(record)) {
+      group.reviewed += 1;
+      if (recordIsFraud(record)) group.reviewedFraud += 1;
+    }
+  });
+
+  return Array.from(groups.values()).map((group) => ({
+    ...group,
+    hitRate: group.reviewed ? group.reviewedFraud / group.reviewed : 0,
+    avgScore: group.count ? group.scoreTotal / group.count : 0,
+  }));
+}
+
+function renderSegmentValidation() {
+  const tbody = document.getElementById("segmentValidationRows");
+  if (!tbody) return;
+
+  const records = validationRecords();
+  const tierOrder = ["Critical", "High", "Medium", "Low"];
+  const tierRows = segmentStats(records, "Risk tier", (record) =>
+    record.priority_tier || classifyPriority(recordProbability(record), state.model.threshold).tier,
+  ).sort(
+    (a, b) =>
+      tierOrder.indexOf(a.segment.replace("Risk tier: ", "")) -
+      tierOrder.indexOf(b.segment.replace("Risk tier: ", "")),
+  );
+  const channelRows = segmentStats(records, "Channel", (record) => record.channel)
+    .sort((a, b) => b.reviewed - a.reviewed || b.count - a.count)
+    .slice(0, 3);
+  const countryRows = segmentStats(records, "Country", (record) => record.txn_country)
+    .sort((a, b) => b.reviewed - a.reviewed || b.count - a.count)
+    .slice(0, 3);
+  const amountRows = segmentStats(records, "Amount band", amountBand).sort(
+    (a, b) => b.reviewed - a.reviewed || b.count - a.count,
+  );
+  const rows = [...tierRows, ...channelRows, ...countryRows, ...amountRows].filter(
+    (row) => row.count > 0,
+  );
+
+  tbody.replaceChildren();
+  rows.forEach((row) => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${row.segment}</td>
+      <td>${row.count.toLocaleString("en-US")}</td>
+      <td>${row.reviewed.toLocaleString("en-US")}</td>
+      <td>${row.reviewed ? percent(row.hitRate) : "0.0%"}</td>
+      <td>${numberText(row.avgScore, 3)}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  const note = document.getElementById("segmentValidationNote");
+  if (note) {
+    note.textContent =
+      `Segment checks use ${records.length.toLocaleString("en-US")} scored synthetic transactions. In production, these same cuts would be monitored for false-positive concentration, fraud capture, and customer friction by country, channel, amount band, and risk tier.`;
+  }
+}
+
+function renderModelTrustAnswers() {
+  const champion = state.dashboard.metrics.champion;
+  const probabilityNote = document.getElementById("probabilityTrustNote");
+  const falsePositiveNote = document.getElementById("falsePositiveTrustNote");
+  if (probabilityNote) {
+    probabilityNote.textContent =
+      `The ${numberText(champion.threshold, 3)} operating threshold is backed by held-out ranking and queue results. Real-data calibration is still required before treating the score as production odds.`;
+  }
+  if (falsePositiveNote) {
+    falsePositiveNote.textContent =
+      `${champion.test_false_positives} false positives require review`;
+  }
+}
+
 function renderScoreContext() {
   const champion = state.dashboard.metrics.champion;
   const summary = state.dashboard.queue_summary;
@@ -1768,6 +1885,8 @@ function renderDashboard() {
   renderCapacityThresholds();
   renderGlobalImportance();
   renderBusinessImpact();
+  renderModelTrustAnswers();
+  renderSegmentValidation();
   document.getElementById("governanceThreshold").textContent =
     state.model.threshold.toFixed(3);
   document.getElementById("governanceCapacity").textContent =

@@ -611,6 +611,59 @@
           </section>
 
           <section class="content-grid">
+            <section class="panel model-trust-panel">
+              <div class="panel-header">
+                <h2>Model Trust Answers</h2>
+                <span class="muted-label">Reviewer challenge log</span>
+              </div>
+              <div class="trust-answer-grid">
+                <article>
+                  <span>Probability use</span>
+                  <strong>Ranking score, not production odds</strong>
+                  <p id="probabilityTrustNote">Backtest thresholding is supported; production calibration remains an approval gate.</p>
+                </article>
+                <article>
+                  <span>Explanation method</span>
+                  <strong>Local sensitivity evidence</strong>
+                  <p>Current explanations show local score drivers; real SHAP is the next technical upgrade before production.</p>
+                </article>
+                <article>
+                  <span>False-positive control</span>
+                  <strong id="falsePositiveTrustNote">Human validation required</strong>
+                  <p>No customer-impacting action is taken from the score alone.</p>
+                </article>
+                <article>
+                  <span>Drift response</span>
+                  <strong>Monitor weekly</strong>
+                  <p>Track score mix, top drivers, segment outcomes, and investigator feedback after deployment.</p>
+                </article>
+              </div>
+            </section>
+
+            <section class="panel segment-validation-panel">
+              <div class="panel-header">
+                <h2>Segment Validation</h2>
+                <span class="muted-label">Country, channel, amount, tier</span>
+              </div>
+              <p id="segmentValidationNote" class="metrics-note"></p>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Segment</th>
+                      <th>Transactions</th>
+                      <th>Reviewed</th>
+                      <th>Hit rate</th>
+                      <th>Avg score</th>
+                    </tr>
+                  </thead>
+                  <tbody id="segmentValidationRows"></tbody>
+                </table>
+              </div>
+            </section>
+          </section>
+
+          <section class="content-grid">
             <section class="panel">
               <div class="panel-header">
                 <h2>Pilot Recommendation</h2>
@@ -795,6 +848,35 @@
                 </div>
               </dl>
             </section>
+          </section>
+
+          <section class="panel lower-panel">
+            <div class="panel-header">
+              <h2>Model Trust Checklist</h2>
+              <span class="muted-label">Risk analyst review</span>
+            </div>
+            <div class="trust-check-grid">
+              <article>
+                <span>Calibration</span>
+                <strong>Approval gate</strong>
+                <p>Use the current score for ranking and queue routing. Before production, compare score bands with observed fraud rates and recalibrate if required.</p>
+              </article>
+              <article>
+                <span>Segment validation</span>
+                <strong>Required before rollout</strong>
+                <p>Review performance by country, channel, amount band, and risk tier so one segment does not absorb excessive false positives.</p>
+              </article>
+              <article>
+                <span>Explainability</span>
+                <strong>Analyst-readable now</strong>
+                <p>Local sensitivity explanations support investigation. A real SHAP layer would strengthen formal model-risk evidence.</p>
+              </article>
+              <article>
+                <span>Drift monitoring</span>
+                <strong>Weekly operating control</strong>
+                <p>Monitor score distribution, top drivers, queue hit rate, false positives, and investigator dispositions.</p>
+              </article>
+            </div>
           </section>
 
           <section class="governance-command-grid">
