@@ -2000,8 +2000,8 @@ h1 {
 .system-badges {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
-  margin-top: 12px;
+  gap: 8px;
+  margin-top: 14px;
 }
 
 .deployment-chip {
@@ -2013,21 +2013,27 @@ h1 {
 
 .system-badges span {
   display: inline-flex;
-  align-items: baseline;
-  gap: 6px;
-  color: #33413f;
-  font-size: 0.82rem;
-  font-weight: 750;
+  align-items: center;
+  gap: 7px;
+  min-height: 30px;
+  padding: 7px 12px;
+  border: 1px solid rgba(15, 125, 117, 0.2);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.74);
+  color: #253432;
+  font-size: 0.78rem;
+  font-weight: 850;
+  box-shadow: 0 8px 18px rgba(8, 79, 74, 0.08);
 }
 
-.system-badges b {
-  color: var(--accent-strong);
-  font-size: 0.66rem;
-  font-weight: 900;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
+.system-badges i {
+  width: 7px;
+  height: 7px;
+  flex: 0 0 auto;
+  border-radius: 999px;
+  background: var(--accent);
+  box-shadow: 0 0 0 3px rgba(15, 125, 117, 0.12);
 }
-
 .topbar-stack {
   display: grid;
   grid-template-columns: minmax(132px, 0.62fr) minmax(158px, 0.76fr) minmax(200px, 0.94fr);
@@ -2337,6 +2343,40 @@ select:focus-visible {
 
   .tab-button {
     height: 40px;
+  }
+
+  .topbar {
+    gap: 14px;
+    min-height: 0;
+    padding: 16px;
+  }
+
+  .topbar-stack {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .topbar-stack .model-chip {
+    grid-column: 1 / -1;
+  }
+
+  .presenter-toggle,
+  .deployment-chip,
+  .model-chip {
+    min-height: 62px;
+    padding: 10px;
+  }
+
+  .presenter-toggle,
+  .deployment-chip span,
+  .model-chip span {
+    font-size: 0.66rem;
+  }
+
+  .deployment-chip strong,
+  .model-chip strong {
+    font-size: 0.86rem;
+    line-height: 1.16;
   }
 }
 
