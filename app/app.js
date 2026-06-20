@@ -14,19 +14,19 @@ const state = {
   selectedCapacityRate: 0.05,
 };
 
-const explanationReportingThreshold = 0.01;
+const explanationReportingThreshold = 0.02;
 
 const featureLabels = {
   geo_distance_km: "Geographic distance",
   txn_country: "Transaction country",
-  synthetic_identity_score: "Synthetic identity score",
+  synthetic_identity_score: "Synthetic identity risk score",
   merchant_risk_score: "Merchant risk score",
   channel: "Payment channel",
   txn_hour: "Transaction hour",
   device_risk_score: "Device risk score",
   merchant_profile_risk_score: "Merchant profile risk score",
   transaction_amount_usd: "Transaction amount",
-  amount_log1p: "Log-scaled amount",
+  amount_log1p: "Transaction amount pattern",
 };
 
 const manualScoringDefaults = {
@@ -261,39 +261,114 @@ function hideTechnicalAmountDuplicate(items) {
   );
 }
 
-function renderReasons(deltas) {
-  const reasonList = document.getElementById("reasonList");
-  reasonList.replaceChildren();
-  const materialPositiveReasons = hideTechnicalAmountDuplicate(
-    deltas.filter((item) => item.delta >= explanationReportingThreshold),
-  ).slice(0, 3);
-  const materialReasons = hideTechnicalAmountDuplicate(
+function materialRiskDrivers(deltas, limit = 3) {
+  return hideTechnicalAmountDuplicate(
+    deltas
+      .filter((item) => item.delta >= explanationReportingThreshold)
+      .sort((a, b) => b.delta - a.delta),
+  ).slice(0, limit);
+}
+
+function materialProtectiveSignals(deltas, limit = 2) {
+  return hideTechnicalAmountDuplicate(
+    deltas
+      .filter((item) => item.delta <= -explanationReportingThreshold)
+      .sort((a, b) => b.absoluteDelta - a.absoluteDelta),
+  ).slice(0, limit);
+}
+
+function materialDriversByImpact(deltas, limit = 3) {
+  return hideTechnicalAmountDuplicate(
     deltas
       .filter((item) => item.absoluteDelta >= explanationReportingThreshold)
       .sort((a, b) => b.absoluteDelta - a.absoluteDelta),
-  ).slice(0, 3);
-  const reasons =
-    materialPositiveReasons.length > 0 ? materialPositiveReasons : materialReasons;
+  ).slice(0, limit);
+}
 
-  if (reasons.length === 0) {
-    const li = document.createElement("li");
-    li.textContent =
-      "No material risk-increasing driver was detected against the reference profile.";
-    reasonList.appendChild(li);
-    return;
+function comparisonText(actual, reference) {
+  const actualNumber = Number(actual);
+  const referenceNumber = Number(reference);
+  if (Number.isFinite(actualNumber) && Number.isFinite(referenceNumber)) {
+    const direction =
+      actualNumber > referenceNumber
+        ? "above"
+        : actualNumber < referenceNumber
+          ? "below"
+          : "near";
+    return `${formatValue(actual)} (${direction} the typical value of ${formatValue(reference)})`;
+  }
+  return `${formatValue(actual)} compared with reference ${formatValue(reference)}`;
+}
+
+function plainRiskDriverText(item) {
+  const label = featureLabels[item.feature] ?? item.feature;
+  return `${label}: ${comparisonText(item.actual, item.reference)}; this adds ${Math.abs(item.delta).toFixed(3)} to the risk score.`;
+}
+
+function plainProtectiveSignalText(item) {
+  const label = featureLabels[item.feature] ?? item.feature;
+  return `${label}: ${comparisonText(item.actual, item.reference)}; this supports a lower-risk decision (local impact -${Math.abs(item.delta).toFixed(3)}).`;
+}
+
+function decisionReasonLines(priority, deltas) {
+  const riskDrivers = materialRiskDrivers(deltas, 3);
+  const protectiveSignals = materialProtectiveSignals(deltas, 2);
+  const lines = [];
+
+  if (priority.tier === "Low") {
+    if (riskDrivers.length === 0) {
+      lines.push("No material risk-increasing signal is above the reporting threshold.");
+    } else {
+      lines.push(
+        `A small risk signal is present, but the final score remains Low: ${plainRiskDriverText(riskDrivers[0])}`,
+      );
+    }
+    if (protectiveSignals.length > 0) {
+      lines.push(
+        `Risk-reducing evidence supports monitor-only treatment: ${plainProtectiveSignalText(protectiveSignals[0])}`,
+      );
+    }
+    lines.push("Decision: no manual review is needed unless new customer, device, amount, country, or merchant behavior appears.");
+    return lines;
   }
 
-  reasons.forEach((item) => {
+  if (priority.tier === "Medium") {
+    if (riskDrivers.length > 0) {
+      lines.push(`The score is in the monitoring band because ${plainRiskDriverText(riskDrivers[0])}`);
+      riskDrivers.slice(1, 2).forEach((item) => lines.push(plainRiskDriverText(item)));
+    } else {
+      lines.push("The score is in the monitoring band, but no single risk driver dominates the decision.");
+    }
+    if (protectiveSignals.length > 0) {
+      lines.push(`One factor reduces the risk: ${plainProtectiveSignalText(protectiveSignals[0])}`);
+    }
+    lines.push("Decision: monitor closely and escalate only if another risk signal appears or the pattern repeats.");
+    return lines;
+  }
+
+  if (riskDrivers.length > 0) {
+    lines.push(
+      `${priority.tier} risk is driven mainly by ${plainRiskDriverText(riskDrivers[0])}`,
+    );
+    riskDrivers.slice(1, 3).forEach((item) => lines.push(plainRiskDriverText(item)));
+  } else {
+    lines.push("The score is above the review threshold, but no single local driver dominates the result.");
+  }
+
+  if (riskDrivers.length < 3) {
+    lines.push("No additional material risk-increasing driver was detected above the reporting threshold.");
+  }
+  return lines;
+}
+
+function renderReasons(priority, deltas) {
+  const reasonList = document.getElementById("reasonList");
+  reasonList.replaceChildren();
+  decisionReasonLines(priority, deltas).forEach((text) => {
     const li = document.createElement("li");
-    li.textContent = item.text;
+    li.textContent = text;
     reasonList.appendChild(li);
   });
-
-  if (reasons.length < 3) {
-    const li = document.createElement("li");
-    li.textContent = "No additional material risk-increasing driver was detected.";
-    reasonList.appendChild(li);
-  }
 }
 
 function strongestRiskDriver(deltas) {
@@ -340,7 +415,7 @@ function recommendedActions(priority, deltas) {
   return [
     "Escalate for immediate investigator review because the score is above the critical band.",
     "Apply step-up authentication or a temporary hold while the evidence is checked.",
-    `Validate ${driver}, device risk, geography, merchant context, and customer history before final action.`,
+    `Validate ${driver}, device posture, merchant context, and customer history before final action.`,
   ];
 }
 
@@ -556,7 +631,7 @@ function scoreCurrentForm() {
   const deltas = localDeltas(input);
 
   renderDecision(probability, priority);
-  renderReasons(deltas);
+  renderReasons(priority, deltas);
   renderActions(priority, deltas);
   renderInvestigatorBrief(input, probability, priority, deltas);
   renderFeatureBars(deltas);
@@ -795,60 +870,70 @@ function caseFacts(caseItem, input, probability, priority) {
 }
 
 function reportLinesForCase(caseItem, input, probability, priority, deltas) {
-  const evidenceReasons = caseEvidenceReasons(caseItem, deltas);
-  const topDrivers = deltas
-    .filter((delta) => Math.abs(delta.delta) >= 0.001)
-    .slice(0, 5)
-    .map(
-      (delta, index) =>
-        `${index + 1}. ${explainFeature(
-          delta.feature,
-          delta.actual,
-          delta.reference,
-          delta.delta,
-        )}`,
-    );
+  const decisionReasons = decisionReasonLines(priority, deltas);
+  const topDrivers = materialDriversByImpact(deltas, 5).map((delta, index) => {
+    const text =
+      delta.delta >= 0 ? plainRiskDriverText(delta) : plainProtectiveSignalText(delta);
+    return `${index + 1}. ${text}`;
+  });
 
   return [
-    "Fraud Alert Control Tower - Investigator Case Report",
-    `Generated: ${new Date().toLocaleString("en-GB")}`,
+    "# Fraud Alert Control Tower - Investigator Case Report",
     "",
-    "Transaction Facts",
+    `Generated: ${new Date().toLocaleString("en-GB")}`,
+    `Transaction: ${caseItem.transaction_id}`,
+    "",
+    "## 1. Decision Summary",
+    `- Risk tier: ${priority.tier}`,
+    `- Fraud probability: ${probability.toFixed(3)}`,
+    `- Review threshold: ${state.model.threshold.toFixed(3)}`,
+    `- Recommended action: ${priority.action}`,
+    `- Model use: decision support only; human approval required before customer-impacting action.`,
+    "",
+    "## 2. Transaction Facts",
     ...caseFacts(caseItem, input, probability, priority).map(
       ([label, value]) => `- ${label}: ${value}`,
     ),
     "",
-    "Why This Case Was Prioritized",
-    ...evidenceReasons.map((reason) => `- ${sentenceText(reason)}`),
+    "## 3. Why This Decision Was Reached",
+    ...decisionReasons.map((reason) => `- ${reason}`),
     "",
-    "Local Feature Impact From Current Form Values",
-    ...(topDrivers.length ? topDrivers : ["1. No material local driver above reporting threshold."]),
+    "## 4. Main Local Signals",
+    ...(topDrivers.length
+      ? topDrivers
+      : ["1. No material local signal above the reporting threshold."]),
     "",
-    "Recommended Next Steps",
+    "## 5. Investigator Checklist",
     ...recommendedActions(priority, deltas).map(
       (recommendation, index) => `${index + 1}. ${recommendation}`,
     ),
     "",
-    "Governance Note",
-    "This prototype is decision support only. Human review is required before customer-impacting action. The case data is synthetic and should be validated on representative real transaction data before production use.",
+    "## 6. Governance And Use Limits",
+    "- This prototype is decision support only.",
+    "- Do not use this output for automatic account blocking, eligibility decisions, or production decisions without real-data validation.",
+    "- The case data is synthetic and should be validated on representative real transaction data before production use.",
+    "- Keep the score, reasons, reviewer action, and final outcome in the audit trail.",
   ];
 }
 
-function caseEvidenceReasons(caseItem, deltas) {
+function displayCaseReasons(caseItem) {
   const exportedReasons = [caseItem.reason_1, caseItem.reason_2, caseItem.reason_3]
     .filter(Boolean)
     .filter((reason) => !/^No additional material/i.test(reason));
 
-  if (exportedReasons.length > 0) {
-    const hasReadableAmountReason = exportedReasons.some((reason) =>
-      /^transaction amount/i.test(reason),
-    );
-    const displayReasons = exportedReasons.filter(
-      (reason) =>
-        !(hasReadableAmountReason && /^log-scaled (transaction )?amount/i.test(reason)),
-    );
-    return displayReasons.length ? displayReasons : exportedReasons;
-  }
+  const hasReadableAmountReason = exportedReasons.some((reason) =>
+    /^transaction amount/i.test(reason),
+  );
+  const displayReasons = exportedReasons.filter(
+    (reason) =>
+      !(hasReadableAmountReason && /^log-scaled (transaction )?amount/i.test(reason)),
+  );
+  return displayReasons.length ? displayReasons : exportedReasons;
+}
+
+function caseEvidenceReasons(caseItem, deltas) {
+  const exportedReasons = displayCaseReasons(caseItem);
+  if (exportedReasons.length > 0) return exportedReasons;
 
   const generatedMaterial = deltas
     .slice()
@@ -1038,11 +1123,11 @@ function exportSelectedCaseReport() {
     priority,
     deltas,
   ).join("\n");
-  const blob = new Blob([report], { type: "text/plain;charset=utf-8" });
+  const blob = new Blob([report], { type: "text/markdown;charset=utf-8" });
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
-  link.download = `${state.selectedCase.transaction_id}-investigator-report.txt`;
+  link.download = `${state.selectedCase.transaction_id}-investigator-case-report.md`;
   document.body.appendChild(link);
   link.click();
   link.remove();
@@ -1284,9 +1369,11 @@ function renderQueue() {
         ? "Backtest: true fraud"
         : "Backtest: non-fraud";
     const oldAlertLabel = evidenceStatus(caseItem);
-    const secondaryReasons = [caseItem.reason_2, caseItem.reason_3]
-      .filter(Boolean)
-      .map((reason) => `<li>${sentenceText(reason)}</li>`)
+    const visibleReasons = displayCaseReasons(caseItem);
+    const primaryReason = visibleReasons[0] ?? caseItem.reason_1;
+    const secondaryReasons = visibleReasons
+      .slice(1, 3)
+      .map((reason) => `<li>${plainReasonText(reason)}</li>`)
       .join("");
 
     row.className = `case-card ${tierClass}`;
@@ -1347,8 +1434,8 @@ function renderQueue() {
         </div>
         <div>
           <span>Primary driver</span>
-          <strong>${primaryDriverLabel(caseItem.reason_1)}</strong>
-          <p>${sentenceText(caseItem.reason_1)}</p>
+          <strong>${primaryDriverLabel(primaryReason)}</strong>
+          <p>${plainReasonText(primaryReason)}</p>
         </div>
         <div>
           <span>Evidence check</span>
