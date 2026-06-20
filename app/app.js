@@ -1140,6 +1140,22 @@ function loadCaseById(transactionId, options = {}) {
   }
 }
 
+function loadOpeningPriorityCase() {
+  const defaultCase = state.dashboard?.top_queue_cases?.[0];
+  if (!defaultCase?.transaction_id) {
+    scoreCurrentForm();
+    return;
+  }
+
+  loadCaseById(defaultCase.transaction_id);
+
+  const status = document.getElementById("lookupStatus");
+  if (status) {
+    status.textContent =
+      `${defaultCase.transaction_id} opened as the current priority case from the synthetic review queue. Use Start manual scoring to enter a new transaction.`;
+  }
+}
+
 function exportSelectedCaseReport() {
   if (!state.selectedCase) return;
   const input = readFormInput();
@@ -1950,7 +1966,7 @@ async function boot() {
   if (initialCase && initialView === "score") {
     loadCaseById(initialCase);
   } else {
-    scoreCurrentForm();
+    loadOpeningPriorityCase();
   }
 }
 
