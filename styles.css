@@ -884,36 +884,6 @@ select:focus {
   margin-top: 18px;
 }
 
-.readiness-status {
-  min-height: 76px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 14px;
-  margin-bottom: 14px;
-  padding: 14px;
-  border: 1px solid #fed7aa;
-  border-radius: 8px;
-  background: #fff7ed;
-}
-
-.readiness-status strong,
-.readiness-status span {
-  display: block;
-}
-
-.readiness-status strong {
-  color: var(--warn);
-  font-size: 1.45rem;
-  line-height: 1.05;
-}
-
-.readiness-status span {
-  color: #7c2d12;
-  font-weight: 850;
-  text-transform: uppercase;
-}
-
 .readiness-grid,
 .risk-register-grid {
   display: grid;
@@ -2591,16 +2561,6 @@ select:focus-visible {
 
 .ops-view .priority-lane.empty b {
   color: var(--ops-muted);
-}
-
-.ops-view .readiness-status {
-  border-color: rgba(247, 197, 107, 0.35);
-  background: rgba(180, 107, 18, 0.16);
-}
-
-.ops-view .readiness-status strong,
-.ops-view .readiness-status span {
-  color: var(--ops-warn);
 }
 
 .ops-view .evidence-links a {
