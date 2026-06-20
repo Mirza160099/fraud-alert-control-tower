@@ -1271,12 +1271,6 @@ function renderQueueCommand(summary) {
     laneList.appendChild(lane);
   });
 
-  const laneNote = document.createElement("p");
-  laneNote.id = "lanePreviewNote";
-  laneNote.className = "lane-note";
-  laneNote.textContent = `This preview shows the ${cases.length} highest-risk queue cases, so it is intentionally concentrated in Critical. Lower bands appear in full transaction search and manual scoring.`;
-  laneList.appendChild(laneNote);
-
   const controlChecks = document.getElementById("queueControlChecks");
   controlChecks.replaceChildren();
   const incrementalFrauds =
