@@ -17,9 +17,9 @@
               <p class="eyebrow">JPMorgan-inspired fraud analytics</p>
               <h1>Fraud Alert Control Tower</h1>
               <div class="system-badges" aria-label="System status">
-                <span>Decision support</span>
-                <span>Synthetic data</span>
-                <span>Human review</span>
+                <span><b>Use</b> Decision support</span>
+                <span><b>Data</b> Synthetic test set</span>
+                <span><b>Control</b> Human approval required</span>
               </div>
             </div>
           </div>
@@ -255,59 +255,70 @@
           </section>
 
           <section class="stitch-analytics-grid" aria-label="Score operating context">
-            <article class="stitch-panel stitch-chart-card">
+            <article class="stitch-panel score-economics-card">
               <div class="stitch-panel-header">
                 <div>
-                  <span class="stitch-kicker">Operating trend</span>
-                  <h2>Fraud Detection Volume vs False Positives</h2>
+                  <span class="stitch-kicker">Operating snapshot</span>
+                  <h2>Threshold Impact In Plain English</h2>
                 </div>
-                <span class="muted-label">7 day view</span>
+                <span class="muted-label">Held-out test</span>
               </div>
-              <div class="stitch-chart" aria-hidden="true">
-                <span style="--bar: 42%; --tone: var(--stitch-primary)"></span>
-                <span style="--bar: 36%; --tone: var(--stitch-primary)"></span>
-                <span style="--bar: 58%; --tone: var(--stitch-primary)"></span>
-                <span style="--bar: 82%; --tone: var(--stitch-danger)"></span>
-                <span style="--bar: 64%; --tone: var(--stitch-primary)"></span>
-                <span style="--bar: 47%; --tone: var(--stitch-primary)"></span>
-                <span style="--bar: 90%; --tone: var(--stitch-danger)"></span>
+              <div class="score-context-grid">
+                <div>
+                  <span>Cases reviewed</span>
+                  <strong id="scoreContextReviewed">0</strong>
+                  <small>At the selected threshold</small>
+                </div>
+                <div>
+                  <span>Fraud captured</span>
+                  <strong id="scoreContextFraudCaptured">0</strong>
+                  <small>Confirmed fraud in backtest</small>
+                </div>
+                <div>
+                  <span>False positives</span>
+                  <strong id="scoreContextFalsePositives">0</strong>
+                  <small>Require human validation</small>
+                </div>
+                <div>
+                  <span>Rule-gap cases</span>
+                  <strong id="scoreContextRuleGap">0</strong>
+                  <small>Missed by old alert rule</small>
+                </div>
               </div>
-              <div class="stitch-chart-axis">
-                <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
-              </div>
+              <p id="scoreContextNarrative" class="score-context-note">Loading threshold policy summary.</p>
             </article>
 
             <article class="stitch-panel stitch-side-card">
               <div class="stitch-panel-header">
                 <div>
-                  <span class="stitch-kicker">Queue efficiency</span>
-                  <h2>SLA Signals</h2>
+                  <span class="stitch-kicker">Capacity use</span>
+                  <h2>Review Load</h2>
                 </div>
               </div>
               <div class="stitch-progress-row">
-                <span>Tier 1 reviews</span>
-                <strong>84% SLA</strong>
-                <div><span style="width: 84%"></span></div>
+                <span>Routed to review</span>
+                <strong id="scoreReviewRateText">0%</strong>
+                <div><span id="scoreReviewRateBar" style="width: 0%"></span></div>
               </div>
-              <div class="stitch-progress-row danger">
-                <span>Escalations</span>
-                <strong>92% SLA</strong>
-                <div><span style="width: 92%"></span></div>
+              <div class="stitch-progress-row muted">
+                <span>Allowed or monitored</span>
+                <strong id="scoreMonitorRateText">0%</strong>
+                <div><span id="scoreMonitorRateBar" style="width: 0%"></span></div>
               </div>
             </article>
 
             <article class="stitch-panel stitch-side-card">
               <div class="stitch-panel-header">
                 <div>
-                  <span class="stitch-kicker">Current queue</span>
-                  <h2>Risk Distribution</h2>
+                  <span class="stitch-kicker">Score bands</span>
+                  <h2>How To Read The Alert</h2>
                 </div>
               </div>
-              <div class="stitch-distribution-list">
-                <div><span class="dot critical"></span><strong>Critical</strong><em>15</em></div>
-                <div><span class="dot high"></span><strong>High</strong><em>0</em></div>
-                <div><span class="dot medium"></span><strong>Medium</strong><em>0</em></div>
-                <div><span class="dot low"></span><strong>Low</strong><em>0</em></div>
+              <div class="stitch-distribution-list score-band-list">
+                <div><span class="dot critical"></span><strong>Critical</strong><em>Immediate review</em></div>
+                <div><span class="dot high"></span><strong>High</strong><em>Investigator review</em></div>
+                <div><span class="dot medium"></span><strong>Medium</strong><em>Monitor closely</em></div>
+                <div><span class="dot low"></span><strong>Low</strong><em>Likely legitimate</em></div>
               </div>
             </article>
           </section>
@@ -330,7 +341,7 @@
               </section>
               <section class="feature-impact-group">
                 <div class="feature-group-header">
-                  <h3>Protective Signals</h3>
+                  <h3>Risk-Reducing Signals</h3>
                   <span id="protectiveSignalCount">0 signals</span>
                 </div>
                 <div id="protectiveFeatureBars" class="feature-bars"></div>

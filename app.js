@@ -14,6 +14,8 @@ const state = {
   selectedCapacityRate: 0.05,
 };
 
+const explanationReportingThreshold = 0.01;
+
 const featureLabels = {
   geo_distance_km: "Geographic distance",
   txn_country: "Transaction country",
@@ -250,16 +252,26 @@ function localDeltas(input) {
     .sort((a, b) => b.delta - a.delta || b.absoluteDelta - a.absoluteDelta);
 }
 
+function hideTechnicalAmountDuplicate(items) {
+  const hasReadableAmountSignal = items.some(
+    (item) => item.feature === "transaction_amount_usd",
+  );
+  return items.filter(
+    (item) => !(hasReadableAmountSignal && item.feature === "amount_log1p"),
+  );
+}
+
 function renderReasons(deltas) {
   const reasonList = document.getElementById("reasonList");
   reasonList.replaceChildren();
-  const materialPositiveReasons = deltas
-    .filter((item) => item.delta > 0.001)
-    .slice(0, 3);
-  const materialReasons = deltas
-    .filter((item) => item.absoluteDelta > 0.001)
-    .sort((a, b) => b.absoluteDelta - a.absoluteDelta)
-    .slice(0, 3);
+  const materialPositiveReasons = hideTechnicalAmountDuplicate(
+    deltas.filter((item) => item.delta >= explanationReportingThreshold),
+  ).slice(0, 3);
+  const materialReasons = hideTechnicalAmountDuplicate(
+    deltas
+      .filter((item) => item.absoluteDelta >= explanationReportingThreshold)
+      .sort((a, b) => b.absoluteDelta - a.absoluteDelta),
+  ).slice(0, 3);
   const reasons =
     materialPositiveReasons.length > 0 ? materialPositiveReasons : materialReasons;
 
@@ -420,12 +432,13 @@ function renderFeatureBars(deltas) {
 
   const material = deltas
     .slice()
-    .filter((item) => item.absoluteDelta > 0.001);
-  const riskDrivers = material
+    .filter((item) => item.absoluteDelta >= explanationReportingThreshold);
+  const displayMaterial = hideTechnicalAmountDuplicate(material);
+  const riskDrivers = displayMaterial
     .filter((item) => item.delta > 0)
     .sort((a, b) => b.delta - a.delta)
     .slice(0, 5);
-  const protectiveSignals = material
+  const protectiveSignals = displayMaterial
     .filter((item) => item.delta < 0)
     .sort((a, b) => b.absoluteDelta - a.absoluteDelta)
     .slice(0, 5);
@@ -469,21 +482,34 @@ function renderFeatureBars(deltas) {
 
   if (riskDrivers.length === 0) {
     riskBars.appendChild(
-      buildEmptyFeatureState("No material risk-increasing signal detected."),
+      buildEmptyFeatureState(
+        "No risk driver above reporting threshold.",
+        "The current inputs are close to the model reference profile, so no single field is pushing the score upward.",
+      ),
     );
   }
 
   if (protectiveSignals.length === 0) {
     protectiveBars.appendChild(
-      buildEmptyFeatureState("No material protective signal detected."),
+      buildEmptyFeatureState(
+        "No risk-reducing signal above reporting threshold.",
+        "This does not mean the case is automatically fraudulent. It means no strong local feature lowered the score enough to offset the risk drivers.",
+      ),
     );
   }
 }
 
-function buildEmptyFeatureState(text) {
-  const empty = document.createElement("p");
+function buildEmptyFeatureState(title, detail = "") {
+  const empty = document.createElement("div");
   empty.className = "feature-empty";
-  empty.textContent = text;
+  const heading = document.createElement("strong");
+  heading.textContent = title;
+  empty.appendChild(heading);
+  if (detail) {
+    const copy = document.createElement("p");
+    copy.textContent = detail;
+    empty.appendChild(copy);
+  }
   return empty;
 }
 
@@ -814,19 +840,40 @@ function caseEvidenceReasons(caseItem, deltas) {
     .filter((reason) => !/^No additional material/i.test(reason));
 
   if (exportedReasons.length > 0) {
-    return exportedReasons;
+    const hasReadableAmountReason = exportedReasons.some((reason) =>
+      /^transaction amount/i.test(reason),
+    );
+    const displayReasons = exportedReasons.filter(
+      (reason) =>
+        !(hasReadableAmountReason && /^log-scaled (transaction )?amount/i.test(reason)),
+    );
+    return displayReasons.length ? displayReasons : exportedReasons;
   }
 
-  const generatedReasons = deltas
+  const generatedMaterial = deltas
     .slice()
-    .filter((delta) => delta.absoluteDelta >= 0.001)
-    .sort((a, b) => b.absoluteDelta - a.absoluteDelta)
+    .filter((delta) => delta.absoluteDelta >= explanationReportingThreshold)
+    .sort((a, b) => b.absoluteDelta - a.absoluteDelta);
+  const generatedReasons = hideTechnicalAmountDuplicate(generatedMaterial)
     .slice(0, 3)
     .map((delta) => delta.text);
 
   return generatedReasons.length
     ? generatedReasons
     : ["No material local driver was detected against the reference profile."];
+}
+
+function plainReasonText(reason) {
+  return sentenceText(reason)
+    .replace(/^Geographic distance was/i, "Unusual geography:")
+    .replace(/^Transaction amount was/i, "Unusual amount:")
+    .replace(/^Log-scaled (transaction )?amount was/i, "Amount pattern:")
+    .replace(/^Device risk score was/i, "Device risk:")
+    .replace(/^Merchant risk score was/i, "Merchant risk:")
+    .replace(/^Merchant profile risk score was/i, "Merchant profile:")
+    .replace(/ versus a typical value of /i, " vs typical ")
+    .replace(/; this increased risk by /i, "; risk impact +")
+    .replace(/; this reduced risk by /i, "; risk impact -");
 }
 
 function renderSelectedCaseDrilldown(input, probability, priority, deltas) {
@@ -842,10 +889,20 @@ function renderSelectedCaseDrilldown(input, probability, priority, deltas) {
   }
 
   const caseItem = state.selectedCase;
-  const strongestDrivers = deltas
-    .filter((delta) => Math.abs(delta.delta) >= 0.001)
-    .slice(0, 4);
-  const evidenceReasons = caseEvidenceReasons(caseItem, deltas);
+  const evidenceReasons = caseEvidenceReasons(caseItem, deltas)
+    .slice(0, 3)
+    .map(plainReasonText);
+  const checklist = recommendedActions(priority, deltas)
+    .slice(0, 3)
+    .map(
+      (action, index) => `
+        <li>
+          <strong>Check ${index + 1}</strong>
+          <p>${action}</p>
+        </li>
+      `,
+    )
+    .join("");
   const facts = caseFacts(caseItem, input, probability, priority)
     .map(
       ([label, value]) => `
@@ -856,24 +913,11 @@ function renderSelectedCaseDrilldown(input, probability, priority, deltas) {
       `,
     )
     .join("");
-  const drivers = strongestDrivers.length
-    ? strongestDrivers
-        .map(
-          (delta) => `
-            <li>
-              <strong>${featureLabels[delta.feature] ?? delta.feature}</strong>
-              <span>${delta.delta >= 0 ? "+" : ""}${delta.delta.toFixed(3)}</span>
-              <p>${explainFeature(delta.feature, delta.actual, delta.reference, delta.delta)}</p>
-            </li>
-          `,
-        )
-        .join("")
-    : `<li><strong>No material driver</strong><span>0.000</span><p>The current form values do not create a material local score change.</p></li>`;
 
   panel.hidden = false;
   const amountNote = Number.isFinite(transactionAmountNumber(caseItem))
-    ? "Lookup fills exported fields from the case data. Country, channel, and risk scores remain editable where the top-case export did not include the original raw column."
-    : "This case export did not include the original amount because amount was not one of the top explanation reasons. The form uses the reference amount as an editable default; update it if the raw transaction amount is available.";
+    ? "Loaded values come from the scored transaction lookup. Inputs remain editable so you can test how the decision changes."
+    : "This case export did not include the original amount, so the amount field uses an editable default until the raw value is available.";
 
   panel.innerHTML = `
     <div class="case-drilldown-header">
@@ -886,16 +930,20 @@ function renderSelectedCaseDrilldown(input, probability, priority, deltas) {
     <div class="case-drilldown-grid">
       ${facts}
     </div>
+    <div class="case-plain-summary">
+      <strong>${priority.tier} priority case</strong>
+      <p>Use the signals below as investigation leads. The model supports prioritization, but a human reviewer should confirm the customer, account, merchant, and recent-activity context before any customer-impacting action.</p>
+    </div>
     <div class="case-drilldown-columns">
       <section>
-        <h3>Case Evidence</h3>
+        <h3>Why This Case Was Flagged</h3>
         <ol>
-          ${evidenceReasons.map((reason) => `<li>${sentenceText(reason)}</li>`).join("")}
+          ${evidenceReasons.map((reason) => `<li>${reason}</li>`).join("")}
         </ol>
       </section>
       <section>
-        <h3>Current Form Drivers</h3>
-        <ul>${drivers}</ul>
+        <h3>Investigator Checklist</h3>
+        <ul>${checklist}</ul>
       </section>
     </div>
     <p class="case-data-note">${amountNote}</p>
@@ -1596,7 +1644,36 @@ function renderBusinessImpact() {
     `Illustrative sensitivity: ${moneyText(reviewCostUsd)} review cost per case and ${moneyText(avoidedFraudLossUsd)} avoided loss per captured fraud. Synthetic data only.`;
 }
 
+function renderScoreContext() {
+  const champion = state.dashboard.metrics.champion;
+  const summary = state.dashboard.queue_summary;
+  const reviewRate = Number(champion.test_queue_rate);
+  const monitorRate = Math.max(0, 1 - reviewRate);
+  const setText = (id, text) => {
+    const element = document.getElementById(id);
+    if (element) element.textContent = text;
+  };
+  const setWidth = (id, value) => {
+    const element = document.getElementById(id);
+    if (element) element.style.width = `${Math.max(4, Math.min(100, value * 100))}%`;
+  };
+
+  setText("scoreContextReviewed", String(champion.test_review_count));
+  setText("scoreContextFraudCaptured", String(champion.test_true_positives));
+  setText("scoreContextFalsePositives", String(champion.test_false_positives));
+  setText("scoreContextRuleGap", String(summary.missed_existing_alerts_in_top_cases));
+  setText("scoreReviewRateText", percent(reviewRate));
+  setText("scoreMonitorRateText", percent(monitorRate));
+  setWidth("scoreReviewRateBar", reviewRate);
+  setWidth("scoreMonitorRateBar", monitorRate);
+  setText(
+    "scoreContextNarrative",
+    `At threshold ${numberText(champion.threshold, 3)}, ${champion.test_review_count} test transactions are routed to investigators. ${champion.test_true_positives} are confirmed fraud in the backtest and ${champion.test_false_positives} are false positives that still need human validation.`,
+  );
+}
+
 function renderDashboard() {
+  renderScoreContext();
   renderQueue();
   renderAnalystMetrics();
   renderPilotRecommendation();
