@@ -899,51 +899,74 @@ function caseFacts(caseItem, input, probability, priority) {
   ];
 }
 
-function reportLinesForCase(caseItem, input, probability, priority, deltas) {
+function csvCell(value) {
+  const text = value === null || value === undefined ? "" : String(value);
+  return /[",\r\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
+}
+
+function csvText(rows) {
+  return rows.map((row) => row.map(csvCell).join(",")).join("\r\n");
+}
+
+function reportRowsForCase(caseItem, input, probability, priority, deltas) {
   const decisionReasons = decisionReasonLines(priority, deltas);
   const topDrivers = materialDriversByImpact(deltas, 5).map((delta, index) => {
     const text =
       delta.delta >= 0 ? plainRiskDriverText(delta) : plainProtectiveSignalText(delta);
-    return `${index + 1}. ${text}`;
+    return [`Signal ${index + 1}`, text];
   });
 
-  return [
-    "# Fraud Alert Control Tower - Investigator Case Report",
-    "",
-    `Generated: ${new Date().toLocaleString("en-GB")}`,
-    `Transaction: ${caseItem.transaction_id}`,
-    "",
-    "## 1. Decision Summary",
-    `- Risk tier: ${priority.tier}`,
-    `- Fraud probability: ${probability.toFixed(3)}`,
-    `- Review threshold: ${state.model.threshold.toFixed(3)}`,
-    `- Recommended action: ${priority.action}`,
-    `- Model use: decision support only; human approval required before customer-impacting action.`,
-    "",
-    "## 2. Transaction Facts",
-    ...caseFacts(caseItem, input, probability, priority).map(
-      ([label, value]) => `- ${label}: ${value}`,
-    ),
-    "",
-    "## 3. Why This Decision Was Reached",
-    ...decisionReasons.map((reason) => `- ${reason}`),
-    "",
-    "## 4. Main Local Signals",
-    ...(topDrivers.length
-      ? topDrivers
-      : ["1. No material local signal above the reporting threshold."]),
-    "",
-    "## 5. Investigator Checklist",
-    ...recommendedActions(priority, deltas).map(
-      (recommendation, index) => `${index + 1}. ${recommendation}`,
-    ),
-    "",
-    "## 6. Governance And Use Limits",
-    "- This prototype is decision support only.",
-    "- Do not use this output for automatic account blocking, eligibility decisions, or production decisions without real-data validation.",
-    "- The case data is synthetic and should be validated on representative real transaction data before production use.",
-    "- Keep the score, reasons, reviewer action, and final outcome in the audit trail.",
+  const rows = [
+    ["Section", "Item", "Value"],
+    ["Report", "Generated", new Date().toLocaleString("en-GB")],
+    ["Report", "Project", "Fraud Alert Control Tower"],
+    ["Report", "Report type", "Investigator case export"],
+    ["Decision summary", "Transaction ID", caseItem.transaction_id],
+    ["Decision summary", "Risk tier", priority.tier],
+    ["Decision summary", "Fraud probability", probability.toFixed(3)],
+    ["Decision summary", "Review threshold", state.model.threshold.toFixed(3)],
+    ["Decision summary", "Recommended action", priority.action],
+    [
+      "Decision summary",
+      "Use limit",
+      "Decision support only; human approval required before customer-impacting action.",
+    ],
   ];
+
+  caseFacts(caseItem, input, probability, priority).forEach(([label, value]) => {
+    rows.push(["Transaction facts", label, value]);
+  });
+
+  decisionReasons.forEach((reason, index) => {
+    rows.push(["Decision evidence", `Reason ${index + 1}`, reason]);
+  });
+
+  if (topDrivers.length) {
+    topDrivers.forEach(([label, text]) => {
+      rows.push(["Local risk signals", label, text]);
+    });
+  } else {
+    rows.push([
+      "Local risk signals",
+      "Signal 1",
+      "No material local signal above the reporting threshold.",
+    ]);
+  }
+
+  recommendedActions(priority, deltas).forEach((recommendation, index) => {
+    rows.push(["Investigator checklist", `Step ${index + 1}`, recommendation]);
+  });
+
+  [
+    "This prototype is decision support only.",
+    "Do not use this output for automatic account blocking, eligibility decisions, or production decisions without real-data validation.",
+    "The case data is synthetic and should be validated on representative real transaction data before production use.",
+    "Keep the score, reasons, reviewer action, and final outcome in the audit trail.",
+  ].forEach((note, index) => {
+    rows.push(["Governance and use limits", `Note ${index + 1}`, note]);
+  });
+
+  return rows;
 }
 
 function displayCaseReasons(caseItem) {
@@ -1162,18 +1185,18 @@ function exportSelectedCaseReport() {
   const probability = predictProbability(input);
   const priority = classifyPriority(probability, state.model.threshold);
   const deltas = localDeltas(input);
-  const report = reportLinesForCase(
+  const report = csvText(reportRowsForCase(
     state.selectedCase,
     input,
     probability,
     priority,
     deltas,
-  ).join("\n");
-  const blob = new Blob([report], { type: "text/markdown;charset=utf-8" });
+  ));
+  const blob = new Blob([`\ufeff${report}`], { type: "text/csv;charset=utf-8" });
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
-  link.download = `${state.selectedCase.transaction_id}-investigator-case-report.md`;
+  link.download = `${state.selectedCase.transaction_id}-investigator-case-report.csv`;
   document.body.appendChild(link);
   link.click();
   link.remove();
