@@ -64,6 +64,10 @@ function numberText(value, digits = 3) {
   return Number(value).toFixed(digits);
 }
 
+function probabilityText(value) {
+  return Number(value).toFixed(3);
+}
+
 function moneyText(value) {
   const sign = Number(value) < 0 ? "-" : "";
   return `${sign}$${Math.abs(Math.round(Number(value))).toLocaleString("en-US")}`;
@@ -80,6 +84,58 @@ function triageLayerName() {
 
 function evidenceBasisLabel() {
   return "Held-out test + governance pack";
+}
+
+function riskTierPolicy(threshold = state.model?.threshold ?? 0.798) {
+  const criticalFloor = Math.max(0.82, threshold);
+  return [
+    {
+      tier: "Critical",
+      className: "critical",
+      floor: criticalFloor,
+      ceiling: 1,
+      action: "Immediate review",
+      capacity: "Highest-risk cases, roughly the emergency queue",
+      description: "Score is above the critical band and should be worked before any customer-impacting decision.",
+    },
+    {
+      tier: "High",
+      className: "high",
+      floor: threshold,
+      ceiling: criticalFloor,
+      action: "Review as fraud risk",
+      capacity: "Selected threshold review queue",
+      description: "Score is above the operating threshold and should enter investigator review.",
+    },
+    {
+      tier: "Medium",
+      className: "medium",
+      floor: 0.35,
+      ceiling: threshold,
+      action: "Monitor closely",
+      capacity: "Watchlist below the manual-review threshold",
+      description: "Score is below review threshold but high enough to monitor for repeat behavior.",
+    },
+    {
+      tier: "Low",
+      className: "low",
+      floor: 0,
+      ceiling: 0.35,
+      action: "Likely legitimate",
+      capacity: "No manual queue unless behavior changes",
+      description: "Score is close to normal profile; keep the audit trail and rescore if behavior changes.",
+    },
+  ];
+}
+
+function policyRangeText(policy) {
+  if (policy.tier === "Critical") {
+    return `p >= ${probabilityText(policy.floor)}`;
+  }
+  if (policy.tier === "Low") {
+    return `p < ${probabilityText(policy.ceiling)}`;
+  }
+  return `${probabilityText(policy.floor)} <= p < ${probabilityText(policy.ceiling)}`;
 }
 
 function getNumber(id, fallback = 0) {
@@ -165,32 +221,10 @@ function predictProbability(input, model = state.model) {
 }
 
 function classifyPriority(probability, threshold) {
-  if (probability >= Math.max(0.82, threshold)) {
-    return {
-      tier: "Critical",
-      action: "Immediate review",
-      className: "critical",
-    };
-  }
-  if (probability >= threshold) {
-    return {
-      tier: "High",
-      action: "Review as fraud risk",
-      className: "high",
-    };
-  }
-  if (probability >= 0.35) {
-    return {
-      tier: "Medium",
-      action: "Monitor closely",
-      className: "medium",
-    };
-  }
-  return {
-    tier: "Low",
-    action: "Likely legitimate",
-    className: "low",
-  };
+  return riskTierPolicy(threshold).find((policy) => {
+    if (policy.tier === "Critical") return probability >= policy.floor;
+    return probability >= policy.floor && probability < policy.ceiling;
+  });
 }
 
 function readFormInput() {
@@ -1939,8 +1973,26 @@ function renderScoreContext() {
   );
 }
 
+function renderRiskTierPolicy() {
+  const list = document.querySelector(".score-band-list");
+  if (!list || !state.model) return;
+  list.replaceChildren();
+
+  riskTierPolicy(state.model.threshold).forEach((policy) => {
+    const row = document.createElement("div");
+    row.innerHTML = `
+      <span class="dot ${policy.className}"></span>
+      <strong>${policy.tier}</strong>
+      <em>${policyRangeText(policy)} | ${policy.action}</em>
+      <small>${policy.capacity}</small>
+    `;
+    list.appendChild(row);
+  });
+}
+
 function renderDashboard() {
   renderScoreContext();
+  renderRiskTierPolicy();
   renderQueue();
   renderAnalystMetrics();
   renderPilotRecommendation();

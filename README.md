@@ -11,7 +11,8 @@ JPMorgan-inspired fraud analytics project that prioritizes transaction alerts, e
 - Queue view: [Investigator queue](https://fraud-alert-control-tower-5cic.vercel.app/?view=queue)
 - Metrics view: [Operating metrics and capacity ladder](https://fraud-alert-control-tower-5cic.vercel.app/?view=metrics)
 - Governance view: [Model risk controls](https://fraud-alert-control-tower-5cic.vercel.app/?view=governance)
-- Executive deck: [`presentation/fraud-alert-control-tower-executive-story.pptx`](presentation/fraud-alert-control-tower-executive-story.pptx)
+- Final journey deck: [`presentation/fraud-alert-control-tower-project-journey-final.pptx`](presentation/fraud-alert-control-tower-project-journey-final.pptx)
+- Professional report: [`presentation/fraud-alert-control-tower-professional-project-report.pdf`](presentation/fraud-alert-control-tower-professional-project-report.pdf)
 - Governance docs: [`docs/governance`](docs/governance)
 
 ## What This Project Demonstrates
@@ -130,6 +131,23 @@ Exact top-5% queue:
 
 Business interpretation: the threshold is not just a modeling parameter. It is a staffing and operating-control decision.
 
+Clear reviewer sentence:
+
+> At the selected review threshold, the triage policy reviews `74` test transactions, captures `10` fraud cases, and exposes `64` false positives for human validation. Compared with the old alert benchmark, it catches `+2` additional fraud cases but requires `+52` additional reviews, so the decision is an explicit capacity-vs-capture trade-off.
+
+## Canonical Risk-Tier Policy
+
+The app, transaction lookup export, and source code use one reviewer-facing tier policy:
+
+| Tier | Probability band | Analyst meaning |
+|---|---|---|
+| Critical | `p >= max(0.820, review_threshold)` | Emergency review before any customer-impacting decision |
+| High | `review_threshold <= p < Critical band` | Manual investigator review |
+| Medium | `0.350 <= p < review_threshold` | Monitor closely and escalate only if behavior repeats or another signal appears |
+| Low | `p < 0.350` | Likely legitimate; keep score and reasons in the audit trail |
+
+The selected review threshold is `0.7977`, so High and Critical cases are routed to review. Medium and Low remain below the manual-review threshold unless new evidence appears.
+
 ## Business Impact And Alert Economics
 
 The selected threshold is also a financial trade-off. On the same held-out test split, the operating policy changes the review queue as follows:
@@ -208,6 +226,30 @@ Use the repository root as the Vercel project root.
 
 If you already created a Vercel project with `app` as the root, that also works. The static app files are available in both places so Vercel can serve `index.html` reliably.
 
+## Reproducible Run Order
+
+The project is designed so the modelling artifacts can be rebuilt in sequence:
+
+```powershell
+python src/train_model.py
+python src/model_selection.py
+python src/explain_model.py
+python src/export_model_for_web.py
+python src/export_dashboard_data.py
+python src/export_transaction_lookup_for_web.py
+```
+
+What those steps do:
+
+1. `train_model.py`: rebuilds the cleaned modelling table, top-10 feature selection, and baseline metrics.
+2. `model_selection.py`: compares stronger candidates and selects the review-capacity threshold.
+3. `explain_model.py`: creates global feature importance and case-level explanations.
+4. `export_model_for_web.py`: exports model scoring logic into `model.json` for browser inference.
+5. `export_dashboard_data.py`: exports metrics, queue cases, threshold rows, and economics into `dashboard-data.json`.
+6. `export_transaction_lookup_for_web.py`: exports searchable transaction-level records into `transaction-lookup.json`.
+
+Runtime note: the deployed Vercel app is static. It does not call a live Python API; the browser reads exported JSON artifacts and performs scoring/client-side lookup from those files.
+
 ## Key Artifacts
 
 - Modeling pipeline: `src/fraud_pipeline.py`, `src/train_model.py`
@@ -221,7 +263,8 @@ If you already created a Vercel project with `app` as the root, that also works.
 - Modeling outputs: `artifacts/modeling`
 - Governance pack: `docs/governance`
 - Deployment checklists: `docs/deployment`
-- Executive deck: `presentation/fraud-alert-control-tower-executive-story.pptx`
+- Final journey deck: `presentation/fraud-alert-control-tower-project-journey-final.pptx`
+- Professional report: `presentation/fraud-alert-control-tower-professional-project-report.pdf`
 
 ## Repository Structure
 

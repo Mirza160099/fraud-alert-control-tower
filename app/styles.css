@@ -1843,11 +1843,19 @@ td {
 }
 
 .score-band-list div {
-  grid-template-columns: auto minmax(76px, 0.75fr) minmax(112px, 1fr);
+  grid-template-columns: auto minmax(72px, 0.6fr) minmax(160px, 1fr);
+  row-gap: 3px;
 }
 
 .score-band-list em {
   font-size: 0.82rem;
+  line-height: 1.25;
+}
+
+.score-band-list small {
+  grid-column: 2 / -1;
+  color: var(--analyst-muted);
+  font-size: 0.74rem;
   line-height: 1.25;
 }
 

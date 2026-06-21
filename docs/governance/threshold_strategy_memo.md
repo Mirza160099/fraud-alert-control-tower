@@ -126,10 +126,10 @@ Business trade-off:
 
 1. Score all eligible transactions.
 2. Assign priority tier:
-   - `Critical`: probability at or above `max(0.80, threshold)`
-   - `High`: probability at or above `max(0.60, threshold)`
-   - `Standard Review`: probability at or above threshold
-   - `Monitor`: below threshold
+   - `Critical`: probability at or above `max(0.820, threshold)`
+   - `High`: probability from the review threshold up to the Critical band
+   - `Medium`: probability from `0.350` up to the review threshold
+   - `Low`: probability below `0.350`
 3. Route `Critical` and `High` first.
 4. Use exact top-K selection when investigator capacity is fixed.
 5. Track actual queue volume daily.

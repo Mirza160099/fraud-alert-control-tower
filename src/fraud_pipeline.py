@@ -473,14 +473,15 @@ def classify_priority(probability: float, threshold: float) -> str:
     """Translate fraud probability into an investigation-friendly priority tier."""
 
     # The threshold separates predicted legitimate from predicted fraud.
-    # Higher bands help an investigator decide what to work first.
-    if probability >= max(0.80, threshold):
+    # Higher bands help an investigator decide what to work first. These
+    # labels intentionally match the frontend score, queue, and report export.
+    if probability >= max(0.82, threshold):
         return "Critical"
-    if probability >= max(0.60, threshold):
-        return "High"
     if probability >= threshold:
-        return "Standard Review"
-    return "Monitor"
+        return "High"
+    if probability >= 0.35:
+        return "Medium"
+    return "Low"
 
 
 def classification_metrics(
@@ -775,10 +776,10 @@ def run_training_pipeline(
         "feature_schema": feature_schema,
         "feature_selection_method": "binned_source_mutual_information",
         "priority_policy": {
-            "Critical": f"probability >= max(0.80, {threshold:.6f})",
-            "High": f"probability >= max(0.60, {threshold:.6f})",
-            "Standard Review": f"probability >= {threshold:.6f}",
-            "Monitor": f"probability < {threshold:.6f}",
+            "Critical": f"probability >= max(0.82, {threshold:.6f})",
+            "High": f"probability >= {threshold:.6f}",
+            "Medium": f"0.35 <= probability < {threshold:.6f}",
+            "Low": "probability < 0.35",
         },
     }
 
