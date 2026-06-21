@@ -16,6 +16,7 @@ const state = {
 
 const explanationReportingThreshold = 0.02;
 const presenterModeStorageKey = "fraudAlertPresenterMode";
+const openingDemoCaseId = "T9030658";
 
 const featureLabels = {
   geo_distance_km: "Geographic distance",
@@ -695,7 +696,6 @@ function initializeForm(model) {
   document.getElementById("transactionForm").addEventListener("change", () => {
     scoreCurrentForm();
   });
-  scoreCurrentForm();
 }
 
 function setActiveTab(tabName, updateUrl = false) {
@@ -1198,7 +1198,15 @@ function loadCaseById(transactionId, options = {}) {
 }
 
 function loadOpeningPriorityCase() {
-  const defaultCase = state.dashboard?.top_queue_cases?.[0];
+  const defaultCase =
+    findCaseById(openingDemoCaseId) ??
+    lookupCases().find(
+      (caseItem) =>
+        Number(caseItem.actual_fraud_label) === 1 &&
+        Number(caseItem.alert_generated) === 0 &&
+        caseItem.priority_tier === "Critical",
+    ) ??
+    state.dashboard?.top_queue_cases?.[0];
   if (!defaultCase?.transaction_id) {
     scoreCurrentForm();
     return;
@@ -1209,7 +1217,7 @@ function loadOpeningPriorityCase() {
   const status = document.getElementById("lookupStatus");
   if (status) {
     status.textContent =
-      `${defaultCase.transaction_id} opened as the current priority case from the synthetic review queue. Use Start manual scoring to enter a new transaction.`;
+      `${defaultCase.transaction_id} opened as a priority rule-gap fraud example from the synthetic review queue. Use Start manual scoring to enter a new transaction.`;
   }
 }
 
@@ -1286,20 +1294,18 @@ function renderQueueCommand(summary) {
 
   const laneList = document.getElementById("priorityLaneList");
   laneList.replaceChildren();
-  const cases = state.dashboard.top_queue_cases;
-  ["Critical", "High", "Medium", "Low"].forEach((tier) => {
-    const count = cases.filter((caseItem) => caseItem.priority_tier === tier).length;
+  riskTierPolicy(champion.threshold).forEach((policy) => {
     const lane = document.createElement("div");
-    lane.className = `priority-lane ${priorityClassName(tier)}${count === 0 ? " empty" : ""}`;
+    lane.className = `priority-lane ${policy.className}`;
     lane.innerHTML = `
       <div>
-        <strong>${tier}</strong>
-        <span>${queueSla(tier)}</span>
-        <small>${queueAction(tier)}</small>
+        <strong>${policy.tier}</strong>
+        <span>${policy.action}</span>
+        <small>${policy.description}</small>
       </div>
-      <div class="lane-count">
-        <b>${count}</b>
-        <span>${count === 1 ? "case" : "cases"}</span>
+      <div class="lane-count lane-policy-range">
+        <b>${policyRangeText(policy)}</b>
+        <span>score band</span>
       </div>
     `;
     laneList.appendChild(lane);

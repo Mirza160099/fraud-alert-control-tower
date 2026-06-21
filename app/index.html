@@ -33,7 +33,7 @@
             </div>
             <div class="model-chip">
               <span class="chip-label">Decision layer</span>
-              <strong id="modelName">Loading</strong>
+              <strong id="modelName">Risk triage engine</strong>
             </div>
           </div>
         </header>
@@ -48,19 +48,19 @@
         <section class="panel live-strip" aria-live="polite">
           <div>
             <span>Live transaction risk</span>
-            <strong id="liveRiskTier">Loading</strong>
+            <strong id="liveRiskTier" class="critical">Critical</strong>
           </div>
           <div>
             <span>Fraud probability</span>
-            <strong id="liveProbability">0.000</strong>
+            <strong id="liveProbability">0.836</strong>
           </div>
           <div>
             <span>Recommended action</span>
-            <strong id="liveAction">Loading</strong>
+            <strong id="liveAction">Immediate review</strong>
           </div>
           <div>
             <span>Evidence basis</span>
-            <strong id="liveModelName">Loading</strong>
+            <strong id="liveModelName">Held-out test + governance pack</strong>
           </div>
         </section>
 
@@ -75,7 +75,7 @@
             </div>
             <div class="analyst-overview-grid">
               <article>
-                <span>Total analyzed test set</span>
+                <span>Scored transaction records</span>
                 <strong>5,000</strong>
               </article>
               <article>
@@ -111,7 +111,7 @@
             <div class="lookup-grid">
               <label>
                 Transaction ID
-                <input id="transactionSearchInput" name="transactionSearchInput" list="transactionIdOptions" placeholder="Try T9042990" autocomplete="off" />
+                <input id="transactionSearchInput" name="transactionSearchInput" list="transactionIdOptions" placeholder="Try T9030658" value="T9030658" autocomplete="off" />
               </label>
               <button id="loadTransactionButton" class="primary-button" type="button">
                 Load case
@@ -119,7 +119,7 @@
               <datalist id="transactionIdOptions"></datalist>
             </div>
             <p id="lookupStatus" class="lookup-status">
-              Search a scored synthetic transaction ID to auto-fill the available facts and open the investigator drilldown.
+              T9030658 opened as a priority rule-gap fraud example from the synthetic review queue.
             </p>
             <section id="caseDrilldownPanel" class="case-drilldown-panel" hidden></section>
           </section>
@@ -136,52 +136,58 @@
               <div class="form-grid">
                 <label>
                   Amount
-                  <input id="amount" name="amount" type="number" min="0" step="0.01" value="20.00" />
+                  <input id="amount" name="amount" type="number" min="0" step="0.01" value="330.95" />
                 </label>
 
                 <label>
                   Currency
-                  <select id="currency" name="currency"></select>
+                  <select id="currency" name="currency">
+                    <option value="USD" selected>USD</option>
+                  </select>
                 </label>
 
                 <label>
                   Transaction country
-                  <select id="txn_country" name="txn_country"></select>
+                  <select id="txn_country" name="txn_country">
+                    <option value="BR" selected>BR</option>
+                  </select>
                 </label>
 
                 <label>
                   Channel
-                  <select id="channel" name="channel"></select>
+                  <select id="channel" name="channel">
+                    <option value="Online Banking" selected>Online Banking</option>
+                  </select>
                 </label>
 
                 <label>
                   Transaction hour
-                  <input id="txn_hour" name="txn_hour" type="number" min="0" max="23" step="1" value="12" />
+                  <input id="txn_hour" name="txn_hour" type="number" min="0" max="23" step="1" value="21" />
                 </label>
 
                 <label>
                   Geographic distance km
-                  <input id="geo_distance_km" name="geo_distance_km" type="number" min="0" step="0.1" value="0" />
+                  <input id="geo_distance_km" name="geo_distance_km" type="number" min="0" step="0.1" value="1287.7" />
                 </label>
 
                 <label>
                   Device risk score
-                  <input id="device_risk_score" name="device_risk_score" type="number" min="0" max="1" step="0.001" value="0.02" />
+                  <input id="device_risk_score" name="device_risk_score" type="number" min="0" max="1" step="0.001" value="0.365" />
                 </label>
 
                 <label>
                   Synthetic identity score
-                  <input id="synthetic_identity_score" name="synthetic_identity_score" type="number" min="0" max="1" step="0.001" value="0.02" />
+                  <input id="synthetic_identity_score" name="synthetic_identity_score" type="number" min="0" max="1" step="0.001" value="0.160" />
                 </label>
 
                 <label>
                   Merchant risk score
-                  <input id="merchant_risk_score" name="merchant_risk_score" type="number" min="0" max="1" step="0.001" value="0.02" />
+                  <input id="merchant_risk_score" name="merchant_risk_score" type="number" min="0" max="1" step="0.001" value="0.308" />
                 </label>
 
                 <label>
                   Merchant profile risk score
-                  <input id="merchant_profile_risk_score" name="merchant_profile_risk_score" type="number" min="0" max="1" step="0.001" value="0.02" />
+                  <input id="merchant_profile_risk_score" name="merchant_profile_risk_score" type="number" min="0" max="1" step="0.001" value="0.232" />
                 </label>
               </div>
 
@@ -194,28 +200,28 @@
               <section class="investigator-brief" aria-live="polite">
                 <div class="brief-header">
                   <span>Investigator Brief</span>
-                  <strong id="briefTier">Loading</strong>
+                  <strong id="briefTier">Critical priority</strong>
                 </div>
                 <div class="brief-grid">
                   <article>
                     <span>Primary signal</span>
-                    <strong id="briefSignal">Loading</strong>
-                    <p id="briefSignalDetail">Loading</p>
+                    <strong id="briefSignal">Geographic distance</strong>
+                    <p id="briefSignalDetail">1287.7 km vs typical 17.6 km; strongest risk driver.</p>
                   </article>
                   <article>
                     <span>Review focus</span>
-                    <strong id="briefFocus">Loading</strong>
-                    <p id="briefFocusDetail">Loading</p>
+                    <strong id="briefFocus">Rule-gap review</strong>
+                    <p id="briefFocusDetail">Backtest fraud case missed by the old alert rule.</p>
                   </article>
                   <article>
                     <span>Control measure</span>
-                    <strong id="briefControl">Loading</strong>
-                    <p id="briefControlDetail">Loading</p>
+                    <strong id="briefControl">Manual review first</strong>
+                    <p id="briefControlDetail">Validate evidence before any customer-impacting action.</p>
                   </article>
                   <article>
                     <span>Evidence check</span>
-                    <strong id="briefEvidence">Loading</strong>
-                    <p id="briefEvidenceDetail">Loading</p>
+                    <strong id="briefEvidence">Confirmed in backtest</strong>
+                    <p id="briefEvidenceDetail">Use as a demo case for fraud capture beyond legacy rules.</p>
                   </article>
                 </div>
               </section>
@@ -231,14 +237,14 @@
               </div>
 
               <div id="decisionBadge" class="decision-badge monitor">
-                <span id="decisionText">Ready</span>
-                <strong id="probabilityText">0.000</strong>
+                <span id="decisionText">Critical fraud risk</span>
+                <strong id="probabilityText">0.836</strong>
               </div>
 
               <div class="metric-row">
                 <div>
                   <span>Recommended action</span>
-                  <strong id="priorityText">Likely legitimate</strong>
+                  <strong id="priorityText">Immediate review</strong>
                 </div>
                 <div>
                   <span>Queue policy</span>
@@ -248,10 +254,17 @@
 
               <div class="explanation-box build-explain" data-build-note="Uses local sensitivity-style explanations to show which transaction features increased or reduced the risk score.">
                 <h3>Why</h3>
-                <ol id="reasonList"></ol>
+                <ol id="reasonList">
+                  <li>Critical risk is driven mainly by geographic distance: 1287.7 km versus a typical value of 17.6 km.</li>
+                  <li>Transaction amount is above the normal profile: $330.95 versus a typical value near $55.43.</li>
+                </ol>
                 <div class="response-plan">
                   <h3>What To Do Next</h3>
-                  <ol id="actionList"></ol>
+                  <ol id="actionList">
+                    <li>Open investigator review before taking any customer-impacting action.</li>
+                    <li>Check device, location, account history, and recent activity.</li>
+                    <li>Use step-up verification if the evidence remains suspicious.</li>
+                  </ol>
                 </div>
               </div>
             </aside>
@@ -269,26 +282,26 @@
               <div class="score-context-grid">
                 <div>
                   <span>Cases reviewed</span>
-                  <strong id="scoreContextReviewed">0</strong>
+                  <strong id="scoreContextReviewed">74</strong>
                   <small>At the selected threshold</small>
                 </div>
                 <div>
                   <span>Fraud captured</span>
-                  <strong id="scoreContextFraudCaptured">0</strong>
+                  <strong id="scoreContextFraudCaptured">10</strong>
                   <small>Confirmed fraud in backtest</small>
                 </div>
                 <div>
                   <span>False positives</span>
-                  <strong id="scoreContextFalsePositives">0</strong>
+                  <strong id="scoreContextFalsePositives">64</strong>
                   <small>Require human validation</small>
                 </div>
                 <div>
                   <span>Rule-gap cases</span>
-                  <strong id="scoreContextRuleGap">0</strong>
+                  <strong id="scoreContextRuleGap">11</strong>
                   <small>Missed by old alert rule</small>
                 </div>
               </div>
-              <p id="scoreContextNarrative" class="score-context-note">Loading threshold policy summary.</p>
+              <p id="scoreContextNarrative" class="score-context-note">At threshold 0.798, 74 held-out test transactions are routed to investigators. 10 are confirmed fraud in the backtest and 64 are false positives that still need human validation.</p>
             </article>
 
             <article class="analyst-panel analyst-side-card">
@@ -300,13 +313,13 @@
               </div>
               <div class="analyst-progress-row">
                 <span>Routed to review</span>
-                <strong id="scoreReviewRateText">0%</strong>
-                <div><span id="scoreReviewRateBar" style="width: 0%"></span></div>
+                <strong id="scoreReviewRateText">7.4%</strong>
+                <div><span id="scoreReviewRateBar" style="width: 7.4%"></span></div>
               </div>
               <div class="analyst-progress-row muted">
                 <span>Allowed or monitored</span>
-                <strong id="scoreMonitorRateText">0%</strong>
-                <div><span id="scoreMonitorRateBar" style="width: 0%"></span></div>
+                <strong id="scoreMonitorRateText">92.6%</strong>
+                <div><span id="scoreMonitorRateBar" style="width: 92.6%"></span></div>
               </div>
             </article>
 
@@ -318,10 +331,10 @@
                 </div>
               </div>
               <div class="analyst-distribution-list score-band-list">
-                <div><span class="dot critical"></span><strong>Critical</strong><em>Immediate review</em></div>
-                <div><span class="dot high"></span><strong>High</strong><em>Investigator review</em></div>
-                <div><span class="dot medium"></span><strong>Medium</strong><em>Monitor closely</em></div>
-                <div><span class="dot low"></span><strong>Low</strong><em>Likely legitimate</em></div>
+                <div><span class="dot critical"></span><strong>Critical</strong><em>p >= 0.820 | Immediate review</em><small>Highest-risk emergency queue</small></div>
+                <div><span class="dot high"></span><strong>High</strong><em>0.798 <= p < 0.820 | Review as fraud risk</em><small>Selected threshold review queue</small></div>
+                <div><span class="dot medium"></span><strong>Medium</strong><em>0.350 <= p < 0.798 | Monitor closely</em><small>Watchlist below manual-review threshold</small></div>
+                <div><span class="dot low"></span><strong>Low</strong><em>p < 0.350 | Likely legitimate</em><small>No manual queue unless behavior changes</small></div>
               </div>
             </article>
           </section>
@@ -381,19 +394,19 @@
           <section class="kpi-grid">
             <div class="panel kpi-card">
               <span>Review queue</span>
-              <strong id="queueSize">0</strong>
+              <strong id="queueSize">74</strong>
             </div>
             <div class="panel kpi-card">
               <span>Frauds in queue</span>
-              <strong id="fraudsInQueue">0</strong>
+              <strong id="fraudsInQueue">10</strong>
             </div>
             <div class="panel kpi-card">
               <span>Queue hit rate</span>
-              <strong id="queueHitRate">0%</strong>
+              <strong id="queueHitRate">13.5%</strong>
             </div>
             <div class="panel kpi-card">
               <span>Rule-gap cases</span>
-              <strong id="missedOldAlerts">0</strong>
+              <strong id="missedOldAlerts">11</strong>
             </div>
           </section>
 
@@ -406,19 +419,19 @@
               <div class="queue-command-metrics">
                 <div>
                   <span>Review rate</span>
-                  <strong id="queueReviewRate">0%</strong>
+                  <strong id="queueReviewRate">7.4%</strong>
                 </div>
                 <div>
                   <span>Threshold</span>
-                  <strong id="queueThreshold">0.000</strong>
+                  <strong id="queueThreshold">0.798</strong>
                 </div>
                 <div>
                   <span>Fraud capture</span>
-                  <strong id="queueCaptureRate">0%</strong>
+                  <strong id="queueCaptureRate">25.0%</strong>
                 </div>
                 <div>
                   <span>False positives</span>
-                  <strong id="queueFalsePositiveLoad">0</strong>
+                  <strong id="queueFalsePositiveLoad">64</strong>
                 </div>
               </div>
             </section>
@@ -426,7 +439,7 @@
             <section class="panel queue-command-card">
               <div class="panel-header">
                 <h2>Routing Bands</h2>
-                <span class="muted-label">Top-case preview</span>
+                <span class="muted-label">Policy definitions</span>
               </div>
               <div id="priorityLaneList" class="priority-lanes"></div>
             </section>
@@ -531,26 +544,26 @@
               <div class="scorecard-grid">
                 <div>
                   <span>Ranking quality</span>
-                  <strong id="scorecardPrAuc">0.000</strong>
+                  <strong id="scorecardPrAuc">0.141</strong>
                   <small id="scorecardPrAucBench">Held-out validation</small>
                 </div>
                 <div>
                   <span>Fraud capture</span>
-                  <strong id="scorecardCapture">0%</strong>
+                  <strong id="scorecardCapture">25.0%</strong>
                   <small id="scorecardCaptureBench">At review threshold</small>
                 </div>
                 <div>
                   <span>Queue precision</span>
-                  <strong id="scorecardHitRate">0%</strong>
+                  <strong id="scorecardHitRate">13.5%</strong>
                   <small id="scorecardHitBench">Fraud share in reviewed cases</small>
                 </div>
                 <div>
                   <span>Review rate</span>
-                  <strong id="scorecardReviewRate">0%</strong>
-                  <small id="scorecardReviewCount">0 reviews</small>
+                  <strong id="scorecardReviewRate">7.4%</strong>
+                  <small id="scorecardReviewCount">74 of 1,000 test transactions</small>
                 </div>
               </div>
-              <p id="scorecardNarrative" class="metrics-note"></p>
+              <p id="scorecardNarrative" class="metrics-note">This operating view translates fraud ranking into a review queue: 7.4% of held-out test transactions are routed to investigators, with capture, precision, and false-positive load shown together.</p>
             </section>
 
             <section class="panel metrics-matrix-panel">
@@ -564,19 +577,19 @@
                   <div class="confusion-grid">
                     <div class="confusion-cell caught">
                       <span>True positives</span>
-                      <strong id="championTp">0</strong>
+                      <strong id="championTp">10</strong>
                     </div>
                     <div class="confusion-cell false-positive">
                       <span>False positives</span>
-                      <strong id="championFp">0</strong>
+                      <strong id="championFp">64</strong>
                     </div>
                     <div class="confusion-cell missed">
                       <span>False negatives</span>
-                      <strong id="championFn">0</strong>
+                      <strong id="championFn">30</strong>
                     </div>
                     <div class="confusion-cell cleared">
                       <span>True negatives</span>
-                      <strong id="championTn">0</strong>
+                      <strong id="championTn">896</strong>
                     </div>
                   </div>
                 </section>
@@ -585,19 +598,19 @@
                   <div class="confusion-grid">
                     <div class="confusion-cell caught">
                       <span>True positives</span>
-                      <strong id="oldTp">0</strong>
+                      <strong id="oldTp">8</strong>
                     </div>
                     <div class="confusion-cell false-positive">
                       <span>False positives</span>
-                      <strong id="oldFp">0</strong>
+                      <strong id="oldFp">14</strong>
                     </div>
                     <div class="confusion-cell missed">
                       <span>False negatives</span>
-                      <strong id="oldFn">0</strong>
+                      <strong id="oldFn">32</strong>
                     </div>
                     <div class="confusion-cell cleared">
                       <span>True negatives</span>
-                      <strong id="oldTn">0</strong>
+                      <strong id="oldTn">946</strong>
                     </div>
                   </div>
                 </section>
@@ -700,19 +713,19 @@
               <div class="capacity-sim-grid">
                 <div>
                   <span>Threshold</span>
-                  <strong id="capacitySimThreshold">0.000</strong>
+                  <strong id="capacitySimThreshold">0.798</strong>
                 </div>
                 <div>
                   <span>Reviews</span>
-                  <strong id="capacitySimReviews">0</strong>
+                  <strong id="capacitySimReviews">74</strong>
                 </div>
                 <div>
                   <span>Fraud capture</span>
-                  <strong id="capacitySimCapture">0%</strong>
+                  <strong id="capacitySimCapture">25.0%</strong>
                 </div>
                 <div>
                   <span>False positives</span>
-                  <strong id="capacitySimFalsePositives">0</strong>
+                  <strong id="capacitySimFalsePositives">64</strong>
                 </div>
                 <div>
                   <span>Review cost change</span>
@@ -746,22 +759,22 @@
             <div class="economics-grid">
               <div>
                 <span>Additional fraud caught</span>
-                <strong id="incrementalFraudCaught">0</strong>
+                <strong id="incrementalFraudCaught">+2</strong>
               </div>
               <div>
                 <span>Additional reviews</span>
-                <strong id="incrementalReviews">0</strong>
+                <strong id="incrementalReviews">+52</strong>
               </div>
               <div>
                 <span>Illustrative review spend</span>
-                <strong id="incrementalReviewSpend">$0</strong>
+                <strong id="incrementalReviewSpend">$416</strong>
               </div>
               <div>
                 <span>Illustrative net impact</span>
-                <strong id="illustrativeNetImpact">$0</strong>
+                <strong id="illustrativeNetImpact">$584</strong>
               </div>
             </div>
-            <p class="economics-note" id="economicsNote"></p>
+            <p class="economics-note" id="economicsNote">Illustrative sensitivity: $8 review cost per case and $500 avoided loss per captured fraud. Synthetic data only.</p>
           </section>
         </section>
 
@@ -928,12 +941,15 @@
             </section>
           </section>
 
-          <section class="panel lower-panel">
-            <div class="panel-header">
-              <h2>Model Risk Register</h2>
-              <span class="muted-label">Controls and owners</span>
-            </div>
-            <div class="risk-register-grid">
+          <details class="panel lower-panel governance-detail-panel">
+            <summary>
+              <span>
+                <strong>Model Risk Register</strong>
+                <small>Controls and owners</small>
+              </span>
+              <em>Open details</em>
+            </summary>
+            <div class="risk-register-grid governance-detail-body">
               <article>
                 <span>Data realism</span>
                 <strong>Synthetic-data limitation</strong>
@@ -959,14 +975,17 @@
                 <small>Owner: Model Monitoring</small>
               </article>
             </div>
-          </section>
+          </details>
 
-          <section class="panel lower-panel">
-            <div class="panel-header">
-              <h2>Approval Gates</h2>
-              <span class="muted-label">Before production</span>
-            </div>
-            <ol class="approval-gates">
+          <details class="panel lower-panel governance-detail-panel">
+            <summary>
+              <span>
+                <strong>Approval Gates</strong>
+                <small>Before production</small>
+              </span>
+              <em>Open details</em>
+            </summary>
+            <ol class="approval-gates governance-detail-body">
               <li>
                 <strong>Real-data validation</strong>
                 <span>Confirm performance on representative production-like transactions.</span>
@@ -988,14 +1007,17 @@
                 <span>Deploy drift, hit-rate, false-positive, and capacity alerts with named owners.</span>
               </li>
             </ol>
-          </section>
+          </details>
 
-          <section class="panel lower-panel">
-            <div class="panel-header">
-              <h2>Monitoring Controls</h2>
-              <span class="muted-label">Operational governance</span>
-            </div>
-            <div class="control-grid">
+          <details class="panel lower-panel governance-detail-panel">
+            <summary>
+              <span>
+                <strong>Monitoring Controls</strong>
+                <small>Operational governance</small>
+              </span>
+              <em>Open details</em>
+            </summary>
+            <div class="control-grid governance-detail-body">
               <article>
                 <span>Daily capacity</span>
                 <strong>Queue size vs staffing capacity</strong>
@@ -1033,7 +1055,7 @@
                 <small>Owner: Fraud Ops + Data Science</small>
               </article>
             </div>
-          </section>
+          </details>
         </section>
       </section>
     </main>

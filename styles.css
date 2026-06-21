@@ -1041,6 +1041,71 @@ select:focus {
   gap: 12px;
 }
 
+.governance-detail-panel {
+  padding: 0;
+  overflow: hidden;
+}
+
+.governance-detail-panel summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 78px;
+  padding: 18px 20px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.governance-detail-panel summary::-webkit-details-marker {
+  display: none;
+}
+
+.governance-detail-panel summary span {
+  display: grid;
+  gap: 5px;
+}
+
+.governance-detail-panel summary strong {
+  color: var(--ink);
+  font-size: 1.15rem;
+}
+
+.governance-detail-panel summary small,
+.governance-detail-panel summary em {
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-style: normal;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+
+.governance-detail-panel summary em {
+  padding: 7px 11px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #fbfdfc;
+  white-space: nowrap;
+}
+
+.governance-detail-panel[open] summary {
+  border-bottom: 1px solid var(--line);
+}
+
+.governance-detail-panel[open] summary em {
+  color: var(--accent-strong);
+  border-color: rgba(15, 132, 119, 0.35);
+  background: #eef8f0;
+}
+
+.governance-detail-panel[open] summary em::before {
+  content: "Viewing ";
+}
+
+.governance-detail-body {
+  margin: 18px;
+}
+
 .control-grid article {
   min-height: 172px;
 }
