@@ -97,7 +97,7 @@ function riskTierPolicy(threshold = state.model?.threshold ?? 0.798) {
       ceiling: 1,
       action: "Immediate review",
       capacity: "Highest-risk cases, roughly the emergency queue",
-      description: "Score is above the critical band and should be worked before any customer-impacting decision.",
+      description: "Work first; validate before customer-impacting action.",
     },
     {
       tier: "High",
@@ -106,7 +106,7 @@ function riskTierPolicy(threshold = state.model?.threshold ?? 0.798) {
       ceiling: criticalFloor,
       action: "Review as fraud risk",
       capacity: "Selected threshold review queue",
-      description: "Score is above the operating threshold and should enter investigator review.",
+      description: "Manual review queue at the selected threshold.",
     },
     {
       tier: "Medium",
@@ -115,7 +115,7 @@ function riskTierPolicy(threshold = state.model?.threshold ?? 0.798) {
       ceiling: threshold,
       action: "Monitor closely",
       capacity: "Watchlist below the manual-review threshold",
-      description: "Score is below review threshold but high enough to monitor for repeat behavior.",
+      description: "Watchlist; review only if activity repeats.",
     },
     {
       tier: "Low",
@@ -124,7 +124,7 @@ function riskTierPolicy(threshold = state.model?.threshold ?? 0.798) {
       ceiling: 0.35,
       action: "Likely legitimate",
       capacity: "No manual queue unless behavior changes",
-      description: "Score is close to normal profile; keep the audit trail and rescore if behavior changes.",
+      description: "Keep audit trail and rescore if behavior changes.",
     },
   ];
 }

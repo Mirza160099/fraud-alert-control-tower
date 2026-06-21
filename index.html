@@ -471,7 +471,7 @@
                   <div>
                     <strong>Critical</strong>
                     <span>Immediate review</span>
-                    <small>Highest emergency band before any customer-impacting action.</small>
+                    <small>Work first; validate before customer-impacting action.</small>
                   </div>
                   <div class="lane-count lane-policy-range"><b>p >= 0.820</b><span>score band</span></div>
                 </div>
@@ -479,7 +479,7 @@
                   <div>
                     <strong>High</strong>
                     <span>Review as fraud risk</span>
-                    <small>Selected operating threshold for investigator review.</small>
+                    <small>Manual review queue at the selected threshold.</small>
                   </div>
                   <div class="lane-count lane-policy-range"><b>0.798 <= p < 0.820</b><span>score band</span></div>
                 </div>
@@ -487,7 +487,7 @@
                   <div>
                     <strong>Medium</strong>
                     <span>Monitor closely</span>
-                    <small>Watchlist below the manual-review threshold.</small>
+                    <small>Watchlist; review only if activity repeats.</small>
                   </div>
                   <div class="lane-count lane-policy-range"><b>0.350 <= p < 0.798</b><span>score band</span></div>
                 </div>
@@ -495,7 +495,7 @@
                   <div>
                     <strong>Low</strong>
                     <span>Likely legitimate</span>
-                    <small>No manual queue unless behavior changes.</small>
+                    <small>Keep audit trail and rescore if behavior changes.</small>
                   </div>
                   <div class="lane-count lane-policy-range"><b>p < 0.350</b><span>score band</span></div>
                 </div>
