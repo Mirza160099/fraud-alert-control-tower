@@ -2164,6 +2164,9 @@ h1 {
 
 .presenter-toggle {
   min-height: 76px;
+  display: grid;
+  align-content: center;
+  gap: 5px;
   padding: 12px 14px;
   border: 1px solid rgba(15, 125, 117, 0.22);
   border-radius: 8px;
@@ -2173,6 +2176,14 @@ h1 {
   font-weight: 900;
   text-transform: uppercase;
   cursor: pointer;
+}
+
+.presenter-toggle small {
+  color: inherit;
+  font-size: 0.66rem;
+  font-weight: 750;
+  opacity: 0.72;
+  text-transform: none;
 }
 
 .presenter-toggle[aria-pressed="true"] {
@@ -2231,6 +2242,16 @@ h1 {
   justify-content: center;
   gap: 8px;
   border-radius: 7px;
+}
+
+.tab-button strong {
+  color: inherit;
+  font-size: inherit;
+  line-height: 1;
+}
+
+.tab-caption {
+  display: none;
 }
 
 .tab-button span {
@@ -2424,6 +2445,41 @@ select:focus-visible {
   top: calc(100% + 10px);
   left: 0;
   right: auto;
+}
+
+.presenter-mode .tabbar {
+  width: min(960px, 100%);
+}
+
+.presenter-mode .tab-button {
+  height: 66px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-rows: auto auto;
+  justify-content: stretch;
+  justify-items: start;
+  gap: 2px 8px;
+  padding: 9px 12px;
+  text-align: left;
+}
+
+.presenter-mode .tab-button > span {
+  grid-row: 1 / 3;
+  align-self: start;
+  margin-top: 2px;
+}
+
+.presenter-mode .tab-button strong {
+  line-height: 1.1;
+}
+
+.presenter-mode .tab-caption {
+  display: block;
+  color: inherit;
+  font-size: 0.68rem;
+  font-weight: 750;
+  line-height: 1.18;
+  opacity: 0.74;
 }
 
 @media (max-width: 1050px) {

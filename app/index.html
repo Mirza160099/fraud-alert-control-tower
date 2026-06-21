@@ -25,7 +25,8 @@
           </div>
           <div class="topbar-stack">
             <button id="presenterModeToggle" class="presenter-toggle" type="button" aria-pressed="false">
-              Presenter Mode
+              <span class="presenter-label">Presenter Mode</span>
+              <small class="presenter-cue">Show build notes</small>
             </button>
             <div class="deployment-chip">
               <span>Live deployment</span>
@@ -39,10 +40,10 @@
         </header>
 
         <nav class="tabbar" aria-label="Control tower views">
-          <button class="tab-button active build-explain" type="button" data-tab="score" data-build-note="Uses exported model logic in model.json, frontend scoring in app.js, and selected fraud features to calculate the transaction risk score."><span>01</span> Score</button>
-          <button class="tab-button build-explain" type="button" data-tab="queue" data-build-note="Uses scored transaction records from dashboard-data.json and transaction-lookup.json to prioritize investigator workload."><span>02</span> Queue</button>
-          <button class="tab-button build-explain" type="button" data-tab="metrics" data-build-note="Shows held-out test results, false positives, fraud capture, threshold capacity, and alert economics."><span>03</span> Metrics</button>
-          <button class="tab-button build-explain" type="button" data-tab="governance" data-build-note="Summarizes the model card, threshold memo, human-review control, production limitations, and monitoring plan."><span>04</span> Governance</button>
+          <button class="tab-button active build-explain" type="button" data-tab="score" data-build-note="Uses exported model logic in model.json, frontend scoring in app.js, and selected fraud features to calculate the transaction risk score."><span>01</span><strong>Score</strong><small class="tab-caption">Show one case and why it was flagged.</small></button>
+          <button class="tab-button build-explain" type="button" data-tab="queue" data-build-note="Uses scored transaction records from dashboard-data.json and transaction-lookup.json to prioritize investigator workload."><span>02</span><strong>Queue</strong><small class="tab-caption">Explain routing and investigator capacity.</small></button>
+          <button class="tab-button build-explain" type="button" data-tab="metrics" data-build-note="Shows held-out test results, false positives, fraud capture, threshold capacity, and alert economics."><span>03</span><strong>Metrics</strong><small class="tab-caption">Defend backtest results and business impact.</small></button>
+          <button class="tab-button build-explain" type="button" data-tab="governance" data-build-note="Summarizes the model card, threshold memo, human-review control, production limitations, and monitoring plan."><span>04</span><strong>Governance</strong><small class="tab-caption">Close with controls and limitations.</small></button>
         </nav>
 
         <section class="panel live-strip" aria-live="polite">

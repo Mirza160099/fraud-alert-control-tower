@@ -738,7 +738,10 @@ function setPresenterMode(enabled) {
   const toggle = document.getElementById("presenterModeToggle");
   if (toggle) {
     toggle.setAttribute("aria-pressed", String(enabled));
-    toggle.textContent = enabled ? "Presenter Mode On" : "Presenter Mode";
+    const label = toggle.querySelector(".presenter-label");
+    const cue = toggle.querySelector(".presenter-cue");
+    if (label) label.textContent = enabled ? "Presenter Mode On" : "Presenter Mode";
+    if (cue) cue.textContent = enabled ? "Hover for section notes" : "Show build notes";
   }
   try {
     window.localStorage.setItem(presenterModeStorageKey, enabled ? "on" : "off");
