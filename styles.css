@@ -1637,6 +1637,25 @@ td {
   line-height: 1;
 }
 
+.analyst-overview-grid small,
+.method-note,
+.score-band-note,
+.queue-policy-note {
+  color: var(--analyst-muted);
+  font-size: 0.82rem;
+  line-height: 1.35;
+}
+
+.method-note,
+.score-band-note,
+.queue-policy-note {
+  margin: 10px 0 0;
+}
+
+.method-note {
+  max-width: 920px;
+}
+
 .analyst-workbench-grid {
   display: grid;
   grid-template-columns: minmax(0, 1.38fr) minmax(340px, 0.78fr);

@@ -555,9 +555,13 @@ function renderFeatureBars(deltas) {
     .slice(0, 5);
 
   document.getElementById("riskDriverCount").textContent =
-    `${riskDrivers.length} ${riskDrivers.length === 1 ? "signal" : "signals"}`;
+    riskDrivers.length
+      ? `${riskDrivers.length} ${riskDrivers.length === 1 ? "signal" : "signals"}`
+      : "No signals";
   document.getElementById("protectiveSignalCount").textContent =
-    `${protectiveSignals.length} ${protectiveSignals.length === 1 ? "signal" : "signals"}`;
+    protectiveSignals.length
+      ? `${protectiveSignals.length} ${protectiveSignals.length === 1 ? "signal" : "signals"}`
+      : "No signals";
 
   const maxRiskDelta = Math.max(
     ...riskDrivers.map((item) => item.absoluteDelta),

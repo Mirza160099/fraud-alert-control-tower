@@ -77,18 +77,22 @@
               <article>
                 <span>Scored transaction records</span>
                 <strong>5,000</strong>
+                <small>Held-out synthetic test set</small>
               </article>
               <article>
-                <span>Routed at policy threshold</span>
-                <strong>74</strong>
+                <span>Operating threshold</span>
+                <strong>0.798</strong>
+                <small>Routes 74 cases to review</small>
               </article>
               <article>
                 <span>Queue hit rate</span>
                 <strong>13.5%</strong>
+                <small>Fraud share in reviewed cases</small>
               </article>
               <article>
                 <span>Target review capacity</span>
                 <strong>5%</strong>
+                <small>Capacity-constrained policy</small>
               </article>
             </div>
           </section>
@@ -119,7 +123,7 @@
               <datalist id="transactionIdOptions"></datalist>
             </div>
             <p id="lookupStatus" class="lookup-status">
-              T9030658 opened as a priority rule-gap fraud example from the synthetic review queue.
+              T9030658 opened as a priority rule-gap fraud example. Try T9042990 or choose a queue case to see how the decision changes.
             </p>
             <section id="caseDrilldownPanel" class="case-drilldown-panel" hidden></section>
           </section>
@@ -336,6 +340,7 @@
                 <div><span class="dot medium"></span><strong>Medium</strong><em>0.350 <= p < 0.798 | Monitor closely</em><small>Watchlist below manual-review threshold</small></div>
                 <div><span class="dot low"></span><strong>Low</strong><em>p < 0.350 | Likely legitimate</em><small>No manual queue unless behavior changes</small></div>
               </div>
+              <p class="score-band-note">Critical is the emergency band; High is the selected review threshold; Medium remains a watchlist band below manual review.</p>
             </article>
           </section>
 
@@ -347,20 +352,39 @@
               </div>
               <span class="muted-label">Local sensitivity</span>
             </div>
+            <p class="method-note">Local explanations compare the current transaction with a reference profile and show which features increase or reduce the score.</p>
             <div class="feature-impact-grid">
               <section class="feature-impact-group">
                 <div class="feature-group-header">
                   <h3>Risk Drivers</h3>
-                  <span id="riskDriverCount">0 signals</span>
+                  <span id="riskDriverCount">3 signals</span>
                 </div>
-                <div id="riskFeatureBars" class="feature-bars"></div>
+                <div id="riskFeatureBars" class="feature-bars">
+                  <div class="feature-row">
+                    <div class="feature-name">Geographic distance</div>
+                    <div class="bar-track"><div class="bar-fill" style="width: 100%"></div></div>
+                    <div class="delta-value">+0.325</div>
+                  </div>
+                  <div class="feature-row">
+                    <div class="feature-name">Transaction amount pattern</div>
+                    <div class="bar-track"><div class="bar-fill" style="width: 12%"></div></div>
+                    <div class="delta-value">+0.019</div>
+                  </div>
+                  <div class="feature-row">
+                    <div class="feature-name">Transaction amount</div>
+                    <div class="bar-track"><div class="bar-fill" style="width: 11%"></div></div>
+                    <div class="delta-value">+0.018</div>
+                  </div>
+                </div>
               </section>
               <section class="feature-impact-group">
                 <div class="feature-group-header">
                   <h3>Risk-Reducing Signals</h3>
-                  <span id="protectiveSignalCount">0 signals</span>
+                  <span id="protectiveSignalCount">No signals</span>
                 </div>
-                <div id="protectiveFeatureBars" class="feature-bars"></div>
+                <div id="protectiveFeatureBars" class="feature-bars">
+                  <div class="feature-empty">No material risk-reducing signal was detected for this critical case.</div>
+                </div>
               </section>
             </div>
           </section>
@@ -434,6 +458,7 @@
                   <strong id="queueFalsePositiveLoad">64</strong>
                 </div>
               </div>
+              <p class="queue-policy-note">Policy is reviewed after pilot feedback and at least quarterly, using capacity, hit rate, fraud capture, and false-positive load.</p>
             </section>
 
             <section class="panel queue-command-card">
@@ -441,7 +466,40 @@
                 <h2>Routing Bands</h2>
                 <span class="muted-label">Policy definitions</span>
               </div>
-              <div id="priorityLaneList" class="priority-lanes"></div>
+              <div id="priorityLaneList" class="priority-lanes">
+                <div class="priority-lane critical">
+                  <div>
+                    <strong>Critical</strong>
+                    <span>Immediate review</span>
+                    <small>Highest emergency band before any customer-impacting action.</small>
+                  </div>
+                  <div class="lane-count lane-policy-range"><b>p >= 0.820</b><span>score band</span></div>
+                </div>
+                <div class="priority-lane high">
+                  <div>
+                    <strong>High</strong>
+                    <span>Review as fraud risk</span>
+                    <small>Selected operating threshold for investigator review.</small>
+                  </div>
+                  <div class="lane-count lane-policy-range"><b>0.798 <= p < 0.820</b><span>score band</span></div>
+                </div>
+                <div class="priority-lane medium">
+                  <div>
+                    <strong>Medium</strong>
+                    <span>Monitor closely</span>
+                    <small>Watchlist below the manual-review threshold.</small>
+                  </div>
+                  <div class="lane-count lane-policy-range"><b>0.350 <= p < 0.798</b><span>score band</span></div>
+                </div>
+                <div class="priority-lane low">
+                  <div>
+                    <strong>Low</strong>
+                    <span>Likely legitimate</span>
+                    <small>No manual queue unless behavior changes.</small>
+                  </div>
+                  <div class="lane-count lane-policy-range"><b>p < 0.350</b><span>score band</span></div>
+                </div>
+              </div>
             </section>
 
             <section class="panel queue-command-card">
@@ -449,7 +507,12 @@
                 <h2>Review Controls</h2>
                 <span class="muted-label">Human review</span>
               </div>
-              <ul id="queueControlChecks" class="control-checks"></ul>
+              <ul id="queueControlChecks" class="control-checks">
+                <li>Threshold 0.798 routes 7.4% of test transactions to review.</li>
+                <li>11 visible top-risk cases were missed by the old alert rule and need validation.</li>
+                <li>+2 additional fraud cases are captured at this operating point.</li>
+                <li>64 backtest false positives require human validation before any customer-impacting action.</li>
+              </ul>
             </section>
           </section>
 
@@ -506,7 +569,32 @@
               </button>
             </section>
             <p id="queueFilterSummary" class="queue-filter-summary"></p>
-            <div id="caseList" class="case-list"></div>
+            <div id="caseList" class="case-list">
+              <article class="case-card critical">
+                <div class="case-header">
+                  <div class="case-title">
+                    <span class="case-rank">#4</span>
+                    <div>
+                      <span class="muted-label">Transaction</span>
+                      <strong>T9030658</strong>
+                      <small>2025-04-05 at 07:14:00</small>
+                    </div>
+                  </div>
+                  <div class="case-header-actions">
+                    <div class="case-score critical">0.836</div>
+                  </div>
+                </div>
+                <div class="case-meta">
+                  <span class="case-tag critical">Critical</span>
+                  <span class="case-tag true-fraud">Backtest: true fraud</span>
+                  <span class="case-tag old-alert-missed">Old alert missed</span>
+                </div>
+                <div class="case-plain-summary">
+                  <strong>Primary driver: geographic distance</strong>
+                  <p>Geographic distance was 1287.7 km versus a typical value of 17.6 km; transaction amount was also above the normal profile.</p>
+                </div>
+              </article>
+            </div>
           </section>
         </section>
 
@@ -623,7 +711,11 @@
               <h2>Analyst Takeaways</h2>
               <span class="muted-label">Decision rationale</span>
             </div>
-            <ul id="metricsTakeaways" class="metrics-takeaways"></ul>
+            <ul id="metricsTakeaways" class="metrics-takeaways">
+              <li>At the selected threshold, 74 test transactions are routed to review and 10 confirmed fraud cases are captured.</li>
+              <li>The policy improves fraud capture versus the old rule, while accepting more false positives for investigator validation.</li>
+              <li>The score is used for ranking and triage, not automatic blocking or production odds.</li>
+            </ul>
           </section>
 
           <section class="content-grid">
@@ -661,7 +753,7 @@
                 <h2>Segment Validation</h2>
                 <span class="muted-label">Country, channel, amount, tier</span>
               </div>
-              <p id="segmentValidationNote" class="metrics-note"></p>
+              <p id="segmentValidationNote" class="metrics-note">Segment checks use 5,000 scored synthetic transactions. In production, the same cuts would be monitored for false-positive concentration, fraud capture, and customer friction by country, channel, amount band, and risk tier.</p>
               <div class="table-wrap">
                 <table>
                   <thead>
@@ -673,7 +765,36 @@
                       <th>Avg score</th>
                     </tr>
                   </thead>
-                  <tbody id="segmentValidationRows"></tbody>
+                  <tbody id="segmentValidationRows">
+                    <tr>
+                      <td>Risk tier: Critical</td>
+                      <td>33</td>
+                      <td>33</td>
+                      <td>27.3%</td>
+                      <td>0.838</td>
+                    </tr>
+                    <tr>
+                      <td>Channel: Online Banking</td>
+                      <td>937</td>
+                      <td>65</td>
+                      <td>13.8%</td>
+                      <td>0.432</td>
+                    </tr>
+                    <tr>
+                      <td>Country: BR</td>
+                      <td>88</td>
+                      <td>55</td>
+                      <td>14.5%</td>
+                      <td>0.674</td>
+                    </tr>
+                    <tr>
+                      <td>Amount band: High</td>
+                      <td>488</td>
+                      <td>39</td>
+                      <td>23.1%</td>
+                      <td>0.517</td>
+                    </tr>
+                  </tbody>
                 </table>
               </div>
             </section>
@@ -732,7 +853,7 @@
                   <strong id="capacitySimCostDelta">$0</strong>
                 </div>
               </div>
-              <p id="capacitySimNarrative" class="metrics-note"></p>
+              <p id="capacitySimNarrative" class="metrics-note">At 5% review capacity, the queue reviews 74 test cases, captures 25.0% of fraud, and sets the selected operating threshold at 0.798.</p>
             </section>
             <div class="table-wrap">
               <table>
@@ -746,7 +867,16 @@
                     <th>Exact top-K hit</th>
                   </tr>
                 </thead>
-                <tbody id="capacityRows"></tbody>
+                <tbody id="capacityRows">
+                  <tr class="selected-policy-row">
+                    <td>5% capacity</td>
+                    <td>0.798</td>
+                    <td>74</td>
+                    <td>13.5%</td>
+                    <td>25.0%</td>
+                    <td>18.0%</td>
+                  </tr>
+                </tbody>
               </table>
             </div>
           </section>
