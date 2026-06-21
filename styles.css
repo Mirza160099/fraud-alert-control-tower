@@ -693,11 +693,11 @@ select:focus {
 
 .case-list {
   display: grid;
-  gap: 12px;
+  gap: 9px;
 }
 
 .case-card {
-  padding: 14px;
+  padding: 12px 14px;
   border: 1px solid var(--line);
   border-left: 4px solid var(--line);
   border-radius: 8px;
@@ -1218,6 +1218,13 @@ td {
   grid-template-columns: 1.05fr 0.95fr;
   gap: 18px;
   margin-bottom: 18px;
+}
+
+.metrics-scorecard-panel {
+  border-top: 3px solid var(--accent);
+  background:
+    linear-gradient(180deg, rgba(15, 118, 110, 0.06), transparent 88px),
+    var(--panel);
 }
 
 .scorecard-grid {
@@ -2500,8 +2507,8 @@ select:focus-visible {
   --ops-card-strong: rgba(38, 43, 44, 0.90);
   --ops-line: rgba(196, 198, 206, 0.22);
   --ops-text: #e0e3e5;
-  --ops-muted: #aeb7b5;
-  --ops-primary: #5dd9d6;
+  --ops-muted: #bec8c6;
+  --ops-primary: #54cbc8;
   --ops-danger: #ffb4ab;
   --ops-warn: #f7c56b;
   --ops-ok: #8ad7a0;
@@ -2659,6 +2666,13 @@ select:focus-visible {
 .ops-view .priority-lane {
   background: transparent;
   border-color: var(--ops-line);
+}
+
+.ops-view .metrics-scorecard-panel {
+  border-top-color: var(--ops-primary);
+  background:
+    linear-gradient(180deg, rgba(84, 203, 200, 0.08), transparent 90px),
+    var(--ops-panel);
 }
 
 .ops-view .case-rank,
