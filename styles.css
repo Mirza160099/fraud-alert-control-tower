@@ -942,6 +942,63 @@ select:focus {
   gap: 12px;
 }
 
+.roadmap-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.roadmap-stage {
+  position: relative;
+  min-height: 230px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfdfc;
+  overflow: hidden;
+}
+
+.roadmap-stage::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 4px;
+  background: var(--accent);
+}
+
+.roadmap-stage.pilot::before {
+  background: #d59f36;
+}
+
+.roadmap-stage.production::before {
+  background: #30465e;
+}
+
+.roadmap-stage span {
+  color: var(--accent-strong);
+  font-size: 0.74rem;
+  font-weight: 850;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.roadmap-stage strong {
+  display: block;
+  margin-top: 8px;
+  color: var(--ink);
+  font-size: 1.08rem;
+  line-height: 1.2;
+}
+
+.roadmap-stage ul {
+  display: grid;
+  gap: 9px;
+  margin: 14px 0 0;
+  padding-left: 18px;
+  color: #2d3836;
+  line-height: 1.38;
+}
+
 .readiness-grid div,
 .risk-register-grid article,
 .control-grid article {
@@ -1507,6 +1564,7 @@ td {
   .metrics-command-grid,
   .metrics-takeaways,
   .governance-command-grid,
+  .roadmap-grid,
   .approval-gates {
     grid-template-columns: 1fr;
   }
@@ -1546,6 +1604,7 @@ td {
   .case-facts,
   .readiness-grid,
   .risk-register-grid,
+  .roadmap-grid,
   .kpi-grid,
   .economics-grid,
   .control-grid,
@@ -2656,6 +2715,7 @@ select:focus-visible {
 .ops-view .approval-gates strong,
 .ops-view .readiness-grid strong,
 .ops-view .risk-register-grid strong,
+.ops-view .roadmap-stage strong,
 .ops-view .control-grid strong,
 .ops-view .governance-list dd,
 .ops-view .scorecard-grid strong,
@@ -2678,6 +2738,7 @@ select:focus-visible {
 .ops-view th,
 .ops-view .readiness-grid span,
 .ops-view .risk-register-grid span,
+.ops-view .roadmap-stage span,
 .ops-view .control-grid span,
 .ops-view .metrics-takeaways li,
 .ops-view .control-checks,
@@ -2703,6 +2764,7 @@ select:focus-visible {
 .ops-view .governance-list div,
 .ops-view .readiness-grid div,
 .ops-view .risk-register-grid article,
+.ops-view .roadmap-stage,
 .ops-view .control-grid article,
 .ops-view .approval-gates li,
 .ops-view .feature-impact-group {
@@ -2771,6 +2833,7 @@ select:focus-visible {
 .ops-view .priority-lane small,
 .ops-view .readiness-grid p,
 .ops-view .risk-register-grid p,
+.ops-view .roadmap-stage li,
 .ops-view .control-grid p,
 .ops-view .approval-gates span,
 .ops-view .governance-list dd,
@@ -2812,6 +2875,27 @@ select:focus-visible {
 .ops-view .evidence-links a:hover {
   border-color: rgba(93, 217, 214, 0.55);
   background: rgba(0, 80, 79, 0.20);
+}
+
+.ops-view .governance-detail-panel summary strong {
+  color: var(--ops-text);
+}
+
+.ops-view .governance-detail-panel summary small,
+.ops-view .governance-detail-panel summary em {
+  color: var(--ops-muted);
+}
+
+.ops-view .governance-detail-panel summary em {
+  color: #40504d;
+  border-color: rgba(224, 227, 229, 0.42);
+  background: #f4fbf9;
+}
+
+.ops-view .governance-detail-panel[open] summary em {
+  color: var(--ops-primary);
+  border-color: rgba(93, 217, 214, 0.42);
+  background: rgba(0, 80, 79, 0.18);
 }
 
 .ops-view .approval-gates li::before,
