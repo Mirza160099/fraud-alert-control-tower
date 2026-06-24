@@ -801,6 +801,66 @@
             </section>
           </section>
 
+          <section class="content-grid validation-evidence-grid">
+            <section class="panel validation-evidence-panel build-explain" data-build-note="Uses scored transaction records to calculate calibration diagnostics and show why the prototype score is used as a ranking signal, not production odds.">
+              <div class="panel-header">
+                <h2>Calibration Evidence</h2>
+                <span class="muted-label">Measured score check</span>
+              </div>
+              <div class="trust-answer-grid">
+                <article>
+                  <span>Brier score</span>
+                  <strong id="calibrationBrierScore">0.219</strong>
+                  <p>Lower is better; production would require calibration on real validation data.</p>
+                </article>
+                <article>
+                  <span>Calibration gap</span>
+                  <strong id="calibrationEce">0.413</strong>
+                  <p>Expected calibration error across score bands.</p>
+                </article>
+                <article>
+                  <span>Largest gap band</span>
+                  <strong id="calibrationWorstBand">0.80-1.00</strong>
+                  <p>The highest score band is strongest for ranking but not production odds.</p>
+                </article>
+                <article>
+                  <span>Use decision</span>
+                  <strong>Ranking, not auto-action</strong>
+                  <p>Use scores to prioritize review until probability calibration is approved.</p>
+                </article>
+              </div>
+            </section>
+
+            <section class="panel validation-evidence-panel build-explain" data-build-note="Measures false-positive concentration by segment and summarizes SLA policy coverage for routed cases. True SLA breach rate needs investigation timestamps in a production system.">
+              <div class="panel-header">
+                <h2>Fairness And SLA Evidence</h2>
+                <span class="muted-label">Pilot controls</span>
+              </div>
+              <div class="trust-answer-grid">
+                <article>
+                  <span>Highest country FPR</span>
+                  <strong id="highestCountryFpr">BR 60.3%</strong>
+                  <p>False-positive concentration to monitor during pilot review.</p>
+                </article>
+                <article>
+                  <span>Highest channel FPR</span>
+                  <strong id="highestChannelFpr">P2P 7.5%</strong>
+                  <p>Channel friction proxy for investigator oversight.</p>
+                </article>
+                <article>
+                  <span>SLA policy coverage</span>
+                  <strong id="slaPolicyCoverage">100%</strong>
+                  <p>Every routed case receives a review urgency policy.</p>
+                </article>
+                <article>
+                  <span>Measured breach rate</span>
+                  <strong id="slaBreachStatus">Needs timestamps</strong>
+                  <p>Requires case created, assigned, and closed timestamps.</p>
+                </article>
+              </div>
+            </section>
+          </section>
+
           <section class="content-grid">
             <section class="panel">
               <div class="panel-header">

@@ -24,6 +24,7 @@ The latest uplift work directly addressed the feedback received:
 - Added a leakage-aware merchant category fraud-rate feature using out-of-fold target encoding on training data only.
 - Added model-aware validation permutation importance after mutual-information shortlisting.
 - Added SQL production logic in `features/fraud_feature_view.sql` so the feature engineering can be explained as a warehouse-ready analyst workflow.
+- Added measured validation evidence: calibration bins, false-positive rate by country/channel, and SLA policy coverage.
 - Added this business report so the project leads with the trade-off, not only model scores.
 
 The feature audit was treated as a disciplined improvement exercise: engineered features were tested, but the live app model was not replaced unless the uplift version clearly improved operational performance.
@@ -40,7 +41,7 @@ At the current operating policy shown in the app:
 | Queue hit rate | 13.5% | 36.4% |
 | Fraud capture | 25.0% | 20.0% |
 
-The model finds more fraud cases, but it also creates more manual-review load. This is why the correct business framing is not “replace the old alert rule immediately.” The correct framing is “use the model as a prioritization overlay or top-K pilot to help investigators work the riskiest alerts first.”
+The model finds more fraud cases, but it also creates more manual-review load. This is why the correct business framing is not "replace the old alert rule immediately." The correct framing is "use the model as a prioritization overlay or top-K pilot to help investigators work the riskiest alerts first."
 
 ## 5. Break-Even Review Economics
 
@@ -48,19 +49,33 @@ The current model queue captures 2 additional fraud cases compared with the exis
 
 Assumption:
 
-- Manual review cost: £8 per case
+- Manual review cost: GBP 8 per case
 
 Calculation:
 
-- Extra review cost: 52 x £8 = £416
+- Extra review cost: 52 x GBP 8 = GBP 416
 - Extra fraud cases captured: 2
-- Break-even avoided loss per extra captured fraud: £416 / 2 = £208
+- Break-even avoided loss per extra captured fraud: GBP 416 / 2 = GBP 208
 
 Interpretation:
 
-If each additional fraud case prevented avoids more than £208 of loss, the additional review workload is financially justified. If avoided loss is below £208, the model should be used more selectively, for example as a top-K prioritization layer rather than a broad replacement rule.
+If each additional fraud case prevented avoids more than GBP 208 of loss, the additional review workload is financially justified. If avoided loss is below GBP 208, the model should be used more selectively, for example as a top-K prioritization layer rather than a broad replacement rule.
 
-## 6. Recommendation
+## 6. Validation Evidence
+
+Additional evidence has been added to protect the uplift and answer likely risk-analyst questions.
+
+| Evidence item | Result | Interpretation |
+|---|---:|---|
+| Brier score | 0.2192 | Score is useful for ranking, but not production odds |
+| Expected calibration error | 0.4132 | Real-data calibration remains an approval gate |
+| Highest country false-positive rate | BR 60.3% | Segment needs pilot monitoring for customer friction |
+| Highest channel false-positive rate | P2P 7.5% | Channel-level friction should be tracked weekly |
+| SLA policy coverage | 100.0% | Every routed case receives an urgency policy |
+
+True SLA breach rate cannot be measured from the current synthetic dataset because it does not contain investigation created, assigned, and closed timestamps. That timestamp capture is listed as a production instrumentation requirement.
+
+## 7. Recommendation
 
 Recommended path:
 
@@ -75,7 +90,7 @@ Not recommended:
 - Do not claim production readiness from synthetic data.
 - Do not replace the incumbent rule until real-data validation, calibration, and segment monitoring are complete.
 
-## 7. Risks And Assumptions
+## 8. Risks And Assumptions
 
 | Risk | Control |
 |---|---|
@@ -85,7 +100,7 @@ Not recommended:
 | Country/channel features can behave like proxy-risk signals | Monitor false positives and fraud capture by segment |
 | Fraud patterns can drift over time | Monitor score distribution, top drivers, queue hit rate, and fraud capture weekly |
 
-## 8. Conclusion
+## 9. Conclusion
 
 The strongest value of this project is not just the model. It is the full control-tower workflow: score a transaction, explain the reason, route it into a capacity-aware queue, compare it against the old alert rule, and document the governance limits.
 

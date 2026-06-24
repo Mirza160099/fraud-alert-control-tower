@@ -206,6 +206,39 @@ Example rationale pattern:
 
 - A transaction with unusually high geographic distance compared with a typical value may receive a higher fraud-risk score.
 
+## Calibration, Segment, And SLA Evidence
+
+Additional validation-evidence artifacts are saved in `artifacts/modeling/validation_evidence`.
+
+Calibration evidence:
+
+| Metric | Value |
+|---|---:|
+| Brier score | 0.2192 |
+| Expected calibration error | 0.4132 |
+| Largest calibration gap band | 0.80-1.00 |
+
+Interpretation: the score is suitable for ranking and queue thresholding in this prototype, but it should not be represented as production odds until calibrated on real validation data.
+
+Fairness / segment false-positive evidence:
+
+| Segment view | Highest observed false-positive concentration |
+|---|---|
+| Country | `BR` at 60.3% across 78 non-fraud scored transactions |
+| Channel | `P2P` at 7.5% across 801 non-fraud scored transactions |
+
+Interpretation: this is a monitoring control, not a legal fairness conclusion. It highlights segments that would need closer false-positive and customer-friction review during a pilot.
+
+SLA / turnaround evidence:
+
+| Metric | Value |
+|---|---:|
+| Routed scored cases with SLA policy assigned | 390 |
+| SLA policy coverage | 100.0% |
+| Measured breach rate | Not available in current synthetic data |
+
+True SLA breach rate requires investigation created, assigned, and closed timestamps. The prototype therefore shows SLA policy coverage and names timestamp capture as a production instrumentation requirement.
+
 ## Limitations
 
 1. The dataset is synthetic, so model metrics should not be represented as production evidence.

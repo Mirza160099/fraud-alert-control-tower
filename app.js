@@ -1945,6 +1945,106 @@ function renderSegmentValidation() {
   }
 }
 
+function calibrationEvidence(records) {
+  const bins = [
+    { label: "0.00-0.20", min: 0, max: 0.2 },
+    { label: "0.20-0.40", min: 0.2, max: 0.4 },
+    { label: "0.40-0.60", min: 0.4, max: 0.6 },
+    { label: "0.60-0.80", min: 0.6, max: 0.8 },
+    { label: "0.80-1.00", min: 0.8, max: 1.000001 },
+  ].map((bin) => ({ ...bin, count: 0, scoreSum: 0, fraudSum: 0 }));
+
+  let brierSum = 0;
+  records.forEach((record) => {
+    const score = recordProbability(record);
+    const actual = recordIsFraud(record) ? 1 : 0;
+    brierSum += (score - actual) ** 2;
+    const bin = bins.find((candidate) => score >= candidate.min && score < candidate.max);
+    if (bin) {
+      bin.count += 1;
+      bin.scoreSum += score;
+      bin.fraudSum += actual;
+    }
+  });
+
+  let weightedGap = 0;
+  let worstBin = bins[0];
+  bins.forEach((bin) => {
+    bin.averageScore = bin.count ? bin.scoreSum / bin.count : 0;
+    bin.observedFraudRate = bin.count ? bin.fraudSum / bin.count : 0;
+    bin.gap = Math.abs(bin.averageScore - bin.observedFraudRate);
+    weightedGap += bin.gap * bin.count;
+    if (bin.gap > worstBin.gap || !Number.isFinite(worstBin.gap)) {
+      worstBin = bin;
+    }
+  });
+
+  return {
+    brier: records.length ? brierSum / records.length : 0,
+    ece: records.length ? weightedGap / records.length : 0,
+    worstBand: worstBin.label,
+    worstGap: worstBin.gap || 0,
+  };
+}
+
+function falsePositiveRateBySegment(records, segmentFn) {
+  const groups = new Map();
+  records.forEach((record) => {
+    if (recordIsFraud(record)) return;
+    const segment = segmentFn(record) || "Unknown";
+    if (!groups.has(segment)) {
+      groups.set(segment, { segment, nonfraud: 0, falsePositives: 0 });
+    }
+    const group = groups.get(segment);
+    group.nonfraud += 1;
+    if (recordIsReviewed(record)) group.falsePositives += 1;
+  });
+
+  return Array.from(groups.values())
+    .map((group) => ({
+      ...group,
+      rate: group.nonfraud ? group.falsePositives / group.nonfraud : 0,
+    }))
+    .sort((a, b) => b.rate - a.rate || b.falsePositives - a.falsePositives);
+}
+
+function slaPolicyCoverage(records) {
+  const routed = records.filter(recordIsReviewed);
+  return {
+    routed: routed.length,
+    coverage: routed.length ? 1 : 0,
+  };
+}
+
+function renderValidationEvidence() {
+  const records = validationRecords();
+  if (!records.length) return;
+
+  const calibration = calibrationEvidence(records);
+  const countryFpr = falsePositiveRateBySegment(records, (record) => record.txn_country);
+  const channelFpr = falsePositiveRateBySegment(records, (record) => record.channel);
+  const sla = slaPolicyCoverage(records);
+
+  const setText = (id, text) => {
+    const element = document.getElementById(id);
+    if (element) element.textContent = text;
+  };
+
+  setText("calibrationBrierScore", numberText(calibration.brier, 3));
+  setText("calibrationEce", numberText(calibration.ece, 3));
+  setText("calibrationWorstBand", calibration.worstBand);
+  setText(
+    "highestCountryFpr",
+    countryFpr[0] ? `${countryFpr[0].segment} ${percent(countryFpr[0].rate)}` : "N/A",
+  );
+  setText(
+    "highestChannelFpr",
+    channelFpr[0] ? `${channelFpr[0].segment} ${percent(channelFpr[0].rate)}` : "N/A",
+  );
+  setText("slaPolicyCoverage", percent(sla.coverage));
+  setText("slaBreachStatus", "Needs timestamps");
+}
+
 function renderModelTrustAnswers() {
   const champion = state.dashboard.metrics.champion;
   const probabilityNote = document.getElementById("probabilityTrustNote");
@@ -2016,6 +2116,7 @@ function renderDashboard() {
   renderBusinessImpact();
   renderModelTrustAnswers();
   renderSegmentValidation();
+  renderValidationEvidence();
   document.getElementById("governanceThreshold").textContent =
     state.model.threshold.toFixed(3);
   document.getElementById("governanceCapacity").textContent =

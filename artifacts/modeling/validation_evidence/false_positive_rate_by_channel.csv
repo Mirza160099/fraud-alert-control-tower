@@ -1,0 +1,6 @@
+segment,nonfraud_transactions,false_positive_count,false_positive_rate
+P2P,801,60,0.0749063670411985
+Card Not Present,1354,99,0.07311669128508123
+Card Present,1471,107,0.07273963290278722
+Online Banking,907,56,0.06174200661521499
+Wire,266,13,0.04887218045112782

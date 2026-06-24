@@ -1,0 +1,23 @@
+{
+  "threshold": 0.7976891621674433,
+  "calibration": {
+    "brier_score": 0.21921098383597723,
+    "expected_calibration_error": 0.41316189531339803,
+    "worst_score_band": "0.80-1.00",
+    "worst_score_band_gap": 0.6656200623776951,
+    "interpretation": "Scores are suitable for ranking and thresholding in the prototype, but should be calibrated on real validation data before production odds are claimed."
+  },
+  "fairness_proxy": {
+    "country_max_false_positive_rate": 0.6025641025641025,
+    "country_max_segment": "BR",
+    "channel_max_false_positive_rate": 0.0749063670411985,
+    "channel_max_segment": "P2P"
+  },
+  "sla": {
+    "review_queue_cases": 390,
+    "sla_policy_assigned_cases": 390,
+    "sla_policy_coverage": 1.0,
+    "measured_breach_rate": null,
+    "breach_rate_note": "True SLA breach rate requires investigation created_at, assigned_at, and closed_at timestamps. The prototype includes SLA policy coverage, not measured operational breach performance."
+  }
+}

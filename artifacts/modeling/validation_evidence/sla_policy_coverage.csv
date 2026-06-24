@@ -1,0 +1,3 @@
+priority_tier,sla_policy,cases,frauds
+High,Same-shift review,357,46
+Critical,Immediate review,33,9

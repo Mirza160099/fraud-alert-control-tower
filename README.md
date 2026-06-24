@@ -14,7 +14,9 @@ JPMorgan-inspired fraud analytics project that prioritizes transaction alerts, e
 - Final journey deck: [`presentation/fraud-alert-control-tower-project-journey-final.pptx`](presentation/fraud-alert-control-tower-project-journey-final.pptx)
 - Professional report: [`presentation/fraud-alert-control-tower-professional-project-report.pdf`](presentation/fraud-alert-control-tower-professional-project-report.pdf)
 - Tutor-feedback business report: [`docs/reports/professional_business_report.docx`](docs/reports/professional_business_report.docx)
+- Professor feedback completion checklist: [`docs/reports/professor_feedback_completion_checklist.md`](docs/reports/professor_feedback_completion_checklist.md)
 - SQL feature view: [`features/fraud_feature_view.sql`](features/fraud_feature_view.sql)
+- Validation evidence addendum: [`artifacts/modeling/validation_evidence/validation_evidence_addendum.md`](artifacts/modeling/validation_evidence/validation_evidence_addendum.md)
 - Governance docs: [`docs/governance`](docs/governance)
 
 ## What This Project Demonstrates
@@ -83,6 +85,12 @@ The Python pipeline:
 - Removes leakage fields before feature selection and model training.
 
 The latest feature-audit artifacts are saved under [`artifacts/modeling/step_03_professor_uplift`](artifacts/modeling/step_03_professor_uplift). The live app model was kept stable because the uplift run improved feature discipline but did not clearly outperform the current operating backtest.
+
+Additional validation evidence is saved under [`artifacts/modeling/validation_evidence`](artifacts/modeling/validation_evidence):
+
+- Calibration bins, Brier score, and expected calibration error.
+- False-positive rate by country and channel.
+- SLA policy coverage for routed cases, with true breach-rate instrumentation listed as a production requirement.
 
 ## Top 10 Selected Features
 
