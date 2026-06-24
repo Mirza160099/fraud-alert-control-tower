@@ -64,17 +64,22 @@ Compared with the existing alert benchmark:
 | Fraud cases caught | 8 | 10 | +2 |
 | False positives | 14 | 64 | +50 |
 
-Illustrative assumptions:
+Break-even assumptions:
 
 | Assumption | Value |
 |---|---:|
-| Review cost per case | $8 |
-| Avoided loss per captured fraud | $500 |
-| Additional review spend | $416 |
-| Additional avoided fraud loss | $1,000 |
-| Illustrative net impact | $584 |
+| Review cost per case | £8 |
+| Additional review spend | 52 x £8 = £416 |
+| Additional fraud cases caught | 2 |
+| Break-even avoided loss per extra captured fraud | £208 |
 
 This sensitivity is not a production ROI claim. It demonstrates the operating question a bank would ask: are the additional reviews justified by the incremental fraud caught, and how should that trade-off change by staffing level, fraud-loss severity, and customer-friction risk?
+
+Recommendation from the economics:
+
+- Use the model as a prioritization overlay or top-K pilot first.
+- Do not position it as a full replacement for the incumbent alert rule until real-data validation proves the extra review load is justified.
+- If avoided loss per additional fraud case is below £208, tighten the queue to a smaller top-K operating point.
 
 ## Capacity Sensitivity
 

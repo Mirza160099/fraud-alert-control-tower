@@ -29,11 +29,13 @@ from sklearn.metrics import (
     recall_score,
     roc_auc_score,
 )
+from sklearn.inspection import permutation_importance
 from sklearn.pipeline import Pipeline
 from sklearn.tree import DecisionTreeClassifier
 
 from fraud_pipeline import (
     PROJECT_ROOT,
+    add_merchant_category_target_encoding,
     build_baseline_model,
     build_feature_schema,
     build_modeling_table,
@@ -220,6 +222,74 @@ def fit_candidate(
         validation_probabilities=validation_probabilities,
         test_probabilities=test_probabilities,
     )
+
+
+def fit_all_candidates(
+    X_train: pd.DataFrame,
+    y_train: pd.Series,
+    X_validation: pd.DataFrame,
+    X_test: pd.DataFrame,
+) -> list[FittedCandidate]:
+    """Fit every model candidate on the same feature set."""
+
+    return [
+        fit_candidate(
+            X_train,
+            y_train,
+            X_validation,
+            X_test,
+            candidate,
+        )
+        for candidate in get_model_candidates()
+    ]
+
+
+def model_aware_feature_importance(
+    fitted: FittedCandidate,
+    X_validation: pd.DataFrame,
+    y_validation: pd.Series,
+) -> pd.DataFrame:
+    """Use validation permutation importance to confirm retained features."""
+
+    importance = permutation_importance(
+        fitted.pipeline,
+        X_validation,
+        y_validation,
+        scoring="average_precision",
+        n_repeats=20,
+        random_state=42,
+        n_jobs=1,
+    )
+
+    return (
+        pd.DataFrame(
+            {
+                "feature": X_validation.columns,
+                "permutation_importance_mean_pr_auc": importance.importances_mean,
+                "permutation_importance_std": importance.importances_std,
+            }
+        )
+        .sort_values("permutation_importance_mean_pr_auc", ascending=False)
+        .reset_index(drop=True)
+    )
+
+
+def prune_features_by_model_importance(
+    importance: pd.DataFrame,
+    minimum_features: int = 4,
+) -> list[str]:
+    """Keep model-aware positive features while avoiding an unstable tiny set."""
+
+    positive = importance[
+        importance["permutation_importance_mean_pr_auc"] > 0
+    ]["feature"].tolist()
+
+    if len(positive) >= minimum_features:
+        return positive
+
+    # If the validation signal is sparse, keep the least harmful top features so
+    # the model remains usable, but this branch is reported in the artifact.
+    return importance.head(minimum_features)["feature"].tolist()
 
 
 def metrics_from_labels(
@@ -471,15 +541,15 @@ def choose_champion_from_capacity(
         how="left",
     )
 
-    # Validation PR-AUC is the primary ranking metric for rare-fraud models.
-    # Capacity F1 remains the operational tie-breaker because the model still
-    # needs to produce an investigator-sized queue.
+    # Capacity F1 is the primary operating metric because this project is an
+    # investigator queue, not a pure probability-ranking exercise. PR-AUC stays
+    # as a tie-breaker so we do not ignore overall rare-fraud ranking quality.
     target_rows = target_rows.sort_values(
         [
-            "validation_average_precision_pr_auc",
             "validation_f1",
             "validation_recall_fraud_capture_rate",
             "validation_precision_hit_rate",
+            "validation_average_precision_pr_auc",
         ],
         ascending=False,
     )
@@ -655,28 +725,76 @@ def run_model_selection_pipeline(
     modeling_table = build_modeling_table(bundle)
     candidate_features = get_candidate_features(modeling_table)
     split_data = split_modeling_data(modeling_table, candidate_features)
+    split_data, target_encoding = add_merchant_category_target_encoding(split_data)
 
     top_features = select_top_features_by_mutual_info(
         split_data.X_train,
         split_data.y_train,
         top_n=top_n,
     )
-    selected_features = top_features["source_feature"].tolist()
+    initial_selected_features = top_features["source_feature"].tolist()
+
+    initial_X_train = split_data.X_train[initial_selected_features]
+    initial_X_validation = split_data.X_validation[initial_selected_features]
+    initial_X_test = split_data.X_test[initial_selected_features]
+
+    initial_fitted_candidates = fit_all_candidates(
+        initial_X_train,
+        split_data.y_train,
+        initial_X_validation,
+        initial_X_test,
+    )
+
+    initial_model_comparison = pd.DataFrame(
+        build_model_comparison_rows(
+            initial_fitted_candidates,
+            split_data.y_validation,
+            split_data.y_test,
+        )
+    ).sort_values("test_average_precision_pr_auc", ascending=False)
+
+    initial_capacity_results = pd.DataFrame(
+        build_capacity_rows(
+            initial_fitted_candidates,
+            split_data.y_validation,
+            split_data.y_test,
+            CAPACITY_RATES,
+        )
+    )
+
+    initial_champion_row = choose_champion_from_capacity(
+        initial_capacity_results,
+        initial_model_comparison,
+        target_capacity_rate,
+    )
+    initial_champion = next(
+        fitted
+        for fitted in initial_fitted_candidates
+        if fitted.name == initial_champion_row["model_name"]
+    )
+
+    validation_importance = model_aware_feature_importance(
+        initial_champion,
+        initial_X_validation,
+        split_data.y_validation,
+    )
+    selected_features = prune_features_by_model_importance(validation_importance)
+    dropped_features = [
+        feature
+        for feature in initial_selected_features
+        if feature not in selected_features
+    ]
 
     X_train = split_data.X_train[selected_features]
     X_validation = split_data.X_validation[selected_features]
     X_test = split_data.X_test[selected_features]
 
-    fitted_candidates = [
-        fit_candidate(
-            X_train,
-            split_data.y_train,
-            X_validation,
-            X_test,
-            candidate,
-        )
-        for candidate in get_model_candidates()
-    ]
+    fitted_candidates = fit_all_candidates(
+        X_train,
+        split_data.y_train,
+        X_validation,
+        X_test,
+    )
 
     model_comparison = pd.DataFrame(
         build_model_comparison_rows(
@@ -712,7 +830,7 @@ def run_model_selection_pipeline(
         threshold=0.5,
     )
 
-    feature_schema = build_feature_schema(modeling_table, selected_features)
+    feature_schema = build_feature_schema(split_data.X_train, selected_features)
     champion_predictions = build_champion_prediction_table(
         split_data.test_context,
         champion.test_probabilities,
@@ -722,7 +840,14 @@ def run_model_selection_pipeline(
 
     metrics = {
         "target_capacity_rate": float(target_capacity_rate),
+        "initial_selected_features": initial_selected_features,
+        "dropped_features_after_validation_importance": dropped_features,
         "selected_features": selected_features,
+        "target_encoding": {
+            key: value
+            for key, value in target_encoding.items()
+            if key != "mapping"
+        },
         "champion": {
             "model_name": champion_name,
             "threshold": champion_threshold,
@@ -762,13 +887,24 @@ def run_model_selection_pipeline(
         "model": champion.pipeline,
         "model_name": champion_name,
         "selected_features": selected_features,
+        "initial_selected_features": initial_selected_features,
+        "dropped_features_after_validation_importance": dropped_features,
         "threshold": champion_threshold,
         "target_capacity_rate": target_capacity_rate,
         "feature_schema": feature_schema,
-        "feature_selection_method": "binned_source_mutual_information",
+        "target_encoding": target_encoding,
+        "feature_selection_method": (
+            "training-only mutual information filter plus validation "
+            "permutation-importance pruning"
+        ),
         "threshold_selection_method": "validation_top_k_capacity",
     }
 
+    top_features.to_csv(output_dir / "initial_mutual_information_features.csv", index=False)
+    validation_importance.to_csv(
+        output_dir / "validation_permutation_importance.csv",
+        index=False,
+    )
     model_comparison.to_csv(output_dir / "model_comparison.csv", index=False)
     capacity_results.to_csv(output_dir / "capacity_thresholds.csv", index=False)
     champion_predictions.to_csv(

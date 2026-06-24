@@ -1,0 +1,11 @@
+feature,permutation_importance_mean_pr_auc,permutation_importance_std
+geo_distance_km,0.03524862688289174,0.012358788217083548
+amt_per_txn_24h,0.005502625822034863,0.006413981231870653
+channel,0.002440379625292683,0.010143995431278597
+synthetic_identity_score,0.00029149984488067505,0.0024220892571759824
+txn_country,0.0,0.0
+hour_sin,0.0,0.0
+device_risk_score,0.0,0.0
+txn_hour,0.0,0.0
+hour_cos,0.0,0.0
+merchant_risk_score,-0.00021983903456107914,0.0005106777760049481

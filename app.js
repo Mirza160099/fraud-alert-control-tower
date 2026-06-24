@@ -71,7 +71,7 @@ function probabilityText(value) {
 
 function moneyText(value) {
   const sign = Number(value) < 0 ? "-" : "";
-  return `${sign}$${Math.abs(Math.round(Number(value))).toLocaleString("en-US")}`;
+  return `${sign}£${Math.abs(Math.round(Number(value))).toLocaleString("en-GB")}`;
 }
 
 function signedCount(value) {
@@ -1814,8 +1814,7 @@ function renderGlobalImportance() {
 }
 
 function renderBusinessImpact() {
-  const reviewCostUsd = 8;
-  const avoidedFraudLossUsd = 500;
+  const reviewCostGbp = 8;
   const champion = state.dashboard.metrics.champion;
   const existing = state.dashboard.metrics.existing_alert_benchmark;
 
@@ -1825,9 +1824,11 @@ function renderBusinessImpact() {
   const incrementalReviews = championReviews - existingReviews;
   const incrementalFraudCaught =
     Number(champion.test_true_positives) - Number(existing.true_positives);
-  const incrementalReviewSpend = incrementalReviews * reviewCostUsd;
-  const incrementalAvoidedLoss = incrementalFraudCaught * avoidedFraudLossUsd;
-  const netImpact = incrementalAvoidedLoss - incrementalReviewSpend;
+  const incrementalReviewSpend = incrementalReviews * reviewCostGbp;
+  const breakEvenLoss =
+    incrementalFraudCaught > 0
+      ? incrementalReviewSpend / incrementalFraudCaught
+      : null;
 
   document.getElementById("incrementalFraudCaught").textContent =
     signedCount(incrementalFraudCaught);
@@ -1836,9 +1837,9 @@ function renderBusinessImpact() {
   document.getElementById("incrementalReviewSpend").textContent =
     moneyText(incrementalReviewSpend);
   document.getElementById("illustrativeNetImpact").textContent =
-    moneyText(netImpact);
+    breakEvenLoss === null ? "N/A" : moneyText(breakEvenLoss);
   document.getElementById("economicsNote").textContent =
-    `Illustrative sensitivity: ${moneyText(reviewCostUsd)} review cost per case and ${moneyText(avoidedFraudLossUsd)} avoided loss per captured fraud. Synthetic data only.`;
+    `Break-even sensitivity: ${moneyText(reviewCostGbp)} review cost per case. Each extra captured fraud must avoid ${breakEvenLoss === null ? "more loss than the added review cost" : moneyText(breakEvenLoss)} to justify the wider queue. Synthetic data only.`;
 }
 
 function validationRecords() {

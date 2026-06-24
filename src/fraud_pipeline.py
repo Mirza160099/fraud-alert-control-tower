@@ -28,7 +28,7 @@ from sklearn.metrics import (
     recall_score,
     roc_auc_score,
 )
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import StratifiedKFold, train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
@@ -181,6 +181,28 @@ def build_modeling_table(bundle: DatasetBundle) -> pd.DataFrame:
         modeling_table["transaction_amount_usd"].clip(lower=0)
     )
 
+    # Fraud often appears as unusual behavior relative to recent activity, not
+    # only as a single large value. These within-row ratios are available at
+    # decision time and avoid using the fraud label.
+    modeling_table["velocity_ratio"] = modeling_table["velocity_1h"] / (
+        modeling_table["velocity_24h"] + 1
+    )
+    modeling_table["amt_per_txn_24h"] = modeling_table[
+        "transaction_amount_usd"
+    ] / (modeling_table["velocity_24h"] + 1)
+
+    # Hour is cyclical: 23:00 and 00:00 are close in real behavior even though
+    # raw integer hour makes them look far apart.
+    modeling_table["hour_sin"] = np.sin(2 * np.pi * modeling_table["txn_hour"] / 24)
+    modeling_table["hour_cos"] = np.cos(2 * np.pi * modeling_table["txn_hour"] / 24)
+
+    # Account takeover often combines distance, new device, and unusual context.
+    # These interaction flags are simple, explainable, and leakage-safe.
+    modeling_table["far_and_new"] = (
+        (modeling_table["geo_distance_km"] > 500)
+        & (modeling_table["new_device_flag"] == 1)
+    ).astype(int)
+
     # Cross-border behavior is a useful fraud signal when home country is known.
     # Missing customer profiles are handled separately by customer_profile_missing_flag.
     modeling_table["cross_border_flag"] = np.where(
@@ -188,8 +210,115 @@ def build_modeling_table(bundle: DatasetBundle) -> pd.DataFrame:
         (modeling_table["txn_country"] != modeling_table["home_country"]).astype(int),
         0,
     )
+    modeling_table["night_crossborder"] = (
+        modeling_table["is_night_flag"].astype(int)
+        * modeling_table["cross_border_flag"].astype(int)
+    )
 
     return modeling_table
+
+
+def add_merchant_category_target_encoding(
+    split_data: SplitData,
+    n_splits: int = 5,
+    random_state: int = 42,
+) -> tuple[SplitData, dict]:
+    """Add leakage-safe out-of-fold merchant category fraud-rate encoding.
+
+    The training rows receive out-of-fold values so a row never sees its own
+    label. Validation and test rows use a mapping fitted on the full training
+    split only, which mirrors how a future transaction would be scored.
+    """
+
+    feature = "merchant_category"
+    encoded_feature = "merchant_cat_fraud_rate"
+
+    X_train = split_data.X_train.copy()
+    X_validation = split_data.X_validation.copy()
+    X_test = split_data.X_test.copy()
+
+    prior = float(split_data.y_train.mean())
+
+    if feature not in X_train.columns:
+        X_train[encoded_feature] = prior
+        X_validation[encoded_feature] = prior
+        X_test[encoded_feature] = prior
+        mapping: dict[str, float] = {}
+    else:
+        oof = pd.Series(prior, index=X_train.index, dtype=float)
+        splitter = StratifiedKFold(
+            n_splits=n_splits,
+            shuffle=True,
+            random_state=random_state,
+        )
+
+        for train_positions, validation_positions in splitter.split(
+            X_train,
+            split_data.y_train,
+        ):
+            train_index = X_train.index[train_positions]
+            validation_index = X_train.index[validation_positions]
+            rates = split_data.y_train.loc[train_index].groupby(
+                X_train.loc[train_index, feature]
+            ).mean()
+            oof.loc[validation_index] = (
+                X_train.loc[validation_index, feature].map(rates).fillna(prior)
+            )
+
+        full_rates = split_data.y_train.groupby(X_train[feature]).mean()
+        mapping = {str(key): float(value) for key, value in full_rates.items()}
+
+        X_train[encoded_feature] = oof
+        X_validation[encoded_feature] = X_validation[feature].map(full_rates).fillna(
+            prior
+        )
+        X_test[encoded_feature] = X_test[feature].map(full_rates).fillna(prior)
+
+    target_encoding = {
+        "feature": feature,
+        "encoded_feature": encoded_feature,
+        "prior": prior,
+        "mapping": mapping,
+        "method": "5-fold out-of-fold on train; full-train map for validation/test",
+    }
+
+    return (
+        SplitData(
+            X_train=X_train,
+            X_validation=X_validation,
+            X_test=X_test,
+            y_train=split_data.y_train,
+            y_validation=split_data.y_validation,
+            y_test=split_data.y_test,
+            test_context=split_data.test_context,
+        ),
+        target_encoding,
+    )
+
+
+def apply_merchant_category_target_encoding(
+    modeling_table: pd.DataFrame,
+    target_encoding: dict,
+) -> pd.DataFrame:
+    """Apply a saved merchant-category target encoding map to new rows."""
+
+    encoded = modeling_table.copy()
+    feature = target_encoding.get("feature", "merchant_category")
+    encoded_feature = target_encoding.get(
+        "encoded_feature",
+        "merchant_cat_fraud_rate",
+    )
+    prior = float(target_encoding.get("prior", 0.0))
+    mapping = target_encoding.get("mapping", {})
+
+    if feature in encoded.columns:
+        encoded[encoded_feature] = encoded[feature].astype(str).map(mapping).fillna(
+            prior
+        )
+    else:
+        encoded[encoded_feature] = prior
+
+    return encoded
 
 
 def get_candidate_features(modeling_table: pd.DataFrame) -> list[str]:

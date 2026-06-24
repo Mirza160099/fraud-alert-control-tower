@@ -13,6 +13,8 @@ JPMorgan-inspired fraud analytics project that prioritizes transaction alerts, e
 - Governance view: [Model risk controls](https://fraud-alert-control-tower-5cic.vercel.app/?view=governance)
 - Final journey deck: [`presentation/fraud-alert-control-tower-project-journey-final.pptx`](presentation/fraud-alert-control-tower-project-journey-final.pptx)
 - Professional report: [`presentation/fraud-alert-control-tower-professional-project-report.pdf`](presentation/fraud-alert-control-tower-professional-project-report.pdf)
+- Tutor-feedback business report: [`docs/reports/professional_business_report.docx`](docs/reports/professional_business_report.docx)
+- SQL feature view: [`features/fraud_feature_view.sql`](features/fraud_feature_view.sql)
 - Governance docs: [`docs/governance`](docs/governance)
 
 ## What This Project Demonstrates
@@ -76,7 +78,11 @@ The Python pipeline:
 - Builds time features such as transaction hour, day of week, month, and weekend flag.
 - Creates `amount_log1p` to reduce skew from transaction amount.
 - Creates cross-border behavior signals.
+- Tests tutor-feedback uplift features: `velocity_ratio`, `amt_per_txn_24h`, `far_and_new`, `night_crossborder`, `hour_sin`, `hour_cos`, and leakage-aware merchant category encoding.
+- Uses mutual information for the first shortlist, then validation permutation importance for model-aware feature audit.
 - Removes leakage fields before feature selection and model training.
+
+The latest feature-audit artifacts are saved under [`artifacts/modeling/step_03_professor_uplift`](artifacts/modeling/step_03_professor_uplift). The live app model was kept stable because the uplift run improved feature discipline but did not clearly outperform the current operating backtest.
 
 ## Top 10 Selected Features
 
@@ -158,15 +164,14 @@ The selected threshold is also a financial trade-off. On the same held-out test 
 | Fraud cases caught | 8 | 10 | +2 |
 | False positives | 14 | 64 | +50 |
 
-Illustrative sensitivity assumptions:
+Break-even sensitivity assumptions:
 
-- Review cost per case: `$8`
-- Avoided loss per captured fraud: `$500`
-- Additional review spend: `$416`
-- Additional avoided fraud loss: `$1,000`
-- Illustrative net impact: `$584`
+- Review cost per case: `£8`
+- Additional review spend: `52 x £8 = £416`
+- Additional fraud cases caught: `2`
+- Break-even avoided loss per extra captured fraud: `£208`
 
-This is not a production ROI claim. It shows how a fraud analytics team can connect model thresholds to investigation cost, fraud capture, and business value.
+This is not a production ROI claim. It shows how a fraud analytics team can connect model thresholds to investigation cost, fraud capture, and business value. The recommended interpretation is a prioritization overlay or top-K pilot, not an immediate replacement for the incumbent alert rule.
 
 ## Explainability
 

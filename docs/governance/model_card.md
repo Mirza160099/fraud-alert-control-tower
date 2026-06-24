@@ -76,6 +76,30 @@ Excluded fields:
 - `alert_generated`
 - `event_ts` raw timestamp
 
+## Feature Engineering Uplift Audit
+
+After tutor feedback, the pipeline was extended with a second feature-engineering and feature-audit pass. The goal was to make the model less dependent on raw fields alone and to test behavior-based fraud signals that are easier to explain in a banking review.
+
+Additional candidate features tested:
+
+| Feature | Business meaning |
+|---|---|
+| `velocity_ratio` | Short-term activity compared with the last 24 hours |
+| `amt_per_txn_24h` | Transaction amount adjusted for recent transaction volume |
+| `far_and_new` | High geographic distance combined with a new device |
+| `night_crossborder` | Night-time activity outside the customer's home country |
+| `hour_sin`, `hour_cos` | Cyclical encoding of transaction hour |
+| `merchant_cat_fraud_rate` | Leakage-aware merchant category fraud-rate encoding |
+
+Selection discipline:
+
+- Mutual information is used as the first training-only shortlist.
+- Validation permutation importance is then used as a model-aware check.
+- Features with negative validation contribution are not promoted simply because they appeared in the initial shortlist.
+- The live app model was kept stable because the uplift experiment improved feature discipline but did not clearly beat the current operating backtest.
+
+This is the important analyst decision: new features were tested and documented, but the production-facing demo was not changed unless the evidence justified it.
+
 ## Training and Validation
 
 Data was split into:
@@ -151,17 +175,20 @@ Interpretation:
 
 ## Business Impact Sensitivity
 
-Using illustrative assumptions of `$8` review cost per case and `$500` avoided loss per captured fraud:
+Using the tutor-feedback economics assumption of `£8` review cost per case:
 
 | Item | Value |
 |---|---:|
 | Additional reviewed cases vs existing alert | 52 |
 | Additional fraud cases caught | 2 |
-| Additional review spend | $416 |
-| Additional avoided fraud loss | $1,000 |
-| Illustrative net impact | $584 |
+| Additional review spend | £416 |
+| Break-even avoided loss per extra captured fraud | £208 |
 
-These values are for decision framing only. A production model would require real loss amounts, review-cost data, customer-friction measurement, and legal/compliance review before any ROI conclusion.
+Interpretation:
+
+- If each additional fraud case prevented avoids more than £208 of loss, the extra review load is financially justified.
+- If avoided loss is below £208, the model should be used more selectively as a top-K prioritization overlay.
+- A production model would require real loss amounts, review-cost data, customer-friction measurement, and legal/compliance review before any ROI conclusion.
 
 ## Explainability
 
