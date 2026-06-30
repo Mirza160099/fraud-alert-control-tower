@@ -1,4 +1,4 @@
-# Python
+﻿# Python
 __pycache__/
 *.py[cod]
 .venv/
@@ -21,3 +21,18 @@ work/
 
 # Office temporary lock files
 ~$*.pptx
+
+# Final-review scratch and recording materials
+*.inspect.ndjson
+presentation/*preview/
+presentation/*-preview/
+presentation/recorded_video_package/
+presentation/*video*
+presentation/*recording*
+docs/reports/progress_report_step_*.md
+presentation/*_NATIVE.pptx
+presentation/fraud-alert-control-tower-executive-final-review.pptx
+presentation/fraud-alert-control-tower-final-review-deck.pptx
+presentation/fraud-alert-control-tower-original-final-deck.pptx
+docs/reports/fraud-alert-control-tower-final-review-report.docx
+*.pdf

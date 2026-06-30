@@ -2,7 +2,7 @@
 
 ## Deliverables
 
-This folder contains the responsible-AI and control documentation for the fraud alert prioritization project.
+This folder contains the responsible model governance and control documentation for the fraud alert prioritization project.
 
 Files:
 
@@ -18,7 +18,7 @@ These documents show that the project goes beyond modeling. They demonstrate:
 - ability to explain threshold trade-offs
 - understanding of fraud operations capacity
 - human-in-the-loop governance thinking
-- responsible AI communication
+- responsible model governance communication
 
 ## Suggested Interview Framing
 

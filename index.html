@@ -459,7 +459,7 @@
                   <strong id="queueFalsePositiveLoad">64</strong>
                 </div>
               </div>
-              <p class="queue-policy-note">Policy is reviewed after pilot feedback and at least quarterly, using capacity, hit rate, fraud capture, and false-positive load.</p>
+              <p class="queue-policy-note">Policy is reviewed after pilot review and at least quarterly, using capacity, hit rate, fraud capture, and false-positive load.</p>
             </section>
 
             <section class="panel queue-command-card">
@@ -744,7 +744,7 @@
                 <article>
                   <span>Drift response</span>
                   <strong>Monitor weekly</strong>
-                  <p>Track score mix, top drivers, segment outcomes, and investigator feedback after deployment.</p>
+                  <p>Track score mix, top drivers, segment outcomes, and investigator outcomes after deployment.</p>
                 </article>
               </div>
             </section>
@@ -911,7 +911,7 @@
                 </div>
                 <div>
                   <span>Review cost change</span>
-                  <strong id="capacitySimCostDelta">£0</strong>
+                  <strong id="capacitySimCostDelta">GBP 0</strong>
                 </div>
               </div>
               <p id="capacitySimNarrative" class="metrics-note">At 5% review capacity, the queue reviews 74 test cases, captures 25.0% of fraud, and sets the selected operating threshold at 0.798.</p>
@@ -962,18 +962,18 @@
               </div>
               <div>
                 <span>Break-even avoided loss</span>
-                <strong id="illustrativeNetImpact">£208</strong>
+                <strong id="illustrativeNetImpact">GBP 208</strong>
               </div>
             </div>
-            <p class="economics-note" id="economicsNote">Break-even sensitivity: £8 review cost per case. Each extra captured fraud must avoid £208 to justify the wider queue. Synthetic data only.</p>
+            <p class="economics-note" id="economicsNote">Break-even sensitivity: GBP 8 review cost per case. Each extra captured fraud must avoid GBP 208 to justify the wider queue. Synthetic data only.</p>
           </section>
         </section>
 
         <section id="governanceView" class="tab-view ops-view">
-          <section class="view-command-panel build-explain" aria-label="Governance command center overview" data-build-note="This governance view collects responsible-AI controls, model-card limits, threshold policy, approval gates, and monitoring ownership.">
+          <section class="view-command-panel build-explain" aria-label="Governance command center overview" data-build-note="This governance view collects responsible model governance controls, model-card limits, threshold policy, approval gates, and monitoring ownership.">
             <div class="view-command-title">
               <div>
-                <span class="analyst-kicker">Responsible AI controls</span>
+                <span class="analyst-kicker">Responsible model governance controls</span>
                 <h2>Governance Command Center</h2>
               </div>
               <p>Document how the model should be used, what it cannot decide alone, and what controls are required before production.</p>
@@ -1017,7 +1017,7 @@
             <section class="panel governance-panel">
               <div class="panel-header">
                 <h2>Model Card Summary</h2>
-                <span class="muted-label">Responsible AI</span>
+                <span class="muted-label">Responsible model governance</span>
               </div>
               <dl class="governance-list">
                 <div>
@@ -1153,7 +1153,7 @@
                 <ul>
                   <li>Calibrate probabilities against observed fraud rates.</li>
                   <li>Add real SHAP explanations and segment validation.</li>
-                  <li>Capture investigator feedback and monitor drift weekly.</li>
+                  <li>Capture investigator outcomes and monitor drift weekly.</li>
                 </ul>
               </article>
               <article class="roadmap-stage production">
@@ -1276,8 +1276,8 @@
                 <small>Owner: Model Risk</small>
               </article>
               <article>
-                <span>Continuous feedback</span>
-                <strong>Investigator outcome feedback</strong>
+                <span>Continuous outcome review</span>
+                <strong>Investigator outcome review</strong>
                 <p>Use analyst dispositions to measure misses, false positives, and retraining need.</p>
                 <small>Owner: Fraud Ops + Data Science</small>
               </article>

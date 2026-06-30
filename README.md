@@ -13,8 +13,6 @@ JPMorgan-inspired fraud analytics project that prioritizes transaction alerts, e
 - Governance view: [Model risk controls](https://fraud-alert-control-tower-5cic.vercel.app/?view=governance)
 - Final journey deck: [`presentation/fraud-alert-control-tower-project-journey-final.pptx`](presentation/fraud-alert-control-tower-project-journey-final.pptx)
 - Professional report: [`presentation/fraud-alert-control-tower-professional-project-report.pdf`](presentation/fraud-alert-control-tower-professional-project-report.pdf)
-- Tutor-feedback business report: [`docs/reports/professional_business_report.docx`](docs/reports/professional_business_report.docx)
-- Professor feedback completion checklist: [`docs/reports/professor_feedback_completion_checklist.md`](docs/reports/professor_feedback_completion_checklist.md)
 - SQL feature view: [`features/fraud_feature_view.sql`](features/fraud_feature_view.sql)
 - Validation evidence addendum: [`artifacts/modeling/validation_evidence/validation_evidence_addendum.md`](artifacts/modeling/validation_evidence/validation_evidence_addendum.md)
 - Governance docs: [`docs/governance`](docs/governance)
@@ -22,7 +20,7 @@ JPMorgan-inspired fraud analytics project that prioritizes transaction alerts, e
 ## What This Project Demonstrates
 
 - End-to-end fraud analytics workflow: data audit, cleaning, joins, feature engineering, feature selection, fraud-risk scoring, thresholding, explainability, and app deployment.
-- Responsible AI framing: leakage prevention, model-card documentation, human review, threshold governance, risk register, approval gates, and monitoring controls.
+- Responsible model governance: leakage prevention, model-card documentation, human review, threshold governance, risk register, approval gates, and monitoring controls.
 - Recruiter-friendly product thinking: the final app is not just a classifier; it is an investigator control tower with explanations, risk/protective feature impact, an investigator brief, queue command controls, governance evidence, and recommended next actions.
 - Investigator workflow depth: 5,000 transaction ID lookup, case drilldown, queue filters, exportable case reports, and a live threshold/capacity simulator.
 - Optional Presenter Mode: build explanations appear on hover so the project can be defended section-by-section without cluttering the risk analyst view.
@@ -80,11 +78,11 @@ The Python pipeline:
 - Builds time features such as transaction hour, day of week, month, and weekend flag.
 - Creates `amount_log1p` to reduce skew from transaction amount.
 - Creates cross-border behavior signals.
-- Tests tutor-feedback uplift features: `velocity_ratio`, `amt_per_txn_24h`, `far_and_new`, `night_crossborder`, `hour_sin`, `hour_cos`, and leakage-aware merchant category encoding.
+- Tests final behavioural feature candidates: `velocity_ratio`, `amt_per_txn_24h`, `far_and_new`, `night_crossborder`, `hour_sin`, `hour_cos`, and leakage-aware merchant category encoding.
 - Uses mutual information for the first shortlist, then validation permutation importance for model-aware feature audit.
 - Removes leakage fields before feature selection and model training.
 
-The latest feature-audit artifacts are saved under [`artifacts/modeling/step_03_professor_uplift`](artifacts/modeling/step_03_professor_uplift). The live app model was kept stable because the uplift run improved feature discipline but did not clearly outperform the current operating backtest.
+The latest feature-audit artifacts include model comparison, capacity thresholds, validation permutation importance, and validation evidence outputs under artifacts/modeling. The live app model was kept stable because the final feature-audit run improved feature discipline but did not clearly outperform the current operating backtest.
 
 Additional validation evidence is saved under [`artifacts/modeling/validation_evidence`](artifacts/modeling/validation_evidence):
 
@@ -174,10 +172,10 @@ The selected threshold is also a financial trade-off. On the same held-out test 
 
 Break-even sensitivity assumptions:
 
-- Review cost per case: `£8`
-- Additional review spend: `52 x £8 = £416`
+- Review cost per case: `GBP 8`
+- Additional review spend: `52 x GBP 8 = GBP 416`
 - Additional fraud cases caught: `2`
-- Break-even avoided loss per extra captured fraud: `£208`
+- Break-even avoided loss per extra captured fraud: `GBP 208`
 
 This is not a production ROI claim. It shows how a fraud analytics team can connect model thresholds to investigation cost, fraud capture, and business value. The recommended interpretation is a prioritization overlay or top-K pilot, not an immediate replacement for the incumbent alert rule.
 
@@ -302,6 +300,7 @@ The clean GitHub package does not include full raw source tables by default. The
 
 ## Interview Pitch
 
-I built an explainable fraud alert prioritization system that treats fraud detection as an operational control problem. The project cleans and joins transaction, customer, and merchant data, selects the top 10 risk features using training-only mutual information, builds a fraud-risk triage layer, and tunes the decision threshold around investigator capacity. I then export the scoring layer into a static Vercel-style app and document governance through a model card, threshold memo, and responsible-AI summary.
+I built an explainable fraud alert prioritization system that treats fraud detection as an operational control problem. The project cleans and joins transaction, customer, and merchant data, selects the top 10 risk features using training-only mutual information, builds a fraud-risk triage layer, and tunes the decision threshold around investigator capacity. I then export the scoring layer into a static Vercel-style app and document governance through a model card, threshold memo, and responsible model governance summary.
 
 The strongest part of the project is that it does not stop at prediction. It shows how a bank would decide which cases get reviewed, why they are risky, and what controls would be needed before production use.
+

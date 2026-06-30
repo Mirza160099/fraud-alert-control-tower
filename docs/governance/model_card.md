@@ -78,7 +78,7 @@ Excluded fields:
 
 ## Feature Engineering Uplift Audit
 
-After tutor feedback, the pipeline was extended with a second feature-engineering and feature-audit pass. The goal was to make the model less dependent on raw fields alone and to test behavior-based fraud signals that are easier to explain in a banking review.
+During the final evidence-led iteration, the pipeline was extended with a second feature-engineering and feature-audit pass. The goal was to make the model less dependent on raw fields alone and to test behavior-based fraud signals that are easier to explain in a banking review.
 
 Additional candidate features tested:
 
@@ -175,19 +175,19 @@ Interpretation:
 
 ## Business Impact Sensitivity
 
-Using the tutor-feedback economics assumption of `£8` review cost per case:
+Using the review-cost economics assumption of `GBP 8` review cost per case:
 
 | Item | Value |
 |---|---:|
 | Additional reviewed cases vs existing alert | 52 |
 | Additional fraud cases caught | 2 |
-| Additional review spend | £416 |
-| Break-even avoided loss per extra captured fraud | £208 |
+| Additional review spend | GBP 416 |
+| Break-even avoided loss per extra captured fraud | GBP 208 |
 
 Interpretation:
 
-- If each additional fraud case prevented avoids more than £208 of loss, the extra review load is financially justified.
-- If avoided loss is below £208, the model should be used more selectively as a top-K prioritization overlay.
+- If each additional fraud case prevented avoids more than GBP 208 of loss, the extra review load is financially justified.
+- If avoided loss is below GBP 208, the model should be used more selectively as a top-K prioritization overlay.
 - A production model would require real loss amounts, review-cost data, customer-friction measurement, and legal/compliance review before any ROI conclusion.
 
 ## Explainability
@@ -269,3 +269,6 @@ Not approved for production deployment without:
 - Security review.
 - Model risk management review.
 - Monitoring and incident response procedures.
+
+
+

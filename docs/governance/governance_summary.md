@@ -1,8 +1,8 @@
-# Governance Summary - Responsible AI and Control Design
+# Governance Summary - Responsible model governance and Control Design
 
 ## Purpose
 
-This governance summary documents the responsible-AI controls, operational assumptions, and monitoring requirements for the fraud alert prioritization prototype.
+This governance summary documents the responsible model governance controls, operational assumptions, and monitoring requirements for the fraud alert prioritization prototype.
 
 The goal is to show that the project is not only technically functional, but also ready to be discussed in a banking risk, model governance, and fraud operations context.
 
@@ -29,7 +29,7 @@ Recommended governance classification:
 | Operational fit | Added queue capacity strategy and investigator control tower |
 | Auditability | Saved model metrics, feature list, thresholds, and explanation artifacts |
 
-## Responsible AI Considerations
+## Responsible model governance Considerations
 
 ### Transparency
 
@@ -121,7 +121,7 @@ Major limitations:
 - Feature drift
 - Segment-level fairness review
 - Periodic benchmark and policy review
-- Investigator feedback themes
+- Investigator outcomes themes
 - Case outcome quality
 
 ## Model Change Management
